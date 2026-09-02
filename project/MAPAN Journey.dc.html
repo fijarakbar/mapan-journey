@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+body{margin:0;background:#E9E5DE}
+*{box-sizing:border-box}
+a{color:#10275A}a:hover{color:#1E8A4C}
+button{font-family:inherit}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid #10275A;outline-offset:2px}
+textarea,input{font-family:inherit}
+@keyframes stampIn{0%{transform:scale(1.5) rotate(-12deg);opacity:0}60%{transform:scale(.96) rotate(-4deg);opacity:1}100%{transform:scale(1) rotate(-4deg);opacity:1}}
+@keyframes fadeUp{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:26px 16px 40px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#10275A">
+<div style="width:390px;height:844px;background:#FBF9F5;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;position:relative;box-shadow:0 26px 70px rgba(16,39,90,.22);border:1px solid rgba(16,39,90,.10)">
+
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 26px 6px;flex:none">
+<span style="font-size:14px;font-weight:700">9:41</span>
+<div style="display:flex;align-items:center;gap:5px">
+<div style="display:flex;align-items:flex-end;gap:2px"><div style="width:3px;height:5px;background:#10275A;border-radius:1px"></div><div style="width:3px;height:8px;background:#10275A;border-radius:1px"></div><div style="width:3px;height:11px;background:#10275A;border-radius:1px"></div></div>
+<div style="width:14px;height:11px;border:1.6px solid #10275A;border-radius:3px"></div>
+<div style="width:22px;height:11px;border:1.6px solid #10275A;border-radius:3px;padding:1.6px"><div style="width:100%;height:100%;background:#10275A;border-radius:1px"></div></div>
+</div>
+</div>
+
+<div style="flex:1;overflow-y:auto;overflow-x:hidden;zoom:{{ zoom }}">
+
+<sc-if value="{{ showBackBar }}" hint-placeholder-val="{{ false }}">
+<div style="padding:12px 20px 0">
+<button onClick="{{ back }}" style="min-height:44px;padding:0 16px;border-radius:14px;border:1px solid rgba(16,39,90,.12);background:#fff;color:rgba(16,39,90,.72);font-size:14px;font-weight:700;cursor:pointer">{{ backBarLabel }}</button>
+</div>
+</sc-if>
+
+
+<sc-if value="{{ sc.welcome }}" hint-placeholder-val="{{ true }}">
+<div style="padding:26px 24px 32px;animation:fadeUp .4s ease both">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:54px;height:54px;border-radius:16px;background:#EAF4EC;border:1px solid rgba(30,138,76,.25);display:flex;align-items:center;justify-content:center">
+<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="21" cy="9" r="4" fill="#E0A32A"></circle><path d="M3 24 L11 12 L17 20 L21 15 L27 24 Z" fill="#1E8A4C"></path></svg>
+</div>
+<div><div style="font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1">MAPAN</div><div style="font-size:11px;font-weight:600;letter-spacing:5px;color:rgba(16,39,90,.6)">JOURNEY</div></div>
+</div>
+<h1 style="font-size:36px;line-height:1.12;font-weight:800;letter-spacing:-1px;margin:28px 0 0;text-wrap:pretty">Menuju Purna Tugas Yang <span style="color:#1E8A4C">MAPAN.</span></h1>
+<p style="font-size:17px;line-height:1.6;color:rgba(16,39,90,.75);margin:16px 0 0;text-wrap:pretty">Persiapkan diri untuk memasuki bab kehidupan berikutnya dengan tubuh yang sehat, bekal yang cukup, hati yang siap, dan hidup yang bermakna.</p>
+<div style="display:flex;align-items:center;gap:8px;margin:20px 0 0;font-size:14px;color:rgba(16,39,90,.6)">Powered by <strong style="font-size:16px;color:#10275A">MDI</strong></div>
+<div style="margin:22px 0 0;height:190px;border-radius:20px;border:1px solid rgba(16,39,90,.10);background:repeating-linear-gradient(135deg,#EEF3EC 0 10px,#E6EEE6 10px 20px);display:flex;align-items:flex-end;justify-content:center;padding:14px">
+<span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(16,39,90,.5);background:rgba(251,249,245,.85);padding:5px 9px;border-radius:8px">ilustrasi: pasangan berjalan di jalur pegunungan</span>
+</div>
+<button onClick="{{ startJourney }}" style="width:100%;height:56px;margin:20px 0 0;border:none;border-radius:16px;background:#10275A;color:#fff;font-size:18px;font-weight:700;cursor:pointer">Mulai Perjalanan</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.intro }}" hint-placeholder-val="{{ false }}">
+<div style="padding:22px 24px 32px">
+<h1 style="font-size:28px;line-height:1.2;font-weight:800;letter-spacing:-.6px;margin:0">Ini bukan sekadar pelatihan.</h1>
+<p style="font-size:17px;line-height:1.6;color:rgba(16,39,90,.75);margin:14px 0 0;text-wrap:pretty">MAPAN adalah perjalanan persiapan menuju bab kehidupan berikutnya. Kamu akan melewati empat terminal untuk melihat kesiapan tubuh, keuangan, hati, serta makna hidupmu.</p>
+<div style="display:flex;flex-direction:column;gap:10px;margin:24px 0 0">
+<sc-for list="{{ terminals }}" as="t" hint-placeholder-count="4">
+<div style="display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:16px;border:1px solid rgba(16,39,90,.10);background:{{ t.tint }}">
+<div style="width:34px;height:34px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:{{ t.color }}">{{ t.num }}</div>
+<div><div style="font-size:17px;font-weight:800;letter-spacing:.3px;color:{{ t.color }}">{{ t.name }}</div><div style="font-size:14px;color:rgba(16,39,90,.65)">{{ t.tag }}</div></div>
+</div>
+</sc-for>
+<div style="display:flex;align-items:center;gap:14px;padding:18px;border-radius:16px;background:#10275A;color:#fff">
+<div style="width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="6" r="3.4" fill="none" stroke="#E0A32A" stroke-width="2"></circle><path d="M8 10 L8 15" stroke="#E0A32A" stroke-width="2"></path></svg></div>
+<div><div style="font-size:17px;font-weight:800;letter-spacing:.3px">THE NEXT CHAPTER</div><div style="font-size:14px;color:rgba(255,255,255,.7)">Tujuan perjalananmu</div></div>
+</div>
+</div>
+<button onClick="{{ toProfile }}" style="width:100%;height:56px;margin:24px 0 0;border:none;border-radius:16px;background:#10275A;color:#fff;font-size:18px;font-weight:700;cursor:pointer">Siapkan Passport Saya</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.profile }}" hint-placeholder-val="{{ false }}">
+<div style="padding:22px 24px 32px">
+<h1 style="font-size:26px;font-weight:800;letter-spacing:-.5px;margin:0">Kenalan sebentar</h1>
+<p style="font-size:16px;line-height:1.55;color:rgba(16,39,90,.7);margin:10px 0 0">Hanya beberapa hal. Semuanya tersimpan di perangkatmu sendiri.</p>
+<div style="display:flex;flex-direction:column;gap:18px;margin:24px 0 0">
+<label style="display:block"><span style="font-size:15px;font-weight:700">Nama / Nama Panggilan</span>
+<input value="{{ prof.nama }}" onChange="{{ onNama }}" placeholder="Budi" style="width:100%;height:54px;margin-top:8px;padding:0 16px;font-size:17px;border-radius:14px;border:1px solid rgba(16,39,90,.18);background:#fff;color:#10275A"></label>
+<label style="display:block"><span style="font-size:15px;font-weight:700">Instansi / Perusahaan <span style="font-weight:500;color:rgba(16,39,90,.5)">(opsional)</span></span>
+<input value="{{ prof.instansi }}" onChange="{{ onInstansi }}" style="width:100%;height:54px;margin-top:8px;padding:0 16px;font-size:17px;border-radius:14px;border:1px solid rgba(16,39,90,.18);background:#fff;color:#10275A"></label>
+<label style="display:block"><span style="font-size:15px;font-weight:700">Perkiraan Purna Tugas <span style="font-weight:500;color:rgba(16,39,90,.5)">(opsional)</span></span>
+<input value="{{ prof.purna }}" onChange="{{ onPurna }}" placeholder="misal: 2028" style="width:100%;height:54px;margin-top:8px;padding:0 16px;font-size:17px;border-radius:14px;border:1px solid rgba(16,39,90,.18);background:#fff;color:#10275A"></label>
+<label style="display:block"><span style="font-size:15px;font-weight:700">Harapan Saya Setelah Purna Tugas <span style="font-weight:500;color:rgba(16,39,90,.5)">(opsional)</span></span>
+<textarea value="{{ prof.harapan }}" onChange="{{ onHarapan }}" rows="3" placeholder="Tulis singkat saja..." style="width:100%;margin-top:8px;padding:14px 16px;font-size:17px;line-height:1.5;border-radius:14px;border:1px solid rgba(16,39,90,.18);background:#fff;color:#10275A;resize:none"></textarea></label>
+</div>
+<div style="font-size:13px;color:rgba(30,138,76,.9);font-weight:600;margin:14px 0 0;height:18px">{{ savedNote }}</div>
+<button onClick="{{ toCheckin }}" style="width:100%;height:56px;margin:12px 0 0;border:none;border-radius:16px;background:#10275A;color:#fff;font-size:18px;font-weight:700;cursor:pointer">Lanjutkan</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.checkin }}" hint-placeholder-val="{{ false }}">
+<div style="padding:22px 24px 32px">
+<h1 style="font-size:26px;font-weight:800;letter-spacing:-.5px;margin:0">Check-In Awal</h1>
+<p style="font-size:16px;line-height:1.55;color:rgba(16,39,90,.7);margin:10px 0 0;text-wrap:pretty">Bukan tes, bukan diagnosa. Hanya cara melihat titik awal perjalananmu. Pilih 1 (belum) sampai 5 (sudah sangat).</p>
+<div style="display:flex;flex-direction:column;gap:14px;margin:22px 0 0">
+<sc-for list="{{ questions }}" as="q" hint-placeholder-count="4">
+<div style="padding:18px;border-radius:18px;background:#fff;border:1px solid rgba(16,39,90,.10);box-shadow:0 1px 2px rgba(16,39,90,.04)">
+<div style="font-size:12px;font-weight:800;letter-spacing:1.2px;color:{{ q.color }}">{{ q.area }}</div>
+<div style="font-size:16px;line-height:1.5;font-weight:600;margin:6px 0 14px;text-wrap:pretty">{{ q.text }}</div>
+<div style="display:flex;gap:8px">
+<sc-for list="{{ q.opts }}" as="o" hint-placeholder-count="5">
+<button onClick="{{ o.pick }}" style="flex:1;height:48px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }}">{{ o.n }}</button>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+<button onClick="{{ finishCheckin }}" style="width:100%;height:56px;margin:22px 0 0;border:none;border-radius:16px;background:{{ checkinCtaBg }};color:#fff;font-size:18px;font-weight:700;cursor:pointer">{{ checkinCta }}</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.result }}" hint-placeholder-val="{{ false }}">
+<div style="padding:22px 24px 32px">
+<h1 style="font-size:26px;font-weight:800;letter-spacing:-.5px;margin:0">Titik Awal Perjalananmu</h1>
+<p style="font-size:16px;line-height:1.55;color:rgba(16,39,90,.7);margin:10px 0 0">Ini gambaran awal, bukan penilaian. Semuanya bisa terus dikembangkan.</p>
+<div style="display:flex;flex-direction:column;gap:12px;margin:22px 0 0">
+<sc-for list="{{ scores }}" as="s" hint-placeholder-count="4">
+<div style="padding:16px 18px;border-radius:16px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="display:flex;justify-content:space-between;align-items:baseline">
+<span style="font-size:16px;font-weight:800;letter-spacing:.3px;color:{{ s.color }}">{{ s.name }}</span>
+<span style="font-size:18px;font-weight:800">{{ s.pctText }}</span>
+</div>
+<div style="height:10px;border-radius:6px;background:rgba(16,39,90,.08);margin:10px 0 8px;overflow:hidden"><div style="height:100%;border-radius:6px;width:{{ s.pctText }};background:{{ s.color }}"></div></div>
+<div style="font-size:14px;color:rgba(16,39,90,.7)">{{ s.band }}</div>
+</div>
+</sc-for>
+</div>
+<button onClick="{{ activatePassport }}" style="width:100%;height:56px;margin:22px 0 0;border:none;border-radius:16px;background:#10275A;color:#fff;font-size:18px;font-weight:700;cursor:pointer">Aktifkan MAPAN Passport</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.home }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 20px 28px">
+<div style="display:flex;align-items:flex-start;justify-content:space-between">
+<div><div style="font-size:24px;font-weight:800;letter-spacing:-.4px">{{ greeting }}</div><div style="font-size:15px;color:rgba(16,39,90,.65);margin-top:2px">{{ greetingSub }}</div></div>
+</div>
+
+<sc-if value="{{ postJourney }}" hint-placeholder-val="{{ false }}">
+<div style="margin:16px 0 0;padding:20px;border-radius:20px;background:#fff;border:1px solid rgba(16,39,90,.10);display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:17px;font-weight:800">Ringkasan Perjalanan</div><div style="font-size:15px;color:rgba(16,39,90,.7);margin-top:6px">Terus melangkah 💪</div><div style="font-size:14px;color:rgba(16,39,90,.6);margin-top:10px">Terminal selesai<br><strong style="font-size:20px;color:#10275A">{{ termsDone }}</strong> dari 4</div></div>
+<div style="position:relative;flex:none;width:84px;height:84px">
+<svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="rgba(16,39,90,.10)" stroke-width="8"></circle><circle cx="42" cy="42" r="34" fill="none" stroke="#1E8A4C" stroke-width="8" stroke-linecap="round" stroke-dasharray="{{ ringBig }}" transform="rotate(-90 42 42)"></circle></svg>
+<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#10275A">{{ pctText }}</div>
+</div>
+</div>
+<div style="font-size:17px;font-weight:800;margin:24px 0 12px">Capaian</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+<sc-for list="{{ achievements }}" as="a" hint-placeholder-count="3">
+<div style="padding:14px 10px;border-radius:16px;background:#fff;border:1px solid rgba(16,39,90,.10);text-align:center">
+<div style="width:34px;height:34px;margin:0 auto;border-radius:11px;background:{{ a.tint }};display:flex;align-items:center;justify-content:center"><div style="width:12px;height:12px;border-radius:50%;background:{{ a.color }}"></div></div>
+<div style="font-size:22px;font-weight:800;margin-top:8px">{{ a.n }}</div>
+<div style="font-size:12px;line-height:1.3;color:rgba(16,39,90,.65);margin-top:2px">{{ a.label }}</div>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin:22px 0 0">
+<sc-for list="{{ postCards }}" as="c" hint-placeholder-count="4">
+<button onClick="{{ c.go }}" style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:18px;border-radius:16px;background:#fff;border:1px solid rgba(16,39,90,.10);cursor:pointer;color:#10275A">
+<span><span style="display:block;font-size:16px;font-weight:800">{{ c.title }}</span><span style="display:block;font-size:14px;color:rgba(16,39,90,.65);margin-top:3px">{{ c.sub }}</span></span>
+<span style="font-size:22px;color:rgba(16,39,90,.35)">›</span>
+</button>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ preJourney }}" hint-placeholder-val="{{ true }}">
+<div style="margin:16px 0 0;padding:20px;border-radius:20px;background:#10275A;color:#fff;display:flex;justify-content:space-between;align-items:center;box-shadow:0 10px 24px rgba(16,39,90,.22)">
+<div style="padding-right:12px">
+<div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.7)">Progres Perjalanan</div>
+<div style="font-size:22px;font-weight:800;letter-spacing:.3px;margin:2px 0 6px">4 TERMINAL</div>
+<div style="font-size:14px;line-height:1.45;color:rgba(255,255,255,.75)">Lengkapi setiap terminal untuk persiapan terbaikmu.</div>
+</div>
+<div style="position:relative;flex:none;width:78px;height:78px">
+<svg width="78" height="78" viewBox="0 0 78 78"><circle cx="39" cy="39" r="31" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="8"></circle><circle cx="39" cy="39" r="31" fill="none" stroke="#7BD389" stroke-width="8" stroke-linecap="round" stroke-dasharray="{{ ringNavy }}" transform="rotate(-90 39 39)"></circle></svg>
+<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#fff">{{ pctText }}</div>
+</div>
+</div>
+<div style="font-size:17px;font-weight:800;margin:24px 0 12px">4 Terminal MAPAN</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<sc-for list="{{ terminals }}" as="t" hint-placeholder-count="4">
+<button onClick="{{ t.go }}" style="text-align:left;padding:16px;border-radius:18px;border:1px solid {{ t.border }};background:{{ t.tint }};cursor:pointer;color:#10275A;min-height:132px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="width:42px;height:42px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;border:1px solid {{ t.border }}"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="{{ t.color }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.iconPath }}"></path></svg></div>
+<div><div style="font-size:16px;font-weight:800;letter-spacing:.4px;color:{{ t.color }}">{{ t.name }}</div>
+<div style="font-size:13px;line-height:1.35;color:rgba(16,39,90,.7);margin-top:2px">{{ t.tag }}</div>
+<div style="font-size:12px;font-weight:700;color:{{ t.color }};margin-top:8px">{{ t.status }}</div></div>
+</button>
+</sc-for>
+</div>
+<button onClick="{{ goNextChapter }}" style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;margin:14px 0 0;padding:18px;border-radius:18px;background:#fff;border:1px solid rgba(16,39,90,.10);cursor:pointer;color:#10275A">
+<span><span style="display:block;font-size:16px;font-weight:800">Next Chapter</span><span style="display:block;font-size:14px;color:rgba(16,39,90,.65);margin-top:3px">{{ ncCardSub }}</span></span>
+<span style="font-size:22px;color:rgba(16,39,90,.35)">›</span>
+</button>
+<button onClick="{{ continueJourney }}" style="width:100%;height:56px;margin:16px 0 0;border:none;border-radius:16px;background:#1E8A4C;color:#fff;font-size:18px;font-weight:700;cursor:pointer">Lanjutkan Perjalanan</button>
+<div style="font-size:14px;color:rgba(16,39,90,.6);text-align:center;margin:10px 0 0">{{ continueHint }}</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.journey }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 20px 28px">
+<h1 style="font-size:24px;font-weight:800;letter-spacing:-.4px;margin:0">Perjalanan MAPAN</h1>
+<p style="font-size:15px;line-height:1.5;color:rgba(16,39,90,.65);margin:6px 0 0">Selesaikan setiap terminal untuk mendapatkan visa.</p>
+<div style="position:relative;margin:20px 0 0">
+<div style="display:flex;flex-direction:column;position:relative">
+<sc-for list="{{ route }}" as="r" hint-placeholder-count="6">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:54px;flex:none;display:flex;justify-content:center"><div style="width:38px;height:38px;border-radius:13px;background:{{ r.markBg }};border:1px solid {{ r.border }};display:flex;align-items:center;justify-content:center"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="{{ r.color }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ r.iconPath }}"></path></svg></div></div>
+<button onClick="{{ r.go }}" style="flex:1;display:flex;align-items:center;justify-content:space-between;text-align:left;padding:16px;border-radius:18px;border:1px solid {{ r.border }};background:{{ r.bg }};cursor:pointer;color:#10275A;box-shadow:{{ r.shadow }}">
+<span><span style="display:block;font-size:11px;font-weight:800;letter-spacing:1.1px;color:{{ r.color }}">{{ r.kicker }}</span>
+<span style="display:block;font-size:17px;font-weight:800;letter-spacing:.3px;margin-top:2px">{{ r.name }}</span>
+<span style="display:block;font-size:13px;color:rgba(16,39,90,.65);margin-top:2px">{{ r.sub }}</span></span>
+<span style="flex:none;width:30px;height:30px;border-radius:50%;border:2px solid {{ r.ringColor }};background:{{ r.ringFill }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">{{ r.check }}</span>
+</button>
+</div>
+<sc-if value="{{ r.hasLeg }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:center;gap:12px;height:52px">
+<div style="width:54px;flex:none;display:flex;justify-content:center">
+<svg width="54" height="52" viewBox="0 0 54 52" fill="none" style="display:block">
+<path d="M27 2 C27 14 27 38 27 50" stroke="rgba(16,39,90,.22)" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round"></path>
+</svg>
+</div>
+<div style="flex:1;display:flex;align-items:center;gap:8px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ r.legColor }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ walkIcon }}"></path></svg>
+<div style="flex:1;height:0;border-top:2px dotted rgba(16,39,90,.22)"></div>
+<span style="font-size:12px;font-weight:700;color:rgba(16,39,90,.45)">{{ r.legLabel }}</span>
+</div>
+</div>
+</sc-if>
+</sc-for>
+</div>
+</div>
+<button onClick="{{ continueJourney }}" style="width:100%;height:56px;margin:18px 0 0;border:none;border-radius:16px;background:#10275A;color:#fff;font-size:18px;font-weight:700;cursor:pointer">Lanjutkan Perjalanan</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.terminal }}" hint-placeholder-val="{{ false }}">
+<div>
+<div style="padding:14px 20px 22px;background:{{ term.tint }};position:relative">
+<div style="position:absolute;inset:0;background:repeating-linear-gradient(120deg,rgba(255,255,255,.55) 0 12px,rgba(255,255,255,0) 12px 24px)"></div>
+<div style="position:relative">
+<button onClick="{{ back }}" style="width:44px;height:44px;border-radius:14px;border:1px solid rgba(16,39,90,.12);background:rgba(255,255,255,.8);font-size:19px;cursor:pointer;color:#10275A">←</button>
+<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:14px">
+<div>
+<div style="width:44px;height:44px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;border:1px solid {{ term.border }}"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="{{ term.color }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ term.iconPath }}"></path></svg></div>
+<div style="font-size:27px;font-weight:800;letter-spacing:.4px;color:{{ term.color }};margin-top:12px">{{ term.name }}</div>
+<div style="font-size:17px;font-weight:700;margin-top:2px">{{ term.tag }}</div>
+<div style="font-size:15px;line-height:1.45;color:rgba(16,39,90,.7);margin-top:8px;max-width:210px;text-wrap:pretty">{{ term.q }}</div>
+</div>
+<div style="position:relative;flex:none;width:82px;height:82px">
+<svg width="82" height="82" viewBox="0 0 82 82"><circle cx="41" cy="41" r="33" fill="#fff"></circle><circle cx="41" cy="41" r="33" fill="none" stroke="rgba(16,39,90,.10)" stroke-width="7"></circle><circle cx="41" cy="41" r="33" fill="none" stroke="{{ term.color }}" stroke-width="7" stroke-linecap="round" stroke-dasharray="{{ term.ring }}" transform="rotate(-90 41 41)"></circle></svg>
+<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#10275A">{{ term.pctText }}</div>
+</div>
+</div>
+</div>
+</div>
+<div style="padding:18px 20px 28px">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<span style="font-size:19px;font-weight:800">Materi</span>
+<span style="font-size:13px;font-weight:700;color:rgba(16,39,90,.6);background:#fff;border:1px solid rgba(16,39,90,.10);padding:6px 12px;border-radius:10px">8 modul</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;margin:14px 0 0">
+<sc-for list="{{ term.modules }}" as="m" hint-placeholder-count="8">
+<button onClick="{{ m.go }}" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border-radius:14px;background:#fff;border:1px solid rgba(16,39,90,.10);cursor:pointer;color:#10275A;min-height:56px">
+<span style="width:26px;height:26px;flex:none;border-radius:9px;background:{{ m.numBg }};color:{{ m.numFg }};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800">{{ m.n }}</span>
+<span style="flex:1;font-size:16px;font-weight:600;line-height:1.35">{{ m.t }}</span>
+<span style="flex:none;width:26px;height:26px;border-radius:50%;border:2px solid {{ m.ringColor }};background:{{ m.ringFill }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800">{{ m.check }}</span>
+</button>
+</sc-for>
+</div>
+<button onClick="{{ term.cta }}" style="width:100%;height:56px;margin:18px 0 0;border:none;border-radius:16px;background:{{ term.color }};color:#fff;font-size:18px;font-weight:700;cursor:pointer">{{ term.ctaLabel }}</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.module }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 20px 24px">
+<div style="display:flex;align-items:center;gap:10px">
+<button onClick="{{ back }}" style="flex:none;width:44px;height:44px;border-radius:14px;border:1px solid rgba(16,39,90,.12);background:#fff;font-size:19px;cursor:pointer;color:#10275A">←</button>
+<button onClick="{{ mod.goTerminal }}" style="flex:1;min-height:44px;text-align:left;padding:0 14px;border-radius:14px;border:1px solid rgba(16,39,90,.12);background:#fff;cursor:pointer;color:rgba(16,39,90,.7);font-size:14px;font-weight:700">{{ mod.crumb }}</button>
+</div>
+<div style="display:flex;gap:8px;margin:12px 0 0">
+<sc-for list="{{ mod.termSwitch }}" as="ts" hint-placeholder-count="4">
+<button onClick="{{ ts.go }}" style="flex:1;min-width:0;min-height:44px;padding:0 6px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid {{ ts.border }};background:{{ ts.bg }};color:{{ ts.color }}">{{ ts.name }}</button>
+</sc-for>
+</div>
+<h1 style="font-size:25px;font-weight:800;letter-spacing:-.4px;line-height:1.2;margin:18px 0 0;color:{{ mod.color }}">{{ mod.t }}</h1>
+<p style="font-size:17px;line-height:1.6;color:rgba(16,39,90,.78);margin:12px 0 0;text-wrap:pretty">{{ mod.lead }}</p>
+
+<sc-if value="{{ mod.isVehicle }}" hint-placeholder-val="{{ false }}">
+<div style="margin:20px 0 0;padding:14px 8px;border-radius:20px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="position:relative;width:300px;height:258px;margin:0 auto">
+<svg width="300" height="258" viewBox="0 0 300 258" fill="none" style="position:absolute;left:0;top:0">
+<path d="M82 168 H218" stroke="rgba(16,39,90,.14)" stroke-width="2" stroke-linecap="round"></path>
+<path d="M88 150 q1-20 11-23 l13-18 q4-5 10-5 h56 q6 0 10 5 l13 18 q10 3 11 23" stroke="{{ mod.color }}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+<path d="M88 150 H212" stroke="{{ mod.color }}" stroke-width="2" stroke-linecap="round"></path>
+<path d="M115 108 H185" stroke="{{ mod.color }}" stroke-width="1.6" stroke-linecap="round"></path>
+<path d="M150 105 V127" stroke="{{ mod.color }}" stroke-width="1.4"></path>
+<circle cx="114" cy="150" r="14" stroke="{{ mod.color }}" stroke-width="2"></circle>
+<circle cx="114" cy="150" r="5" stroke="{{ mod.color }}" stroke-width="1.6"></circle>
+<circle cx="186" cy="150" r="14" stroke="{{ mod.color }}" stroke-width="2"></circle>
+<circle cx="186" cy="150" r="5" stroke="{{ mod.color }}" stroke-width="1.6"></circle>
+<path d="M208 137 h5" stroke="{{ mod.color }}" stroke-width="2.6" stroke-linecap="round"></path>
+<sc-for list="{{ mod.vparts }}" as="p" hint-placeholder-count="5">
+<path d="{{ p.lineD }}" stroke="{{ mod.color }}" stroke-width="1.2" stroke-dasharray="2 3" opacity="0.5"></path>
+</sc-for>
+</svg>
+<sc-for list="{{ mod.vparts }}" as="p" hint-placeholder-count="5">
+<div style="position:absolute;left:{{ p.left }}px;top:{{ p.top }}px;width:80px;text-align:{{ p.align }}">
+<div style="font-size:13px;font-weight:800;line-height:1.2;color:{{ mod.color }}">{{ p.h }}</div>
+<div style="font-size:12px;line-height:1.3;color:rgba(16,39,90,.65);margin-top:2px">{{ p.b }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ mod.isFinmap }}" hint-placeholder-val="{{ false }}">
+<div style="margin:20px 0 0;padding:14px 8px;border-radius:20px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="position:relative;width:300px;height:244px;margin:0 auto">
+<svg width="300" height="244" viewBox="0 0 300 244" fill="none" style="position:absolute;left:0;top:0">
+<path d="M150 40 V128" stroke="{{ mod.color }}" stroke-width="2" stroke-linecap="round"></path>
+<path d="M60 40 H240" stroke="{{ mod.color }}" stroke-width="2" stroke-linecap="round"></path>
+<circle cx="150" cy="40" r="4.5" fill="{{ mod.color }}"></circle>
+<path d="M60 40 L38 74 H82 Z" stroke="{{ mod.color }}" stroke-width="1.8" stroke-linejoin="round"></path>
+<path d="M240 40 L218 74 H262 Z" stroke="{{ mod.color }}" stroke-width="1.8" stroke-linejoin="round"></path>
+<path d="M128 170 H172 L150 128 Z" stroke="{{ mod.color }}" stroke-width="1.8" stroke-linejoin="round"></path>
+<path d="M110 178 H190" stroke="rgba(16,39,90,.14)" stroke-width="2" stroke-linecap="round"></path>
+</svg>
+<sc-for list="{{ mod.finzones }}" as="z" hint-placeholder-count="3">
+<div style="position:absolute;left:{{ z.left }}px;top:{{ z.top }}px;width:{{ z.w }}px;text-align:center">
+<div style="font-size:12px;font-weight:800;letter-spacing:1px;color:{{ mod.color }}">{{ z.t }}</div>
+<div style="font-size:12px;line-height:1.3;color:rgba(16,39,90,.65);margin-top:2px">{{ z.b }}</div>
+</div>
+</sc-for>
+</div>
+<div style="font-size:14px;line-height:1.5;color:rgba(16,39,90,.62);text-align:center;padding:0 14px">Kerangka ini kamu isi lewat refleksi di bawah, dengan angka kasar sekalipun.</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ mod.isStages }}" hint-placeholder-val="{{ false }}">
+<div style="margin:20px 0 0;padding:20px 16px;border-radius:20px;background:#fff;border:1px solid rgba(16,39,90,.10);display:flex;flex-direction:column;gap:2px">
+<sc-for list="{{ mod.stages }}" as="st" hint-placeholder-count="3">
+<div style="display:flex;gap:14px;align-items:flex-start">
+<div style="flex:none;display:flex;flex-direction:column;align-items:center;align-self:stretch">
+<div style="width:16px;height:16px;border-radius:50%;border:3px solid {{ mod.color }};background:#fff"></div>
+<div style="flex:1;min-height:26px;width:0;border-left:2px dashed rgba(16,39,90,.22)"></div>
+</div>
+<div style="padding-bottom:18px">
+<div style="font-size:14px;font-weight:800;letter-spacing:1px;color:{{ mod.color }}">{{ st.t }}</div>
+<div style="font-size:15px;line-height:1.45;color:rgba(16,39,90,.7);margin-top:3px">{{ st.b }}</div>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ mod.isCompass }}" hint-placeholder-val="{{ false }}">
+<div style="margin:20px 0 0;padding:14px 8px;border-radius:20px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="position:relative;width:300px;height:300px;margin:0 auto">
+<svg width="300" height="300" viewBox="0 0 300 300" fill="none" style="position:absolute;left:0;top:0">
+<circle cx="150" cy="150" r="64" stroke="{{ mod.color }}" stroke-width="2.4"></circle>
+<path d="M150 86 V100M150 200 V214M86 150 H100M200 150 H214" stroke="{{ mod.color }}" stroke-width="2.4" stroke-linecap="round"></path>
+<path d="M150 120 L160 150 L150 180 L140 150 Z" stroke="{{ mod.color }}" stroke-width="2" stroke-linejoin="round"></path>
+<path d="M150 120 L160 150 L140 150 Z" fill="{{ mod.color }}"></path>
+<circle cx="150" cy="150" r="5" fill="{{ mod.color }}"></circle>
+</svg>
+<sc-for list="{{ mod.compassDirs }}" as="dir" hint-placeholder-count="4">
+<div style="position:absolute;left:{{ dir.left }}px;top:{{ dir.top }}px;width:{{ dir.w }}px;text-align:center">
+<div style="font-size:12px;font-weight:800;letter-spacing:1px;color:{{ mod.color }}">{{ dir.label }}</div>
+<div style="font-size:11px;line-height:1.3;color:rgba(16,39,90,.6);margin-top:1px">{{ dir.sub }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ mod.isPlain }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:10px;margin:20px 0 0">
+<sc-for list="{{ mod.points }}" as="p" hint-placeholder-count="3">
+<div style="display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:16px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="width:30px;height:30px;flex:none;border-radius:10px;background:{{ mod.tint }};display:flex;align-items:center;justify-content:center"><div style="width:11px;height:11px;border-radius:50%;background:{{ mod.color }}"></div></div>
+<div><div style="font-size:16px;font-weight:800">{{ p.h }}</div><div style="font-size:15px;line-height:1.5;color:rgba(16,39,90,.7);margin-top:2px;text-wrap:pretty">{{ p.b }}</div></div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ mod.isChips }}" hint-placeholder-val="{{ false }}">
+<div style="margin:20px 0 0">
+<div style="font-size:16px;font-weight:800">{{ mod.chipTitle }}</div>
+<div style="font-size:15px;line-height:1.5;color:rgba(16,39,90,.7);margin:4px 0 12px">{{ mod.chipHint }}</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<sc-for list="{{ mod.chips }}" as="c" hint-placeholder-count="10">
+<button onClick="{{ c.toggle }}" style="padding:14px 16px;min-height:52px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;border:1.5px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }}">{{ c.label }}</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ mod.isTwoCol }}" hint-placeholder-val="{{ false }}">
+<div style="margin:20px 0 0;display:flex;flex-direction:column;gap:14px">
+<sc-for list="{{ mod.cols }}" as="col" hint-placeholder-count="2">
+<div style="padding:16px;border-radius:18px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="font-size:12px;font-weight:800;letter-spacing:1.2px;color:{{ col.color }}">{{ col.title }}</div>
+<div style="font-size:14px;color:rgba(16,39,90,.65);margin:4px 0 12px">{{ col.hint }}</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<sc-for list="{{ col.chips }}" as="c" hint-placeholder-count="5">
+<button onClick="{{ c.toggle }}" style="padding:12px 14px;min-height:48px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:1.5px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }}">{{ c.label }}</button>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ mod.isTree }}" hint-placeholder-val="{{ false }}">
+<div style="margin:20px 0 0;padding:18px;border-radius:20px;background:#FFF8EE;border:1px solid rgba(226,116,58,.20)">
+<div style="font-size:16px;font-weight:800">Tree of Legacy</div>
+<div style="font-size:15px;line-height:1.5;color:rgba(16,39,90,.7);margin:4px 0 14px;text-wrap:pretty">Nilai apa yang ingin kamu tinggalkan kepada keluarga, sahabat, atau masyarakat?</div>
+<div style="display:flex;gap:8px">
+<input value="{{ mod.treeDraft }}" onChange="{{ mod.onTreeDraft }}" placeholder="Tulis satu nilai" style="flex:1;height:52px;padding:0 14px;font-size:16px;border-radius:14px;border:1px solid rgba(16,39,90,.18);background:#fff;color:#10275A">
+<button onClick="{{ mod.addLeaf }}" style="width:96px;height:52px;border:none;border-radius:14px;background:#E2743A;color:#fff;font-size:16px;font-weight:700;cursor:pointer">Tambah</button>
+</div>
+<div style="margin:16px 0 0;border-radius:14px;background:#fff;border:1px solid rgba(226,116,58,.16);padding:8px 0">
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" style="display:block;margin:0 auto;max-width:100%">
+<path d="M132 190 H168" stroke="rgba(16,39,90,.14)" stroke-width="2" stroke-linecap="round"></path>
+<path d="M144 190 C146 168 146 148 150 122" stroke="#B0521F" stroke-width="2.6" stroke-linecap="round"></path>
+<path d="M156 190 C154 168 154 148 150 122" stroke="#B0521F" stroke-width="2.6" stroke-linecap="round"></path>
+<path d="M150 150 C132 142 120 128 113 110" stroke="#B0521F" stroke-width="2" stroke-linecap="round"></path>
+<path d="M150 144 C168 136 180 122 187 105" stroke="#B0521F" stroke-width="2" stroke-linecap="round"></path>
+<path d="M150 130 C140 118 134 104 131 91" stroke="#B0521F" stroke-width="1.8" stroke-linecap="round"></path>
+<path d="M150 126 C160 114 166 100 169 88" stroke="#B0521F" stroke-width="1.8" stroke-linecap="round"></path>
+<path d="M132 140 C120 134 110 124 104 112" stroke="#B0521F" stroke-width="1.6" stroke-linecap="round"></path>
+<path d="M168 136 C180 130 190 120 196 108" stroke="#B0521F" stroke-width="1.6" stroke-linecap="round"></path>
+<path d="M150 122 V72" stroke="#B0521F" stroke-width="1.8" stroke-linecap="round"></path>
+<sc-for list="{{ mod.treeDots }}" as="dot" hint-placeholder-count="10">
+<circle cx="{{ dot.cx }}" cy="{{ dot.cy }}" r="{{ dot.r }}" fill="{{ dot.fill }}" stroke="{{ dot.stroke }}" stroke-width="1.6"></circle>
+</sc-for>
+</svg>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0">
+<sc-for list="{{ mod.leaves }}" as="l" hint-placeholder-count="3">
+<span style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:#EAF4EC;border:1px solid rgba(30,138,76,.25);font-size:15px;font-weight:700;color:#1E6E42">{{ l.text }}<button onClick="{{ l.remove }}" style="border:none;background:none;cursor:pointer;font-size:16px;color:rgba(16,39,90,.45);padding:0">×</button></span>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<div style="margin:22px 0 0;padding:18px;border-radius:20px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+<span style="font-size:12px;font-weight:800;letter-spacing:1.2px;color:{{ mod.color }}">REFLEKSI</span>
+<span style="font-size:12px;font-weight:700;color:rgba(16,39,90,.5)">{{ mod.updatedBadge }}</span>
+</div>
+<div style="font-size:16px;line-height:1.5;font-weight:700;margin:8px 0 12px;text-wrap:pretty">{{ mod.reflect }}</div>
+<textarea value="{{ mod.reflection }}" onChange="{{ mod.onReflection }}" onFocus="{{ mod.onReflectionFocus }}" onBlur="{{ mod.onReflectionBlur }}" rows="4" placeholder="Tulis refleksimu di sini..." style="width:100%;padding:14px;font-size:17px;line-height:1.55;border-radius:14px;border:1px solid rgba(16,39,90,.18);background:#FBF9F5;color:#10275A;resize:none"></textarea>
+<div style="font-size:13px;font-weight:600;color:#1E8A4C;margin:10px 0 0;height:18px">{{ savedNote }}</div>
+<sc-if value="{{ mod.hasHistory }}" hint-placeholder-val="{{ false }}">
+<button onClick="{{ mod.toggleHistory }}" style="width:100%;min-height:46px;margin:6px 0 0;text-align:left;padding:0 14px;border-radius:12px;border:1px dashed rgba(16,39,90,.22);background:#FBF9F5;color:rgba(16,39,90,.7);font-size:14px;font-weight:700;cursor:pointer">{{ mod.historyLabel }}</button>
+<sc-if value="{{ mod.historyOpen }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:8px;margin:10px 0 0">
+<sc-for list="{{ mod.history }}" as="h" hint-placeholder-count="2">
+<div style="padding:14px;border-radius:12px;background:#FBF9F5;border:1px solid rgba(16,39,90,.10)">
+<div style="font-size:12px;font-weight:700;color:rgba(16,39,90,.5)">{{ h.at }}</div>
+<div style="font-size:15px;line-height:1.5;color:rgba(16,39,90,.78);margin:6px 0 0;text-wrap:pretty">{{ h.text }}</div>
+<button onClick="{{ h.restore }}" style="min-height:42px;margin:10px 0 0;padding:0 14px;border-radius:10px;border:1px solid rgba(16,39,90,.18);background:#fff;color:#10275A;font-size:14px;font-weight:700;cursor:pointer">Pulihkan tulisan ini</button>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</sc-if>
+</div>
+<button onClick="{{ mod.toggleDone }}" style="width:100%;min-height:52px;margin:12px 0 0;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;border:1.5px solid {{ mod.doneBorder }};background:{{ mod.doneBg }};color:{{ mod.doneFg }}">{{ mod.doneLabel }}</button>
+<div style="display:flex;gap:10px;margin:18px 0 0">
+<button onClick="{{ mod.prev }}" style="flex:1;height:54px;border-radius:16px;border:1px solid rgba(16,39,90,.18);background:#fff;color:#10275A;font-size:17px;font-weight:700;cursor:pointer">Sebelumnya</button>
+<button onClick="{{ mod.next }}" style="flex:1.3;height:54px;border-radius:16px;border:none;background:#10275A;color:#fff;font-size:17px;font-weight:700;cursor:pointer">{{ mod.nextLabel }}</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.visaq }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 20px 28px">
+<button onClick="{{ back }}" style="width:44px;height:44px;border-radius:14px;border:1px solid rgba(16,39,90,.12);background:#fff;font-size:19px;cursor:pointer;color:#10275A">←</button>
+<div style="font-size:12px;font-weight:800;letter-spacing:1.2px;color:{{ term.color }};margin:18px 0 0">SEBELUM VISA {{ term.name }}</div>
+<h1 style="font-size:23px;font-weight:800;line-height:1.35;letter-spacing:-.3px;margin:8px 0 0;text-wrap:pretty">{{ term.visaQ }}</h1>
+<textarea value="{{ term.commitment }}" onChange="{{ term.onCommitment }}" rows="6" placeholder="Tulis komitmenmu..." style="width:100%;margin:18px 0 0;padding:16px;font-size:17px;line-height:1.6;border-radius:18px;border:1px solid rgba(16,39,90,.18);background:#fff;color:#10275A;resize:none"></textarea>
+<div style="font-size:13px;font-weight:600;color:#1E8A4C;margin:10px 0 0;height:18px">{{ savedNote }}</div>
+<button onClick="{{ term.claimVisa }}" style="width:100%;height:56px;margin:12px 0 0;border:none;border-radius:16px;background:{{ term.color }};color:#fff;font-size:18px;font-weight:700;cursor:pointer">Ambil Visa</button>
+<div style="font-size:14px;color:rgba(16,39,90,.6);text-align:center;margin:10px 0 0">Kamu bisa kembali ke bagian ini kapan saja.</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.visa }}" hint-placeholder-val="{{ false }}">
+<div style="padding:26px 24px 32px;background:#FDF8EE;min-height:100%;text-align:center">
+<div style="font-size:15px;font-weight:700;color:rgba(16,39,90,.6)">Visa Terminal</div>
+<div style="font-size:24px;font-weight:700;margin:22px 0 0">Selamat!</div>
+<div style="font-size:27px;font-weight:800;line-height:1.25;letter-spacing:-.4px;margin:6px 0 0;color:{{ term.color }}">Visa {{ term.visa }}<br>Telah Diperoleh</div>
+<div style="position:relative;margin:26px auto 0;width:200px;height:200px;animation:stampIn .7s cubic-bezier(.2,.8,.2,1) both">
+<svg width="200" height="200" viewBox="0 0 200 200">
+<defs>
+<path id="visaArcTop" d="M 38 100 A 62 62 0 0 1 162 100" fill="none"></path>
+</defs>
+<circle cx="100" cy="100" r="92" fill="none" stroke="{{ term.color }}" stroke-width="4"></circle>
+<circle cx="100" cy="100" r="78" fill="none" stroke="{{ term.color }}" stroke-width="2" stroke-dasharray="3 5"></circle>
+<circle cx="100" cy="100" r="44" fill="none" stroke="{{ term.color }}" stroke-width="2"></circle>
+<g transform="translate(100 91) scale(1.5) translate(-12 -12)"><path d="{{ stampIcon }}" fill="none" stroke="{{ term.color }}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></g>
+<path d="M82 114q4.5-4.5 9 0t9 0 9 0" fill="none" stroke="{{ term.color }}" stroke-width="2" stroke-linecap="round"></path>
+<path d="M82 122q4.5-4.5 9 0t9 0 9 0" fill="none" stroke="{{ term.color }}" stroke-width="2" stroke-linecap="round"></path>
+{{ stampArch }}
+</svg>
+</div>
+<p style="font-size:17px;line-height:1.6;color:rgba(16,39,90,.75);margin:24px 0 0;text-wrap:pretty">Kamu telah menyelesaikan {{ term.name }} dan siap melanjutkan perjalanan ke terminal berikutnya.</p>
+<button onClick="{{ term.afterVisa }}" style="width:100%;height:56px;margin:24px 0 0;border:none;border-radius:16px;background:#E0A32A;color:#fff;font-size:18px;font-weight:700;cursor:pointer">{{ term.afterVisaLabel }}</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.transition }}" hint-placeholder-val="{{ false }}">
+<div style="padding:30px 24px;min-height:100%;display:flex;flex-direction:column;justify-content:center">
+<div style="height:170px;border-radius:20px;background:repeating-linear-gradient(135deg,#EDF1F7 0 10px,#E4EAF3 10px 20px);display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(16,39,90,.5);background:rgba(255,255,255,.85);padding:5px 9px;border-radius:8px">ilustrasi: jalan menuju terminal berikutnya</span></div>
+<h1 style="font-size:26px;font-weight:800;line-height:1.25;letter-spacing:-.5px;margin:26px 0 0;text-wrap:pretty">{{ trans.title }}</h1>
+<p style="font-size:17px;line-height:1.6;color:rgba(16,39,90,.75);margin:12px 0 0;text-wrap:pretty">{{ trans.body }}</p>
+<button onClick="{{ trans.go }}" style="width:100%;height:56px;margin:26px 0 0;border:none;border-radius:16px;background:#10275A;color:#fff;font-size:18px;font-weight:700;cursor:pointer">{{ trans.cta }}</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.immigration }}" hint-placeholder-val="{{ false }}">
+<div style="padding:26px 24px 32px">
+<div style="font-size:12px;font-weight:800;letter-spacing:2px;color:rgba(16,39,90,.55)">IMMIGRATION</div>
+<h1 style="font-size:27px;font-weight:800;line-height:1.25;letter-spacing:-.5px;margin:10px 0 0">Semua visa perjalananmu telah diperoleh.</h1>
+<div style="display:flex;flex-direction:column;gap:10px;margin:24px 0 0">
+<sc-for list="{{ visaRows }}" as="v" hint-placeholder-count="4">
+<div style="display:flex;align-items:center;gap:12px;padding:16px 18px;border-radius:16px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="width:30px;height:30px;flex:none;border-radius:50%;background:{{ v.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">✓</div>
+<div style="flex:1"><div style="font-size:16px;font-weight:800;letter-spacing:.3px">{{ v.visa }}</div><div style="font-size:14px;color:rgba(16,39,90,.65)">{{ v.name }}</div></div>
+<div style="font-size:13px;font-weight:700;color:#1E8A4C">Selesai</div>
+</div>
+</sc-for>
+</div>
+<button onClick="{{ goSummary }}" style="width:100%;height:56px;margin:24px 0 0;border:none;border-radius:16px;background:#10275A;color:#fff;font-size:18px;font-weight:700;cursor:pointer">Lihat Passport Saya</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.passport }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 20px 28px">
+<div style="display:flex;align-items:center;gap:12px">
+<button onClick="{{ back }}" style="width:44px;height:44px;border-radius:14px;border:1px solid rgba(16,39,90,.12);background:#fff;font-size:19px;cursor:pointer;color:#10275A">←</button>
+<span style="font-size:18px;font-weight:800">MAPAN Passport</span>
+</div>
+<div style="margin:16px 0 0;padding:24px 22px;border-radius:20px;background:#10275A;color:#fff;box-shadow:0 12px 30px rgba(16,39,90,.25)">
+<div style="display:flex;justify-content:space-between;align-items:flex-start">
+<div><div style="font-size:11px;font-weight:700;letter-spacing:2.5px;color:#E0A32A">MAPAN</div><div style="font-size:22px;font-weight:800;letter-spacing:1px;color:#E0A32A">PASSPORT</div></div>
+<svg width="46" height="46" viewBox="0 0 46 46"><circle cx="23" cy="23" r="20" fill="none" stroke="#E0A32A" stroke-width="2"></circle><circle cx="23" cy="23" r="8" fill="none" stroke="#E0A32A" stroke-width="1.5"></circle><path d="M3 23 H43" stroke="#E0A32A" stroke-width="1.5"></path></svg>
+</div>
+<div style="height:1px;background:rgba(224,163,42,.35);margin:20px 0"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:14px">
+<div><div style="color:rgba(255,255,255,.6);font-size:12px">Nama</div><div style="font-weight:700;font-size:16px;margin-top:2px">{{ passportName }}</div></div>
+<div><div style="color:rgba(255,255,255,.6);font-size:12px">Destination</div><div style="font-weight:700;font-size:16px;margin-top:2px">The Next Chapter</div></div>
+<div><div style="color:rgba(255,255,255,.6);font-size:12px">Mulai Perjalanan</div><div style="font-weight:700;font-size:16px;margin-top:2px">{{ startDate }}</div></div>
+<div><div style="color:rgba(255,255,255,.6);font-size:12px">Progres</div><div style="font-weight:700;font-size:16px;margin-top:2px">{{ pctText }}</div></div>
+</div>
+</div>
+<div style="font-size:17px;font-weight:800;margin:24px 0 12px">Halaman Visa</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<sc-for list="{{ visaRows }}" as="v" hint-placeholder-count="4">
+<div style="padding:16px;border-radius:16px;background:{{ v.bg }};border:1px solid {{ v.border }};min-height:120px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="width:34px;height:34px;border-radius:50%;border:2px dashed {{ v.color }};display:flex;align-items:center;justify-content:center;color:{{ v.color }};font-size:14px;font-weight:800">{{ v.check }}</div>
+<div><div style="font-size:14px;font-weight:800;line-height:1.25;letter-spacing:.3px;color:{{ v.color }}">{{ v.visa }}</div><div style="font-size:12px;font-weight:700;color:rgba(16,39,90,.6);margin-top:4px">{{ v.statusText }}</div></div>
+</div>
+</sc-for>
+</div>
+<div style="font-size:17px;font-weight:800;margin:24px 0 12px">Passport Stamps</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<sc-for list="{{ stamps }}" as="s" hint-placeholder-count="3">
+<span style="padding:10px 14px;border-radius:999px;background:#fff;border:1px dashed {{ s.color }};font-size:14px;font-weight:700;color:{{ s.color }}">{{ s.label }}</span>
+</sc-for>
+</div>
+<button onClick="{{ goSummary }}" style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;margin:20px 0 0;padding:18px;border-radius:16px;background:#fff;border:1px solid rgba(16,39,90,.10);cursor:pointer;color:#10275A">
+<span><span style="display:block;font-size:16px;font-weight:800">My Passport Summary</span><span style="display:block;font-size:14px;color:rgba(16,39,90,.65);margin-top:3px">Ringkasan jawaban perjalananmu</span></span>
+<span style="font-size:22px;color:rgba(16,39,90,.35)">›</span>
+</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.summary }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 20px 28px">
+<div style="display:flex;align-items:center;gap:12px">
+<button onClick="{{ back }}" style="width:44px;height:44px;border-radius:14px;border:1px solid rgba(16,39,90,.12);background:#fff;font-size:19px;cursor:pointer;color:#10275A">←</button>
+<span style="font-size:18px;font-weight:800">My Passport Summary</span>
+</div>
+<p style="font-size:15px;line-height:1.55;color:rgba(16,39,90,.68);margin:14px 0 0">Disusun dari jawabanmu. Kamu bisa memperbaikinya kapan saja.</p>
+<div style="display:flex;flex-direction:column;gap:12px;margin:18px 0 0">
+<sc-for list="{{ summaryFields }}" as="f" hint-placeholder-count="7">
+<div style="padding:16px;border-radius:16px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="font-size:15px;font-weight:800">{{ f.label }}</div>
+<textarea value="{{ f.value }}" onChange="{{ f.onChange }}" rows="2" placeholder="Belum diisi" style="width:100%;margin-top:8px;padding:12px;font-size:16px;line-height:1.5;border-radius:12px;border:1px solid rgba(16,39,90,.15);background:#FBF9F5;color:#10275A;resize:none"></textarea>
+</div>
+</sc-for>
+</div>
+<div style="font-size:13px;font-weight:600;color:#1E8A4C;margin:10px 0 0;height:18px">{{ savedNote }}</div>
+<button onClick="{{ goNextChapter }}" style="width:100%;height:56px;margin:12px 0 0;border:none;border-radius:16px;background:#10275A;color:#fff;font-size:18px;font-weight:700;cursor:pointer">Lanjut ke Next Chapter</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.nextchapter }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 20px 28px">
+<div style="display:flex;align-items:center;gap:12px">
+<button onClick="{{ back }}" style="width:44px;height:44px;border-radius:14px;border:1px solid rgba(16,39,90,.12);background:#fff;font-size:19px;cursor:pointer;color:#10275A">←</button>
+<span style="font-size:22px;font-weight:800;letter-spacing:-.3px">Next Chapter</span>
+</div>
+<p style="font-size:17px;line-height:1.6;color:rgba(16,39,90,.75);margin:14px 0 0;text-wrap:pretty">{{ ncIntro }}</p>
+<div style="font-size:15px;color:rgba(16,39,90,.65);margin:10px 0 0">Pilih satu arketipe utama. Kamu boleh menambah maksimal dua pendukung.</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0 0">
+<sc-for list="{{ archetypes }}" as="a" hint-placeholder-count="6">
+<button onClick="{{ a.select }}" style="text-align:left;padding:16px;border-radius:18px;border:1.5px solid {{ a.border }};background:{{ a.bg }};cursor:pointer;color:#10275A;min-height:152px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;width:100%">
+<div style="width:38px;height:38px;border-radius:12px;background:#fff;border:1px solid {{ a.border }};display:flex;align-items:center;justify-content:center"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="{{ a.color }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ a.iconPath }}"></path></svg></div>
+<span style="font-size:11px;font-weight:800;color:{{ a.color }}">{{ a.badge }}</span>
+</div>
+<div><div style="font-size:14px;font-weight:800;line-height:1.25;letter-spacing:.3px;color:{{ a.color }}">{{ a.title }}</div>
+<div style="font-size:13px;line-height:1.4;color:rgba(16,39,90,.7);margin-top:5px">{{ a.sub }}</div></div>
+</button>
+</sc-for>
+</div>
+<button onClick="{{ exploreArchetype }}" style="width:100%;height:56px;margin:18px 0 0;border:none;border-radius:16px;background:{{ ncCtaBg }};color:#fff;font-size:18px;font-weight:700;cursor:pointer">Mulai Eksplorasi Arketipe</button>
+<div style="font-size:14px;color:rgba(16,39,90,.6);text-align:center;margin:10px 0 0">{{ ncHint }}</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.archetype }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 20px 28px">
+<button onClick="{{ back }}" style="width:44px;height:44px;border-radius:14px;border:1px solid rgba(16,39,90,.12);background:#fff;font-size:19px;cursor:pointer;color:#10275A">←</button>
+<div style="font-size:12px;font-weight:800;letter-spacing:1.5px;color:{{ arch.color }};margin:18px 0 0">ARKETIPE UTAMA</div>
+<h1 style="font-size:25px;font-weight:800;line-height:1.2;letter-spacing:-.4px;margin:8px 0 0">{{ arch.title }}</h1>
+<p style="font-size:17px;line-height:1.6;color:rgba(16,39,90,.75);margin:12px 0 0;text-wrap:pretty">{{ arch.body }}</p>
+<div style="display:flex;flex-direction:column;gap:10px;margin:20px 0 0">
+<sc-for list="{{ arch.examples }}" as="e" hint-placeholder-count="4">
+<div style="display:flex;align-items:center;gap:12px;padding:15px 16px;border-radius:14px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="width:10px;height:10px;border-radius:50%;background:{{ arch.color }}"></div>
+<span style="font-size:16px;font-weight:600">{{ e.text }}</span>
+</div>
+</sc-for>
+</div>
+<button onClick="{{ goMyNext }}" style="width:100%;height:56px;margin:20px 0 0;border:none;border-radius:16px;background:#10275A;color:#fff;font-size:18px;font-weight:700;cursor:pointer">Susun My Next Chapter</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.mynext }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 20px 28px">
+<div style="display:flex;align-items:center;gap:12px">
+<button onClick="{{ back }}" style="width:44px;height:44px;border-radius:14px;border:1px solid rgba(16,39,90,.12);background:#fff;font-size:19px;cursor:pointer;color:#10275A">←</button>
+<span style="font-size:18px;font-weight:800">My Next Chapter</span>
+</div>
+<p style="font-size:15px;line-height:1.55;color:rgba(16,39,90,.68);margin:14px 0 0">Lengkapi sebisamu. Refleksimu tersimpan otomatis.</p>
+<div style="display:flex;flex-direction:column;gap:12px;margin:18px 0 0">
+<sc-for list="{{ ncFields }}" as="f" hint-placeholder-count="5">
+<div style="padding:16px;border-radius:16px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="font-size:16px;font-weight:800">{{ f.label }}</div>
+<textarea value="{{ f.value }}" onChange="{{ f.onChange }}" rows="2" placeholder="Tulis di sini..." style="width:100%;margin-top:8px;padding:12px;font-size:16px;line-height:1.5;border-radius:12px;border:1px solid rgba(16,39,90,.15);background:#FBF9F5;color:#10275A;resize:none"></textarea>
+</div>
+</sc-for>
+</div>
+<div style="font-size:13px;font-weight:600;color:#1E8A4C;margin:10px 0 0;height:18px">{{ savedNote }}</div>
+<button onClick="{{ goPlan }}" style="width:100%;height:56px;margin:12px 0 0;border:none;border-radius:16px;background:#10275A;color:#fff;font-size:18px;font-weight:700;cursor:pointer">Lanjut ke Rencana 90 Hari</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.plan90 }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 20px 28px">
+<div style="display:flex;align-items:center;gap:12px">
+<button onClick="{{ back }}" style="width:44px;height:44px;border-radius:14px;border:1px solid rgba(16,39,90,.12);background:#fff;font-size:19px;cursor:pointer;color:#10275A">←</button>
+<span style="font-size:18px;font-weight:800">Rencana 90 Hari</span>
+</div>
+<p style="font-size:15px;line-height:1.55;color:rgba(16,39,90,.68);margin:14px 0 0">Maksimal tiga langkah per periode. Sederhana saja.</p>
+<div style="display:flex;flex-direction:column;gap:14px;margin:18px 0 0">
+<sc-for list="{{ periods }}" as="p" hint-placeholder-count="3">
+<div style="padding:18px;border-radius:18px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="font-size:18px;font-weight:800;letter-spacing:.3px;color:{{ p.color }}">{{ p.title }}</div>
+<div style="display:flex;flex-direction:column;gap:8px;margin:12px 0 0">
+<sc-for list="{{ p.actions }}" as="a" hint-placeholder-count="2">
+<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:#FBF9F5;border:1px solid rgba(16,39,90,.10)">
+<span style="flex:1;font-size:16px;line-height:1.4;font-weight:600">{{ a.text }}</span>
+<button onClick="{{ a.cycle }}" style="flex:none;padding:8px 12px;min-height:40px;border-radius:10px;border:1px solid {{ a.border }};background:{{ a.bg }};color:{{ a.fg }};font-size:13px;font-weight:700;cursor:pointer">{{ a.status }}</button>
+<button onClick="{{ a.remove }}" style="border:none;background:none;font-size:20px;color:rgba(16,39,90,.4);cursor:pointer">×</button>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;gap:8px;margin:10px 0 0">
+<input value="{{ p.draft }}" onChange="{{ p.onDraft }}" placeholder="Tambah langkah" style="flex:1;height:50px;padding:0 14px;font-size:16px;border-radius:12px;border:1px solid rgba(16,39,90,.18);background:#fff;color:#10275A">
+<button onClick="{{ p.add }}" style="width:88px;height:50px;border:none;border-radius:12px;background:{{ p.color }};color:#fff;font-size:16px;font-weight:700;cursor:pointer">Tambah</button>
+</div>
+</div>
+</sc-for>
+</div>
+<button onClick="{{ goArrival }}" style="width:100%;height:56px;margin:18px 0 0;border:none;border-radius:16px;background:#10275A;color:#fff;font-size:18px;font-weight:700;cursor:pointer">Selesaikan Rencana</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.arrival }}" hint-placeholder-val="{{ false }}">
+<div style="padding:26px 24px 32px;background:#FDF8EE;min-height:100%">
+<div style="font-size:12px;font-weight:800;letter-spacing:2.5px;color:rgba(16,39,90,.55);text-align:center">ARRIVAL</div>
+<h1 style="font-size:27px;font-weight:800;line-height:1.25;letter-spacing:-.5px;margin:12px 0 0;text-align:center">Selamat datang di bab berikutnya.</h1>
+<div style="margin:24px 0 0;padding:22px;border-radius:20px;background:#10275A;color:#fff;box-shadow:0 14px 32px rgba(16,39,90,.25)">
+<div style="font-size:11px;font-weight:700;letter-spacing:2.5px;color:#E0A32A">ARRIVAL CARD</div>
+<div style="font-size:24px;font-weight:800;margin:10px 0 0">{{ passportName }}</div>
+<div style="height:1px;background:rgba(224,163,42,.35);margin:16px 0"></div>
+<div style="display:flex;flex-direction:column;gap:14px;font-size:15px">
+<div><div style="font-size:12px;color:rgba(255,255,255,.6)">Destination</div><div style="font-weight:700;font-size:17px;margin-top:2px">THE NEXT CHAPTER</div></div>
+<div><div style="font-size:12px;color:rgba(255,255,255,.6)">Primary Archetype</div><div style="font-weight:700;font-size:17px;margin-top:2px">{{ arrival.archetype }}</div></div>
+<div><div style="font-size:12px;color:rgba(255,255,255,.6)">My Mission</div><div style="font-weight:600;line-height:1.5;margin-top:2px">{{ arrival.mission }}</div></div>
+<div><div style="font-size:12px;color:rgba(255,255,255,.6)">My First Step</div><div style="font-weight:600;line-height:1.5;margin-top:2px">{{ arrival.firstStep }}</div></div>
+</div>
+</div>
+<button onClick="{{ finishJourney }}" style="width:100%;height:56px;margin:24px 0 0;border:none;border-radius:16px;background:#1E8A4C;color:#fff;font-size:18px;font-weight:700;cursor:pointer">Mulai Bab Baruku</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.jadwal }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 20px 28px">
+<h1 style="font-size:24px;font-weight:800;letter-spacing:-.4px;margin:0">Jadwal</h1>
+<p style="font-size:15px;line-height:1.5;color:rgba(16,39,90,.65);margin:6px 0 0">Pengingat lembut untuk perjalananmu.</p>
+<div style="display:flex;flex-direction:column;gap:10px;margin:18px 0 0">
+<sc-for list="{{ events }}" as="e" hint-placeholder-count="3">
+<div style="display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="width:56px;flex:none;text-align:center;padding:8px 0;border-radius:12px;background:{{ e.tint }}"><div style="font-size:20px;font-weight:800;color:{{ e.color }}">{{ e.day }}</div><div style="font-size:11px;font-weight:700;color:{{ e.color }}">{{ e.month }}</div></div>
+<div style="flex:1"><div style="font-size:16px;font-weight:800;line-height:1.3">{{ e.title }}</div><div style="font-size:14px;color:rgba(16,39,90,.65);margin-top:2px">{{ e.sub }}</div><div style="font-size:13px;color:rgba(16,39,90,.55);margin-top:4px">{{ e.time }}</div></div>
+</div>
+</sc-for>
+</div>
+<div style="margin:20px 0 0;padding:18px;border-radius:18px;background:#EAF4EC;border:1px solid rgba(30,138,76,.20)">
+<div style="font-size:12px;font-weight:800;letter-spacing:1.2px;color:#1E6E42">INSPIRASI HARI INI</div>
+<p style="font-size:17px;line-height:1.55;font-weight:600;margin:8px 0 0;text-wrap:pretty">"Perjalanan terbaik adalah ketika kamu menjadi versi terbaik dirimu sendiri."</p>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.catatan }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 20px 28px">
+<h1 style="font-size:24px;font-weight:800;letter-spacing:-.4px;margin:0">Catatan Refleksi</h1>
+<p style="font-size:15px;line-height:1.5;color:rgba(16,39,90,.65);margin:6px 0 0">{{ notesSub }}</p>
+<div style="display:flex;flex-direction:column;gap:10px;margin:18px 0 0">
+<sc-for list="{{ notes }}" as="n" hint-placeholder-count="3">
+<button onClick="{{ n.go }}" style="width:100%;text-align:left;padding:16px;border-radius:16px;background:#fff;border:1px solid rgba(16,39,90,.10);cursor:pointer;color:#10275A">
+<div style="display:flex;align-items:center;gap:8px"><div style="width:9px;height:9px;border-radius:50%;background:{{ n.color }}"></div><span style="font-size:12px;font-weight:800;letter-spacing:.8px;color:{{ n.color }}">{{ n.crumb }}</span></div>
+<div style="font-size:16px;font-weight:800;margin:6px 0 0">{{ n.title }}</div>
+<div style="font-size:15px;line-height:1.5;color:rgba(16,39,90,.72);margin-top:4px">{{ n.text }}</div>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.profil }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 20px 28px">
+<h1 style="font-size:24px;font-weight:800;letter-spacing:-.4px;margin:0">Profil</h1>
+<div style="margin:16px 0 0;padding:18px;border-radius:18px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="font-size:19px;font-weight:800">{{ passportName }}</div>
+<div style="font-size:15px;color:rgba(16,39,90,.65);margin-top:4px">{{ profileMeta }}</div>
+<button onClick="{{ goPassport }}" style="width:100%;height:50px;margin:14px 0 0;border-radius:14px;border:1px solid rgba(16,39,90,.18);background:#FBF9F5;color:#10275A;font-size:16px;font-weight:700;cursor:pointer">Buka MAPAN Passport</button>
+</div>
+<div style="font-size:17px;font-weight:800;margin:22px 0 10px">Pengaturan</div>
+<div style="padding:18px;border-radius:18px;background:#fff;border:1px solid rgba(16,39,90,.10)">
+<div style="font-size:16px;font-weight:700">Ukuran Teks</div>
+<div style="display:flex;gap:10px;margin:12px 0 0">
+<button onClick="{{ setTextNormal }}" style="flex:1;height:50px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;border:1.5px solid {{ textNormal.border }};background:{{ textNormal.bg }};color:{{ textNormal.fg }}">Normal</button>
+<button onClick="{{ setTextBesar }}" style="flex:1;height:50px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;border:1.5px solid {{ textBesar.border }};background:{{ textBesar.bg }};color:{{ textBesar.fg }}">Besar</button>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin:12px 0 0">
+<button onClick="{{ backupData }}" style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:18px;border-radius:16px;background:#fff;border:1px solid rgba(16,39,90,.10);cursor:pointer;color:#10275A;min-height:56px">
+<span><span style="display:block;font-size:16px;font-weight:800">Backup Data</span><span style="display:block;font-size:14px;color:rgba(16,39,90,.65);margin-top:3px">Simpan satu file JSON ke perangkat</span></span><span style="font-size:20px;color:rgba(16,39,90,.35)">↓</span>
+</button>
+<button onClick="{{ pickRestore }}" style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:18px;border-radius:16px;background:#fff;border:1px solid rgba(16,39,90,.10);cursor:pointer;color:#10275A;min-height:56px">
+<span><span style="display:block;font-size:16px;font-weight:800">Pulihkan Data</span><span style="display:block;font-size:14px;color:rgba(16,39,90,.65);margin-top:3px">Ambil dari file backup MAPAN</span></span><span style="font-size:20px;color:rgba(16,39,90,.35)">↑</span>
+</button>
+<input type="file" accept="application/json" ref="{{ fileRef }}" onChange="{{ onRestoreFile }}" style="display:none">
+<button onClick="{{ goProgram }}" style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:18px;border-radius:16px;background:#fff;border:1px solid rgba(16,39,90,.10);cursor:pointer;color:#10275A;min-height:56px">
+<span><span style="display:block;font-size:16px;font-weight:800">Program Next Chapter</span><span style="display:block;font-size:14px;color:rgba(16,39,90,.65);margin-top:3px">Informasi pendampingan lanjutan</span></span><span style="font-size:22px;color:rgba(16,39,90,.35)">›</span>
+</button>
+<button onClick="{{ resetJourney }}" style="width:100%;text-align:left;padding:18px;border-radius:16px;background:#fff;border:1px solid rgba(226,116,58,.35);cursor:pointer;color:#B0521F;min-height:56px">
+<span style="display:block;font-size:16px;font-weight:800">Mulai Ulang Perjalanan</span><span style="display:block;font-size:14px;color:rgba(16,39,90,.6);margin-top:3px">Perlu konfirmasi dua kali</span>
+</button>
+</div>
+<div style="font-size:14px;line-height:1.6;color:rgba(16,39,90,.6);margin:20px 0 0">
+<div style="font-weight:700;color:#10275A">Tentang MAPAN</div>
+MAPAN Journey membantu persiapan purna tugas melalui empat terminal kesiapan. Semua datamu tersimpan di perangkat ini saja.
+<div style="margin-top:8px">Versi Aplikasi {{ appVersion }} · Powered by MDI</div>
+</div>
+<div style="font-size:13px;font-weight:600;color:#1E8A4C;margin:12px 0 0;height:18px">{{ savedNote }}</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sc.program }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 20px 28px">
+<div style="display:flex;align-items:center;gap:12px">
+<button onClick="{{ back }}" style="width:44px;height:44px;border-radius:14px;border:1px solid rgba(16,39,90,.12);background:#fff;font-size:19px;cursor:pointer;color:#10275A">←</button>
+<span style="font-size:18px;font-weight:800">Program Next Chapter</span>
+</div>
+<div style="margin:18px 0 0;padding:20px;border-radius:20px;background:#FDF8EE;border:1px solid rgba(224,163,42,.30)">
+<p style="font-size:17px;line-height:1.65;margin:0;text-wrap:pretty">Setelah menyelesaikan MAPAN Journey, peserta dapat melanjutkan ke program pendampingan pascapensiun sesuai kebutuhan dan paket yang dipilih. Peserta dapat memilih arketipe Next Chapter yang paling sesuai, sekaligus memperoleh pendampingan berkelanjutan pada aspek kesehatan, keuangan maupun psikologis sesuai keperluan.</p>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 0">
+<sc-for list="{{ terminals }}" as="t" hint-placeholder-count="4">
+<div style="padding:16px;border-radius:16px;background:{{ t.tint }};border:1px solid {{ t.border }}">
+<div style="width:32px;height:32px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;border:1px solid {{ t.border }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="{{ t.color }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.iconPath }}"></path></svg></div>
+<div style="font-size:15px;font-weight:800;margin-top:10px">{{ t.support }}</div>
+<div style="font-size:13px;color:rgba(16,39,90,.65)">({{ t.nameTitle }})</div>
+</div>
+</sc-for>
+</div>
+<div style="font-size:15px;line-height:1.6;color:rgba(16,39,90,.65);margin:16px 0 0">Pendampingan fleksibel sesuai paket yang kamu pilih dan sesuai kebutuhanmu.</div>
+</div>
+</sc-if>
+
+</div>
+
+<sc-if value="{{ showNav }}" hint-placeholder-val="{{ false }}">
+<div style="flex:none;display:flex;align-items:stretch;background:#fff;border-top:1px solid rgba(16,39,90,.10);padding:8px 6px 14px">
+<button onClick="{{ nav.beranda.go }}" style="flex:1;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;min-height:52px;color:{{ nav.beranda.color }}">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11 L12 4 L20 11 V20 H4 Z" stroke-linejoin="round"></path></svg>
+<span style="font-size:11px;font-weight:{{ nav.beranda.weight }}">Beranda</span>
+</button>
+<button onClick="{{ nav.perjalanan.go }}" style="flex:1;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;min-height:52px;color:{{ nav.perjalanan.color }}">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6 L9 4 L15 6 L20 4 V18 L15 20 L9 18 L4 20 Z" stroke-linejoin="round"></path><path d="M9 4 V18"></path><path d="M15 6 V20"></path></svg>
+<span style="font-size:11px;font-weight:{{ nav.perjalanan.weight }}">Perjalanan</span>
+</button>
+<button onClick="{{ nav.jadwal.go }}" style="flex:1;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;min-height:52px;color:{{ nav.jadwal.color }}">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="14" rx="3"></rect><path d="M4 11 H20"></path><path d="M9 4 V7"></path><path d="M15 4 V7"></path></svg>
+<span style="font-size:11px;font-weight:{{ nav.jadwal.weight }}">Jadwal</span>
+</button>
+<button onClick="{{ nav.catatan.go }}" style="flex:1;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;min-height:52px;color:{{ nav.catatan.color }}">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="16" rx="3"></rect><path d="M9 9 H15"></path><path d="M9 13 H15"></path><path d="M9 17 H12"></path></svg>
+<span style="font-size:11px;font-weight:{{ nav.catatan.weight }}">Catatan</span>
+</button>
+<button onClick="{{ nav.profil.go }}" style="flex:1;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;min-height:52px;color:{{ nav.profil.color }}">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20 C5 16 8 14.5 12 14.5 C16 14.5 19 16 19 20"></path></svg>
+<span style="font-size:11px;font-weight:{{ nav.profil.weight }}">Profil</span>
+</button>
+</div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:920},&quot;demoState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Baru&quot;,&quot;Fitland selesai&quot;,&quot;Semua selesai&quot;],&quot;default&quot;:&quot;Fitland selesai&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo&quot;}}">
+const KEY = 'mapan-journey-v1';
+const NAVY = '#10275A';
+
+const ICON = {
+  person: 'M12 4.4a2.1 2.1 0 1 1 0 4.2 2.1 2.1 0 0 1 0-4.2M12 8.6v5.6M6.4 10.8h11.2M12 14.2 8.4 20.2M12 14.2l3.6 6',
+  wallet: 'M5.2 7.4h11a3 3 0 0 1 3 3v5.8a3 3 0 0 1-3 3h-11a3 3 0 0 1-3-3v-5.8a3 3 0 0 1 3-3ZM5.2 7.4V6.6a2 2 0 0 1 2.5-1.94l8 1.74M14.6 12.6h4.6v3.6h-4.6a1.8 1.8 0 0 1 0-3.6Z',
+  brain: 'M12 5.6a3.3 3.3 0 0 0-5.7 2.1A2.9 2.9 0 0 0 4.5 11a3 3 0 0 0 1.3 2.5A3 3 0 0 0 9 18.7a3.1 3.1 0 0 0 3-1.5ZM12 5.6a3.3 3.3 0 0 1 5.7 2.1A2.9 2.9 0 0 1 19.5 11a3 3 0 0 1-1.3 2.5A3 3 0 0 1 15 18.7a3.1 3.1 0 0 1-3-1.5ZM12 5.6v11.6',
+  compass: 'M12 3.3a8.7 8.7 0 1 0 0 17.4 8.7 8.7 0 0 0 0-17.4ZM15.4 8.6l-2.1 4.7-4.7 2.1 2.1-4.7Z',
+  plane: 'M20.8 4.2 3.4 11.1l7.2 2.6M20.8 4.2 13.5 20l-2.9-6.3M10.6 13.7 20.8 4.2',
+  pin: 'M12 21.2s6.4-6.9 6.4-11A6.4 6.4 0 0 0 5.6 10.2c0 4.1 6.4 11 6.4 11ZM12 12.4a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6Z',
+  shop: 'M3.6 9.6h16.8v9.4a1.6 1.6 0 0 1-1.6 1.6H5.2a1.6 1.6 0 0 1-1.6-1.6ZM3.6 9.6 5.6 4.6h12.8l2 5M9.2 20.6v-5h5.6v5',
+  briefcase: 'M3.6 8.6h16.8v9.6a1.6 1.6 0 0 1-1.6 1.6H5.2a1.6 1.6 0 0 1-1.6-1.6ZM9.2 8.6V6.2a1.6 1.6 0 0 1 1.6-1.6h2.4a1.6 1.6 0 0 1 1.6 1.6v2.4M3.6 13.2h16.8',
+  book: 'M12 7.2C10 5.6 7 5.2 4 5.6v12c3-.4 6 0 8 1.6 2-1.6 5-2 8-1.6v-12c-3-.4-6 0-8 1.6ZM12 7.2v12',
+  heart: 'M12 19.6c-3.5-2.7-6.6-4.7-6.6-8.1A3.6 3.6 0 0 1 12 9.3a3.6 3.6 0 0 1 6.6 2.2c0 3.4-3.1 5.4-6.6 8.1Z',
+  chart: 'M4.4 19.6h15.2M7.6 19.6v-5.2M12 19.6v-9.2M16.4 19.6v-6.6',
+  house: 'M4 11.6 12 5l8 6.6M6.6 10.1v9.5h10.8v-9.5M10 19.6v-5h4v5',
+  walk: 'M12.6 4.4a2 2 0 1 1 0 4 2 2 0 0 1 0-4M12.2 8.8 11.2 14.3M11.2 14.3 7.4 19.8M11.2 14.3l3.8 5.5M13.4 10.4l3.6 1.8M10.6 10.6 7 12.4'
+};
+
+const VPARTS = [
+  { left: 220, top: 6, align: 'left', lineD: 'M218 30 C206 58 200 86 196 108' },
+  { left: 0, top: 6, align: 'right', lineD: 'M82 30 C92 58 96 86 100 108' },
+  { left: 0, top: 198, align: 'right', lineD: 'M82 200 C90 186 96 176 104 164' },
+  { left: 220, top: 198, align: 'left', lineD: 'M218 200 C210 186 202 176 192 164' },
+  { left: 220, top: 104, align: 'left', lineD: 'M218 120 L210 136' }
+];
+
+const LEAF_SLOTS = [[112, 104], [188, 100], [130, 86], [170, 84], [100, 96], [200, 92], [145, 78], [118, 72], [182, 70], [150, 60]];
+
+const COMPASS_DIRS = [
+  { label: 'NILAI', sub: 'yang saya pegang', left: 75, top: 46, w: 150 },
+  { label: 'ORANG', sub: 'yang saya jaga', left: 218, top: 134, w: 82 },
+  { label: 'KONTRIBUSI', sub: 'yang saya beri', left: 75, top: 222, w: 150 },
+  { label: 'KEYAKINAN', sub: 'menguatkan', left: 0, top: 134, w: 82 }
+];
+
+const STAGES = [
+  { t: 'MELEPAS', b: 'Peran & rutinitas lama' },
+  { t: 'MASA ANTARA', b: 'Terasa kosong, dan itu wajar' },
+  { t: 'MEMULAI', b: 'Peran baru tumbuh perlahan' }
+];
+
+const FINZONES = [
+  { t: 'ASET', b: 'Rumah, tanah, tabungan', left: 6, top: 84, w: 96 },
+  { t: 'KEWAJIBAN', b: 'Utang & cicilan', left: 198, top: 84, w: 96 },
+  { t: 'ARUS BULANAN', b: 'Masuk & keluar', left: 102, top: 186, w: 96 }
+];
+
+const C = {
+  fitland: { color: '#1E8A4C', tint: '#EAF4EC', border: 'rgba(30,138,76,.25)', icon: ICON.person },
+  assetland: { color: '#C9871A', tint: '#FDF3DF', border: 'rgba(201,135,26,.28)', icon: ICON.wallet },
+  mindland: { color: '#6C4FB6', tint: '#F0EBFA', border: 'rgba(108,79,182,.25)', icon: ICON.brain },
+  soulland: { color: '#D9662F', tint: '#FDEEE4', border: 'rgba(217,102,47,.25)', icon: ICON.compass }
+};
+
+function mk(t, lead, pts, reflect, kind) {
+  return { t: t, lead: lead, points: pts.map(function (p) { return { h: p[0], b: p[1] }; }), reflect: reflect, kind: kind || 'plain' };
+}
+
+const TERMINALS = [
+  {
+    id: 'fitland', name: 'FITLAND', nameTitle: 'Fitland', tag: 'Sehat Tanpa Obat', support: 'Kesehatan',
+    q: 'Apakah tubuh saya siap untuk perjalanan ini?', visa: 'FIT TO TRAVEL',
+    visaQ: 'Kebiasaan apa yang akan saya jaga secara konsisten agar kendaraan ini tetap siap menemani saya menikmati bab kehidupan berikutnya?',
+    modules: [
+      mk('Health Check-In', 'Mulai dari gambaran jujur tentang kondisi tubuhmu hari ini. Tidak ada nilai, hanya kesadaran.', [['Energi harian', 'Seberapa sering kamu merasa cukup bertenaga sampai malam?'], ['Keluhan berulang', 'Nyeri, sesak, atau lelah yang sering datang.'], ['Pemeriksaan terakhir', 'Kapan terakhir kamu memeriksa tekanan darah dan gula?']], 'Apa satu hal tentang tubuhmu yang paling kamu syukuri hari ini?'),
+      mk('Body as Your Vehicle', 'Tubuh adalah kendaraanmu menuju bab kehidupan berikutnya. Rawatlah dengan baik agar perjalananmu nyaman dan lancar.', [['Mesin', 'Jantung & paru-paru'], ['Bahan Bakar', 'Nutrisi & hidrasi'], ['Ban', 'Otot, mobilitas & keseimbangan'], ['Rem', 'Istirahat & recovery'], ['Lampu', 'Pikiran positif & awareness']], 'Bagian mana dari kendaraanmu yang paling ingin kamu rawat mulai sekarang?', 'vehicle'),
+      mk('Healthy Aging', 'Menua adalah proses alami. Yang bisa kita pilih adalah menua dengan tetap kuat dan mandiri.', [['Kekuatan bisa dijaga', 'Massa otot menurun setelah usia 40, tetapi latihan ringan yang rutin menahannya.'], ['Kebiasaan kecil menang', 'Konsisten sepuluh menit setiap hari lebih berpengaruh daripada usaha besar sesekali.'], ['Tidak perlu ekstrem', 'Target yang realistis lebih mungkin kamu jalani bertahun-tahun.']], 'Kebiasaan kecil apa yang bisa kamu mulai minggu ini?'),
+      mk('Move to Stay Independent', 'Tujuan bergerak di usia ini bukan penampilan, tetapi kemandirian: bisa naik tangga, menggendong cucu, bepergian sendiri.', [['Jalan kaki', '20 sampai 30 menit, hampir setiap hari.'], ['Latihan kekuatan', 'Dua kali seminggu, cukup dengan beban tubuh sendiri.'], ['Keseimbangan', 'Berdiri satu kaki saat menyikat gigi sudah membantu.']], 'Gerakan apa yang paling mungkin kamu lakukan secara rutin?'),
+      mk('Eat for Your Next Chapter', 'Makan bukan soal pantangan ketat, tetapi soal pola yang bisa kamu jalani terus.', [['Protein cukup', 'Untuk menjaga otot dan daya tahan.'], ['Kurangi gula & gorengan', 'Cukup kurangi porsinya, tidak harus berhenti total.'], ['Air yang cukup', 'Rasa lapar sering hanya rasa haus.']], 'Satu perubahan pola makan yang realistis untukmu?'),
+      mk('Sleep & Recovery', 'Pemulihan adalah bagian dari kebugaran, bukan kemalasan.', [['Tujuh jam', 'Jam tidur yang teratur lebih penting daripada jumlahnya saja.'], ['Rutinitas malam', 'Kurangi layar dan kopi menjelang tidur.'], ['Jeda siang', 'Istirahat singkat dua puluh menit menyegarkan tanpa mengganggu malam.']], 'Apa yang paling sering mengganggu istirahatmu, dan apa langkah kecil untuk memperbaikinya?'),
+      mk('Prevent, Don\u2019t Wait', 'Mencegah jauh lebih murah dan nyaman daripada mengobati.', [['Angka dasar', 'Tekanan darah, gula darah, kolesterol.'], ['Skrining sesuai usia', 'Diskusikan dengan dokter mana yang relevan untukmu.'], ['Kenali tanda bahaya', 'Nyeri dada, sesak, pusing berat jangan ditunda.']], 'Pemeriksaan apa yang ingin kamu jadwalkan bulan ini?'),
+      mk('My Fit to Travel Plan', 'Rangkum semuanya menjadi rencana sederhana yang bisa kamu jalani tiga bulan ke depan.', [['Gerak', 'Jenis, durasi, dan harinya.'], ['Makan', 'Satu perubahan saja, dijalani konsisten.'], ['Tidur & cek kesehatan', 'Jam tidur dan jadwal pemeriksaan.']], 'Tuliskan rencana sehatmu untuk tiga bulan ke depan.')
+    ]
+  },
+  {
+    id: 'assetland', name: 'ASSETLAND', nameTitle: 'Assetland', tag: 'Bekal Saya Cukup?', support: 'Keuangan',
+    q: 'Apakah bekal saya cukup untuk menikmati perjalanan ini?', visa: 'FINANCIALLY READY',
+    visaQ: 'Prioritas keuangan apa yang akan saya jaga agar bekal perjalanan ini tetap cukup dan tenang?',
+    modules: [
+      mk('Financial Check-In', 'Gambaran kasar sudah cukup untuk mulai. Ketelitian bisa menyusul.', [['Pemasukan setelah purna tugas', 'Pensiun, sewa, usaha, atau lainnya.'], ['Pengeluaran bulanan', 'Perkirakan yang benar-benar rutin.'], ['Kewajiban', 'Cicilan atau tanggungan yang masih berjalan.']], 'Apa satu hal tentang keuanganmu yang paling ingin kamu perjelas?'),
+      mk('Defining Enough', 'Cukup bukan angka yang sama untuk semua orang. Cukup adalah angka yang membuatmu tenang.', [['Biaya hidup pokok', 'Rumah, makan, listrik, transportasi.'], ['Biaya kesehatan', 'Bagian yang paling sering diremehkan.'], ['Biaya menikmati hidup', 'Hobi, perjalanan, keluarga. Ini bukan pemborosan.']], 'Menurutmu, seperti apa hidup yang sudah bisa disebut cukup?'),
+      mk('My Financial Map', 'Peta sederhana: apa yang kamu miliki, apa yang kamu bayar, dan apa yang mengalir setiap bulan.', [['Aset', 'Rumah, tanah, tabungan, investasi.'], ['Kewajiban', 'Utang dan cicilan.'], ['Arus bulanan', 'Masuk dan keluar.']], 'Setelah melihat petamu, bagian mana yang paling perlu dirapikan?', 'finmap'),
+      mk('Packing Your Financial Luggage', 'Pilih bekal yang paling penting untukmu. Ini latihan kesadaran, bukan perhitungan investasi.', [], 'Mengapa tiga bekal teratas itu yang paling penting bagimu?', 'chips'),
+      mk('Protect Your Journey', 'Proteksi menjaga rencana tetap utuh ketika ada kejadian tak terduga.', [['Kesehatan', 'Jaminan atau asuransi kesehatan setelah tidak lagi bekerja.'], ['Jiwa', 'Terutama bila masih ada tanggungan.'], ['Dana darurat', 'Simpanan yang mudah dicairkan.']], 'Perlindungan apa yang belum kamu siapkan?'),
+      mk('The Second Journey', 'Sebagian orang ingin tetap berpenghasilan setelah purna tugas. Sebagian memilih berhenti. Keduanya sah.', [['Dari keahlian', 'Konsultasi atau mengajar.'], ['Dari hobi', 'Usaha kecil yang menyenangkan.'], ['Dari aset', 'Sewa atau usaha yang dikelola orang lain.']], 'Kalau ingin tetap berpenghasilan, dari mana kamu ingin memulainya?'),
+      mk('Avoid Financial Turbulence', 'Sebagian risiko keuangan pascapensiun bisa dihindari hanya dengan berhati-hati.', [['Tawaran untung besar', 'Semakin tinggi janji hasilnya, semakin besar risikonya.'], ['Menanggung terlalu banyak', 'Bantuan keluarga tetap perlu batas.'], ['Modal habis di awal', 'Jangan taruh seluruh dana pensiun pada satu usaha baru.']], 'Risiko keuangan mana yang paling perlu kamu waspadai?'),
+      mk('My Financial Flight Plan', 'Rangkum menjadi tiga keputusan keuangan yang akan kamu jalankan.', [['Yang saya jaga', 'Dana darurat dan kesehatan.'], ['Yang saya kurangi', 'Pengeluaran yang tidak lagi penting.'], ['Yang saya siapkan', 'Satu langkah dalam tiga bulan ke depan.']], 'Tuliskan rencana keuanganmu secara singkat.')
+    ]
+  },
+  {
+    id: 'mindland', name: 'MINDLAND', nameTitle: 'Mindland', tag: 'Hati & Identitas Siap?', support: 'Psikologis',
+    q: 'Apakah hati dan identitas saya siap memasuki bab baru?', visa: 'EMOTIONALLY READY',
+    visaQ: 'Sikap apa yang akan saya jaga agar hati saya tetap tenang saat memasuki bab baru?',
+    modules: [
+      mk('Emotional Check-In', 'Perasaan menjelang purna tugas biasanya bercampur. Itu normal.', [['Lega dan lelah', 'Keduanya bisa hadir bersamaan.'], ['Cemas', 'Biasanya tentang peran dan penghasilan.'], ['Penasaran', 'Tanda kamu sudah melihat ke depan.']], 'Perasaan apa yang paling sering muncul ketika kamu memikirkan purna tugas?'),
+      mk('Retirement as Life Transition', 'Purna tugas bukan akhir karier, tetapi perpindahan peran. Setiap perpindahan butuh waktu.', [], 'Di tahap mana kamu merasa berada sekarang?', 'stages'),
+      mk('Letting Go with Grace', 'Melepaskan dengan tenang meninggalkan kesan yang jauh lebih panjang daripada jabatan.', [['Selesaikan dengan baik', 'Serah terima yang rapi.'], ['Ucapkan terima kasih', 'Kepada orang yang menemani perjalananmu.'], ['Lepaskan kendali', 'Penggantimu punya caranya sendiri.']], 'Apa yang ingin kamu selesaikan dengan baik sebelum purna tugas?'),
+      mk('Rediscovering My Identity', 'Kamu bukan jabatanmu. Ada banyak hal yang layak dibawa, dan beberapa yang lebih baik ditinggalkan.', [], 'Setelah memilih, siapa dirimu di luar pekerjaan?', 'twocol'),
+      mk('Finding New Purpose', 'Tujuan baru biasanya kecil dan dekat, bukan besar dan dramatis.', [['Apa yang kamu nikmati', 'Kegiatan yang membuat waktu terasa cepat.'], ['Apa yang kamu kuasai', 'Pengalaman yang bisa dibagikan.'], ['Apa yang dibutuhkan sekitar', 'Di keluarga atau komunitas.']], 'Kegiatan apa yang membuatmu merasa berguna?'),
+      mk('Staying Connected', 'Relasi kerja sering ikut berhenti bersama pekerjaan. Relasi lain perlu dirawat sejak sekarang.', [['Keluarga', 'Kualitas waktu, bukan hanya keberadaan.'], ['Sahabat lama', 'Hubungan yang tidak bergantung jabatan.'], ['Komunitas baru', 'Hobi, ibadah, kegiatan sosial.']], 'Siapa yang ingin kamu prioritaskan di bab berikutnya?'),
+      mk('Building Emotional Resilience', 'Ketahanan bukan berarti tidak pernah sedih, tetapi bisa pulih.', [['Kenali pemicunya', 'Situasi yang membuatmu tertekan.'], ['Punya penyangga', 'Orang, kebiasaan, atau keyakinan.'], ['Minta bantuan', 'Bukan tanda lemah.']], 'Apa yang biasanya membantumu pulih ketika sedang berat?'),
+      mk('Boarding to My Next Chapter', 'Rangkum kesiapan hatimu menjadi satu kalimat yang bisa kamu ingat.', [['Yang saya bawa', 'Nilai dan pengalaman.'], ['Yang saya tinggalkan', 'Beban yang tidak lagi perlu.'], ['Identitas baru', 'Sebutkan dalam satu kalimat.']], 'Tuliskan satu kalimat tentang dirimu di bab berikutnya.')
+    ]
+  },
+  {
+    id: 'soulland', name: 'SOULLAND', nameTitle: 'Soulland', tag: 'Makna & Tujuan Hidup', support: 'Makna Hidup',
+    q: 'Untuk apa saya menjalani perjalanan ini?', visa: 'INNER PEACE',
+    visaQ: 'Makna atau nilai apa yang akan menjadi kompas saya di bab kehidupan berikutnya?',
+    modules: [
+      mk('Spiritual Check-In', 'Bagian ini terbuka untuk semua keyakinan. Isi sesuai caramu sendiri.', [['Ketenangan', 'Seberapa sering kamu merasa tenang.'], ['Sumber makna', 'Keluarga, keyakinan, karya, atau pelayanan.'], ['Ruang hening', 'Kapan terakhir kamu punya waktu untuk diam?']], 'Apa yang paling memberi ketenangan bagimu saat ini?'),
+      mk('What Truly Matters?', 'Setelah karier tidak lagi menjadi pusat, apa yang tinggal? Empat arah ini bisa menjadi kompasmu.', [], 'Tiga hal apa yang paling penting dalam hidupmu?', 'compass'),
+      mk('Gratitude Changes Perspective', 'Syukur tidak menghapus masalah, tetapi mengubah cara kita melihatnya.', [['Perjalanan karier', 'Hal yang ternyata layak disyukuri.'], ['Orang di sekitar', 'Yang menemani tanpa banyak bicara.'], ['Hal sederhana', 'Kesehatan, waktu, rumah.']], 'Tuliskan tiga hal yang kamu syukuri hari ini.'),
+      mk('Legacy Beyond Position', 'Yang diingat orang biasanya bukan jabatanmu, tetapi caramu memperlakukan mereka.', [], 'Bagaimana kamu ingin diingat oleh orang terdekatmu?', 'tree'),
+      mk('Serving Beyond Career', 'Pengalamanmu masih dibutuhkan, hanya dalam bentuk yang berbeda.', [['Mentoring', 'Membimbing yang lebih muda.'], ['Kegiatan sosial', 'Komunitas atau rumah ibadah.'], ['Lingkungan terdekat', 'Kadang cukup di tingkat keluarga.']], 'Di mana kamu ingin memberi kontribusi?'),
+      mk('Reconnecting with Yourself', 'Setelah puluhan tahun sibuk, perlu waktu untuk mengenal diri sendiri kembali.', [['Waktu hening', 'Sedikit saja setiap hari.'], ['Menulis', 'Membantu merapikan pikiran.'], ['Alam dan gerak', 'Menenangkan tanpa banyak kata.']], 'Kapan kamu merasa paling dekat dengan dirimu sendiri?'),
+      mk('Faith as Strength', 'Bagi banyak orang, keyakinan menjadi sumber kekuatan di masa transisi. Bentuknya bisa berbeda-beda.', [['Sumber ketenangan', 'Ibadah, doa, atau perenungan.'], ['Komunitas', 'Tempat bertumbuh bersama.'], ['Arah', 'Membantu memilih apa yang penting.']], 'Dari mana kamu memperoleh kekuatan ketika menghadapi perubahan besar?'),
+      mk('My Meaningful Journey', 'Rangkum kompas hidupmu menjadi satu pernyataan yang sederhana.', [['Nilai', 'Yang saya pegang.'], ['Orang', 'Yang saya jaga.'], ['Kontribusi', 'Yang saya berikan.']], 'Tuliskan misi hidupmu dalam satu atau dua kalimat.')
+    ]
+  }
+];
+
+const LUGGAGE = ['Dana Darurat', 'Dana Kesehatan', 'Rumah', 'Proteksi', 'Investasi', 'Hobi', 'Bisnis', 'Liburan', 'Dana Keluarga', 'Warisan'];
+const CARRY = ['Pengalaman', 'Kebijaksanaan', 'Persahabatan', 'Integritas', 'Humor', 'Rasa ingin tahu'];
+const LEAVE = ['Ego jabatan', 'Perfeksionisme', 'Takut gagal', 'Terlalu sibuk', 'Membandingkan diri'];
+
+const QUESTIONS = [
+  { area: 'FITLAND', id: 'fitland', text: 'Saya merasa tubuh saya cukup bugar untuk aktivitas harian.' },
+  { area: 'FITLAND', id: 'fitland', text: 'Saya rutin bergerak atau berolahraga setiap minggu.' },
+  { area: 'ASSETLAND', id: 'assetland', text: 'Saya punya gambaran jelas tentang kebutuhan biaya hidup setelah purna tugas.' },
+  { area: 'ASSETLAND', id: 'assetland', text: 'Saya sudah menyiapkan dana darurat dan dana kesehatan.' },
+  { area: 'MINDLAND', id: 'mindland', text: 'Saya merasa siap melepas peran dan jabatan saat ini.' },
+  { area: 'MINDLAND', id: 'mindland', text: 'Saya punya gambaran tentang diri saya di luar pekerjaan.' },
+  { area: 'SOULLAND', id: 'soulland', text: 'Saya tahu apa yang paling bermakna dalam hidup saya.' },
+  { area: 'SOULLAND', id: 'soulland', text: 'Saya punya kegiatan yang memberi rasa berguna.' },
+  { area: 'NEXT CHAPTER', id: 'next', text: 'Saya punya gambaran ingin melakukan apa setelah purna tugas.' },
+  { area: 'NEXT CHAPTER', id: 'next', text: 'Saya sudah membicarakan rencana ini dengan keluarga.' }
+];
+
+const ARCHETYPES = [
+  { id: 'wirausaha', title: 'WIRAUSAHA', sub: 'Bangun usaha dari passion & peluang', color: '#1E8A4C', tint: '#EAF4EC', icon: ICON.shop, body: 'Menjalankan usaha sendiri setelah purna tugas, dalam skala yang kamu nikmati dan mampu kelola.', examples: ['Usaha dari hobi', 'Usaha dari keahlian', 'Usaha keluarga', 'Usaha digital atau online'] },
+  { id: 'konsultan', title: 'KONSULTAN / PROFESIONAL PARUH WAKTU', sub: 'Berbagi keahlian secara fleksibel', color: '#10275A', tint: '#EEF1F7', icon: ICON.briefcase, body: 'Tetap bekerja di bidang yang kamu kuasai, dengan waktu dan beban yang kamu tentukan sendiri.', examples: ['Konsultan bidang lama', 'Freelancer', 'Advisor atau komisaris', 'Kontrak paruh waktu'] },
+  { id: 'edukator', title: 'EDUKATOR / MENTOR', sub: 'Mengajar dan membimbing generasi berikutnya', color: '#6C4FB6', tint: '#F0EBFA', icon: ICON.book, body: 'Menurunkan pengalaman kepada orang lain melalui pengajaran, pelatihan, atau tulisan.', examples: ['Pengajar', 'Trainer', 'Mentor', 'Penulis atau content creator'] },
+  { id: 'sosial', title: 'KONTRIBUTOR SOSIAL', sub: 'Berkontribusi pada masyarakat & isu sosial', color: '#D9662F', tint: '#FDEEE4', icon: ICON.heart, body: 'Memberi waktu dan pengalaman untuk kegiatan sosial, komunitas, atau keagamaan.', examples: ['Relawan', 'Organisasi sosial atau keagamaan', 'Komunitas', 'Kegiatan masyarakat'] },
+  { id: 'investor', title: 'INVESTOR / PENGELOLA ASET', sub: 'Mengembangkan aset & perencanaan keuangan', color: '#C9871A', tint: '#FDF3DF', icon: ICON.chart, body: 'Fokus mengelola dan menjaga aset agar bekal perjalanan tetap aman dan bertumbuh wajar.', examples: ['Properti', 'Portofolio investasi', 'Pemilik usaha pasif', 'Pengelolaan aset keluarga'] },
+  { id: 'purna', title: 'PURNA TUGAS UTUH', sub: 'Menikmati hidup berkualitas dengan keluarga & diri sendiri', color: '#1E6E42', tint: '#EDF3EE', icon: ICON.house, body: 'Memilih tidak mencari penghasilan baru dan menikmati waktu dengan penuh. Pilihan ini sama berharganya.', examples: ['Keluarga', 'Kesehatan', 'Hobi', 'Perjalanan', 'Spiritual', 'Menikmati hidup tanpa agenda ketat'] }
+];
+
+const SUMMARY_FIELDS = [
+  { key: 'identitas', label: 'Identitas Baru Saya' },
+  { key: 'nilai', label: 'Nilai yang Akan Saya Jaga' },
+  { key: 'orang', label: 'Orang yang Akan Saya Prioritaskan' },
+  { key: 'kebiasaan', label: 'Kebiasaan yang Ingin Saya Pertahankan' },
+  { key: 'keuangan', label: 'Prioritas Keuangan Saya' },
+  { key: 'misi', label: 'Misi Hidup Saya' },
+  { key: 'legacy', label: 'Legacy yang Ingin Saya Tinggalkan' }
+];
+
+const NC_FIELDS = [
+  { key: 'menjadi', label: 'Saya ingin menjadi\u2026' },
+  { key: 'melakukan', label: 'Saya ingin melakukan\u2026' },
+  { key: 'kontribusi', label: 'Saya ingin memberi kontribusi kepada\u2026' },
+  { key: 'menjaga', label: 'Saya ingin tetap menjaga\u2026' },
+  { key: 'langkah', label: 'Langkah pertama yang ingin saya lakukan\u2026' }
+];
+
+const STATUSES = ['Belum Dimulai', 'Sedang Berjalan', 'Selesai'];
+
+function blank() {
+  return {
+    appVersion: '0.1.0', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    participantProfile: { nama: '', instansi: '', purna: '', harapan: '' },
+    initialAssessment: { answers: {}, scores: null, done: false },
+    responses: { fitland: {}, assetland: {}, mindland: {}, soulland: {} },
+    commitments: {}, visaStatus: {}, passportStamps: [], passportSummary: {},
+    nextChapter: { primary: null, secondary: [], plan: {} },
+    ninetyDayPlan: { d30: [], d60: [], d90: [] },
+    notes: [], reminders: [], appPreferences: { textSize: 'normal' },
+    journeyProgress: { started: false, finished: false }, seedMark: 'Baru'
+  };
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return null;
+    const d = JSON.parse(raw);
+    if (!d || !d.participantProfile) return null;
+    return d;
+  } catch (e) { return null; }
+}
+
+function seeded(mark) {
+  const d = blank();
+  d.seedMark = mark;
+  d.participantProfile = { nama: 'Budi', instansi: 'PT Nusantara Sejahtera', purna: '2028', harapan: 'Tetap sehat, dekat dengan keluarga, dan sempat mengajar.' };
+  d.initialAssessment = { answers: {}, done: true, scores: { fitland: 65, assetland: 55, mindland: 70, soulland: 60, next: 50 } };
+  d.journeyProgress.started = true;
+  const fill = function (tid, upto) {
+    TERMINALS.forEach(function (t) {
+      if (t.id !== tid) return;
+      for (var i = 0; i < upto; i++) d.responses[tid]['m' + i] = { done: true, reflection: 'Saya ingin lebih konsisten menjaga bagian ini.', chips: [] };
+    });
+  };
+  if (mark === 'Fitland selesai') {
+    fill('fitland', 8);
+    d.visaStatus.fitland = true;
+    d.passportStamps = [{ id: 'fitland', label: 'FIT TO TRAVEL', date: new Date().toISOString() }];
+    d.responses.assetland.m0 = { done: true, reflection: 'Ingin memperjelas kebutuhan bulanan.', chips: [] };
+  }
+  if (mark === 'Semua selesai') {
+    ['fitland', 'assetland', 'mindland', 'soulland'].forEach(function (id) {
+      fill(id, 8); d.visaStatus[id] = true;
+      d.passportStamps.push({ id: id, label: TERMINALS.filter(function (t) { return t.id === id; })[0].visa, date: new Date().toISOString() });
+    });
+    d.nextChapter.primary = 'edukator';
+    d.nextChapter.plan = { menjadi: 'Mentor bagi profesional muda', melakukan: 'Mengajar dua kali sebulan', kontribusi: 'Komunitas alumni dan keluarga', menjaga: 'Kesehatan dan waktu bersama cucu', langkah: 'Menghubungi kampus tempat saya pernah menjadi pembicara' };
+    d.ninetyDayPlan = { d30: [{ text: 'Cek kesehatan lengkap', status: 'Sedang Berjalan' }], d60: [{ text: 'Menyusun materi kelas pertama', status: 'Belum Dimulai' }], d90: [{ text: 'Mengajar kelas perdana', status: 'Belum Dimulai' }] };
+    d.journeyProgress.finished = true;
+  }
+  return d;
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const mark = props.demoState || 'Baru';
+    let d = load();
+    if (!d || d.seedMark !== mark) d = mark === 'Baru' ? (d || blank()) : seeded(mark);
+    this.state = {
+      data: d,
+      screen: d.journeyProgress && d.journeyProgress.started ? 'home' : 'welcome',
+      params: {}, stack: [], saved: false, drafts: {}, resetStep: 0
+    };
+    this.fileRef = React.createRef();
+  }
+
+  componentDidUpdate(prev) {
+    if (prev.demoState !== this.props.demoState) {
+      const mark = this.props.demoState || 'Baru';
+      const d = mark === 'Baru' ? blank() : seeded(mark);
+      this.persist(d);
+      this.setState({ data: d, screen: d.journeyProgress.started ? 'home' : 'welcome', params: {}, stack: [] });
+    }
+  }
+
+  persist(d) { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} }
+
+  upd(fn, quiet) {
+    const d = JSON.parse(JSON.stringify(this.state.data));
+    fn(d);
+    d.updatedAt = new Date().toISOString();
+    this.persist(d);
+    this.setState({ data: d, saved: !quiet });
+    if (!quiet) {
+      clearTimeout(this._t);
+      this._t = setTimeout(() => this.setState({ saved: false }), 2200);
+    }
+  }
+
+  go(screen, params) {
+    this.setState(s => ({ screen: screen, params: params || {}, stack: s.stack.concat([{ screen: s.screen, params: s.params }]), resetStep: 0 }));
+    const el = document.querySelector('[data-scroll]');
+    if (el) el.scrollTop = 0;
+  }
+
+  back() {
+    this.setState(s => {
+      const st = s.stack.slice();
+      const prev = st.pop() || { screen: 'home', params: {} };
+      return { screen: prev.screen, params: prev.params, stack: st, resetStep: 0 };
+    });
+  }
+
+  term(id) { return TERMINALS.filter(t => t.id === id)[0]; }
+  resp(tid, i) { return (this.state.data.responses[tid] || {})['m' + i] || {}; }
+  doneCount(tid) { const r = this.state.data.responses[tid] || {}; return Object.keys(r).filter(k => r[k] && r[k].done).length; }
+  totalDone() { return TERMINALS.reduce((a, t) => a + this.doneCount(t.id), 0); }
+
+  nextStop() {
+    for (var i = 0; i < TERMINALS.length; i++) {
+      const t = TERMINALS[i];
+      if (this.state.data.visaStatus[t.id]) continue;
+      for (var j = 0; j < 8; j++) if (!this.resp(t.id, j).done) return { screen: 'module', params: { t: t.id, m: j }, label: t.nameTitle + ' \u00b7 Modul ' + (j + 1) };
+      return { screen: 'visaq', params: { t: t.id }, label: 'Visa ' + t.nameTitle };
+    }
+    if (!this.state.data.nextChapter.primary) return { screen: 'nextchapter', params: {}, label: 'Next Chapter' };
+    return { screen: 'plan90', params: {}, label: 'Rencana 90 Hari' };
+  }
+
+  backup() {
+    const d = this.state.data;
+    const nama = (d.participantProfile.nama || 'Peserta').replace(/\s+/g, '-');
+    const date = new Date().toISOString().slice(0, 10);
+    const payload = { format: 'MAPAN-JOURNEY-BACKUP', version: 1, exportedAt: new Date().toISOString(), data: d };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'MAPAN-Backup-' + nama + '-' + date + '.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    this.setState({ saved: true });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ saved: false }), 2500);
+  }
+
+  restore(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let parsed = null;
+      try { parsed = JSON.parse(reader.result); } catch (err) { parsed = null; }
+      if (!parsed || parsed.format !== 'MAPAN-JOURNEY-BACKUP' || !parsed.data || !parsed.data.participantProfile) {
+        window.alert('File ini sepertinya bukan backup MAPAN yang utuh. Coba pilih file lain.');
+        return;
+      }
+      if (!window.confirm('Data MAPAN yang ada di perangkat ini akan diganti dengan data dari file backup. Lanjutkan?')) return;
+      const d = Object.assign(blank(), parsed.data);
+      this.persist(d);
+      this.setState({ data: d, screen: 'home', params: {}, stack: [], saved: true });
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  }
+
+  reset() {
+    if (this.state.resetStep === 0) { this.setState({ resetStep: 1 }); window.alert('Tekan sekali lagi untuk mengulang perjalanan. Semua refleksi, visa, dan rencana di perangkat ini akan dihapus.'); return; }
+    if (!window.confirm('Yakin ingin mengulang perjalanan dari awal? Sebaiknya lakukan Backup Data terlebih dahulu.')) { this.setState({ resetStep: 0 }); return; }
+    const d = blank();
+    this.persist(d);
+    this.setState({ data: d, screen: 'welcome', params: {}, stack: [], resetStep: 0 });
+  }
+
+  renderVals() {
+    const self = this;
+    const s = this.state;
+    const d = s.data;
+    const screen = s.screen;
+    const sc = {};
+    ['welcome', 'intro', 'profile', 'checkin', 'result', 'home', 'journey', 'terminal', 'module', 'visaq', 'visa', 'transition', 'immigration', 'passport', 'summary', 'nextchapter', 'archetype', 'mynext', 'plan90', 'arrival', 'jadwal', 'catatan', 'profil', 'program'].forEach(k => { sc[k] = screen === k; });
+
+    const pct = Math.round(this.totalDone() / 32 * 100);
+    const termsDone = TERMINALS.filter(t => d.visaStatus[t.id]).length;
+    const allVisas = TERMINALS.every(function (t) { return !!d.visaStatus[t.id]; });
+    const post = !!d.journeyProgress.finished && allVisas;
+    const nama = d.participantProfile.nama || 'Sahabat';
+
+    const V = {
+      zoom: d.appPreferences.textSize === 'besar' ? 1.1 : 1,
+      sc: sc,
+      savedNote: s.saved ? 'Tersimpan di perangkat' : '',
+      stampIcon: ICON.plane,
+      walkIcon: ICON.walk,
+      pctText: pct + '%',
+      ringNavy: (pct / 100 * 194.8).toFixed(1) + ' 400',
+      ringBig: (pct / 100 * 213.6).toFixed(1) + ' 400',
+      termsDone: termsDone,
+      appVersion: d.appVersion,
+      passportName: nama,
+      startDate: new Date(d.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+      postJourney: post,
+      preJourney: !post,
+      greeting: post ? 'Selamat datang di bab berikutnya, ' + nama + '.' : 'Halo, ' + nama + ' \ud83d\udc4b',
+      greetingSub: post ? 'Perjalanan MAPAN-mu sudah lengkap.' : 'Perjalanan MAPAN-mu dimulai!',
+      profileMeta: [d.participantProfile.instansi, d.participantProfile.purna ? 'Purna tugas ' + d.participantProfile.purna : ''].filter(Boolean).join(' \u00b7 ') || 'Data tersimpan di perangkat ini',
+      showNav: ['home', 'journey', 'jadwal', 'catatan', 'profil'].indexOf(screen) >= 0,
+      back: () => this.back(),
+      startJourney: () => { this.upd(x => { x.journeyProgress.started = true; }, true); this.go('intro'); },
+      toProfile: () => this.go('profile'),
+      toCheckin: () => this.go('checkin'),
+      ncLocked: !allVisas,
+      ncCardSub: allVisas ? 'Siapkan langkahmu di bab berikutnya' : 'Berikutnya, setelah empat terminal',
+      goNextChapter: () => { if (allVisas) { this.go('nextchapter'); } else { const n = this.nextStop(); this.go(n.screen, n.params); } },
+      goSummary: () => this.go('summary'),
+      goPassport: () => this.go('passport'),
+      goProgram: () => this.go('program'),
+      goMyNext: () => this.go('mynext'),
+      goPlan: () => this.go('plan90'),
+      goArrival: () => { if (allVisas) this.go('arrival'); },
+      finishJourney: () => { if (allVisas) this.upd(x => { x.journeyProgress.finished = true; }, true); this.setState({ screen: 'home', params: {}, stack: [] }); },
+      backupData: () => this.backup(),
+      pickRestore: () => { if (this.fileRef.current) this.fileRef.current.click(); },
+      onRestoreFile: e => this.restore(e),
+      fileRef: this.fileRef,
+      resetJourney: () => this.reset(),
+      setTextNormal: () => this.upd(x => { x.appPreferences.textSize = 'normal'; }, true),
+      setTextBesar: () => this.upd(x => { x.appPreferences.textSize = 'besar'; }, true),
+      continueJourney: () => { const n = this.nextStop(); this.go(n.screen, n.params); },
+      continueHint: 'Berikutnya: ' + this.nextStop().label,
+      onNama: e => { const v = e.target.value; this.upd(x => { x.participantProfile.nama = v; }); },
+      onInstansi: e => { const v = e.target.value; this.upd(x => { x.participantProfile.instansi = v; }); },
+      onPurna: e => { const v = e.target.value; this.upd(x => { x.participantProfile.purna = v; }); },
+      onHarapan: e => { const v = e.target.value; this.upd(x => { x.participantProfile.harapan = v; }); },
+      prof: d.participantProfile
+    };
+
+    const tone = function (id) { return C[id] || { color: NAVY, tint: '#EEF1F7', border: 'rgba(16,39,90,.14)', icon: ICON.compass }; };
+
+    V.terminals = TERMINALS.map(function (t, i) {
+      const c = tone(t.id);
+      const dn = self.doneCount(t.id);
+      const visa = !!d.visaStatus[t.id];
+      const prev = i === 0 ? true : !!d.visaStatus[TERMINALS[i - 1].id];
+      return {
+        num: i + 1, name: t.name, nameTitle: t.nameTitle, tag: t.tag, support: t.support,
+        color: c.color, tint: c.tint, border: c.border, iconPath: c.icon,
+        status: visa ? '\u2713 Selesai' : dn > 0 ? 'Sedang berjalan \u00b7 ' + dn + '/8' : prev ? 'Berikutnya' : 'Belum dimulai',
+        go: function () { self.go('terminal', { t: t.id }); }
+      };
+    });
+
+    V.route = [{
+      kicker: 'START', name: 'Boarding Pass', sub: 'Persiapan perjalanan', color: NAVY,
+      markBg: '#EEF1F7', border: 'rgba(16,39,90,.14)', bg: '#fff', shadow: 'none', iconPath: ICON.plane,
+      check: d.initialAssessment.done ? '\u2713' : '', ringColor: d.initialAssessment.done ? '#1E8A4C' : 'rgba(16,39,90,.2)',
+      ringFill: d.initialAssessment.done ? '#1E8A4C' : 'transparent',
+      go: function () { self.go(d.initialAssessment.done ? 'result' : 'checkin'); }
+    }].concat(TERMINALS.map(function (t, i) {
+      const c = tone(t.id);
+      const visa = !!d.visaStatus[t.id];
+      const dn = self.doneCount(t.id);
+      const current = !visa && (i === 0 || !!d.visaStatus[TERMINALS[i - 1].id]);
+      return {
+        kicker: 'TERMINAL ' + (i + 1), name: t.name, sub: t.tag, color: c.color,
+        markBg: c.tint, border: current || visa ? c.border : 'rgba(16,39,90,.10)',
+        bg: current || visa ? c.tint : '#fff', shadow: current ? '0 6px 18px rgba(16,39,90,.10)' : 'none',
+        iconPath: c.icon,
+        check: visa ? '\u2713' : '', ringColor: visa ? c.color : 'rgba(16,39,90,.2)', ringFill: visa ? c.color : 'transparent',
+        go: function () { self.go('terminal', { t: t.id }); }
+      };
+    })).concat([{
+      kicker: 'DESTINATION', name: 'Next Chapter', color: NAVY,
+      markBg: '#EEF1F7', border: 'rgba(16,39,90,.14)', bg: '#fff', shadow: 'none', iconPath: ICON.pin,
+      sub: allVisas ? 'Pilih arketipe & langkahmu' : 'Berikutnya, setelah empat terminal',
+      check: d.nextChapter.primary ? '\u2713' : '', ringColor: d.nextChapter.primary ? '#1E8A4C' : 'rgba(16,39,90,.2)',
+      ringFill: d.nextChapter.primary ? '#1E8A4C' : 'transparent',
+      go: function () { if (allVisas) self.go('nextchapter'); else { const n = self.nextStop(); self.go(n.screen, n.params); } }
+    }]);
+
+    const LEG_LABELS = ['menuju Fitland', 'menuju Assetland', 'menuju Mindland', 'menuju Soulland', 'menuju Next Chapter'];
+    V.route = V.route.map(function (r, i) {
+      r.hasLeg = i < V.route.length - 1;
+      r.legLabel = LEG_LABELS[i] || '';
+      r.legColor = V.route[i + 1] ? V.route[i + 1].color : NAVY;
+      return r;
+    });
+
+    V.questions = QUESTIONS.map(function (q, i) {
+      const c = tone(q.id);
+      const val = d.initialAssessment.answers['q' + i];
+      return {
+        area: q.area, text: q.text, color: c.color,
+        opts: [1, 2, 3, 4, 5].map(function (n) {
+          const on = val === n;
+          return {
+            n: n, bg: on ? c.color : '#FBF9F5', fg: on ? '#fff' : 'rgba(16,39,90,.75)',
+            border: on ? c.color : 'rgba(16,39,90,.15)',
+            pick: function () { self.upd(function (x) { x.initialAssessment.answers['q' + i] = n; }, true); }
+          };
+        })
+      };
+    });
+    const answered = Object.keys(d.initialAssessment.answers).length;
+    V.checkinCta = answered >= QUESTIONS.length ? 'Lihat Titik Awal Perjalananmu' : 'Terjawab ' + answered + ' dari ' + QUESTIONS.length;
+    V.checkinCtaBg = answered >= QUESTIONS.length ? NAVY : 'rgba(16,39,90,.35)';
+    V.finishCheckin = function () {
+      if (answered < QUESTIONS.length) return;
+      const sum = {}, cnt = {};
+      QUESTIONS.forEach(function (q, i) {
+        const v = d.initialAssessment.answers['q' + i] || 3;
+        sum[q.id] = (sum[q.id] || 0) + v; cnt[q.id] = (cnt[q.id] || 0) + 1;
+      });
+      const scores = {};
+      Object.keys(sum).forEach(function (k) { scores[k] = Math.round(sum[k] / cnt[k] / 5 * 100); });
+      self.upd(function (x) { x.initialAssessment.scores = scores; x.initialAssessment.done = true; }, true);
+      self.go('result');
+    };
+
+    const band = function (p) { return p < 50 ? 'Perlu diperhatikan' : p < 65 ? 'Sedang dipersiapkan' : p < 80 ? 'Sudah cukup kuat' : 'Bisa terus dikembangkan'; };
+    const sco = d.initialAssessment.scores || {};
+    V.scores = TERMINALS.map(function (t) {
+      const c = tone(t.id);
+      const p = sco[t.id] == null ? 0 : sco[t.id];
+      return { name: t.name, color: c.color, pctText: p + '%', band: band(p) };
+    }).concat([{ name: 'NEXT CHAPTER', color: NAVY, pctText: (sco.next == null ? 0 : sco.next) + '%', band: band(sco.next == null ? 0 : sco.next) }]);
+    V.activatePassport = function () { self.setState({ screen: 'home', params: {}, stack: [] }); };
+
+    V.achievements = [
+      { n: d.passportStamps.length, label: 'Visa Diperoleh', color: '#1E8A4C', tint: '#EAF4EC' },
+      { n: self.totalDone(), label: 'Modul Selesai', color: '#C9871A', tint: '#FDF3DF' },
+      { n: TERMINALS.reduce(function (a, t) { const r = d.responses[t.id] || {}; return a + Object.keys(r).filter(function (k) { return r[k] && r[k].reflection; }).length; }, 0), label: 'Catatan Refleksi', color: '#6C4FB6', tint: '#F0EBFA' }
+    ];
+    V.postCards = [
+      { title: 'My Next Chapter', sub: 'Rencana bab berikutnya', go: function () { self.go('mynext'); } },
+      { title: 'Rencana 90 Hari', sub: 'Langkah 30, 60, 90 hari', go: function () { self.go('plan90'); } },
+      { title: 'MAPAN Passport', sub: 'Visa, stamp & ringkasan', go: function () { self.go('passport'); } },
+      { title: 'Refleksi Saya', sub: 'Semua catatan perjalanan', go: function () { self.go('catatan'); } },
+      { title: 'Program Next Chapter', sub: 'Pendampingan lanjutan', go: function () { self.go('program'); } }
+    ];
+
+    const tid = s.params.t || 'fitland';
+    const T = self.term(tid);
+    const tc = tone(tid);
+    const dn = self.doneCount(tid);
+    const allDone = dn >= 8;
+    const nextIdx = (function () { for (var i = 0; i < 8; i++) if (!self.resp(tid, i).done) return i; return 7; })();
+    V.term = {
+      name: T.name, nameTitle: T.nameTitle, tag: T.tag, q: T.q, visa: T.visa, visaQ: T.visaQ,
+      color: tc.color, tint: tc.tint, border: tc.border, iconPath: tc.icon,
+      pctText: Math.round(dn / 8 * 100) + '%', ring: (dn / 8 * 207.3).toFixed(1) + ' 400',
+      commitment: d.commitments[tid] || '',
+      onCommitment: function (e) { const v = e.target.value; self.upd(function (x) { x.commitments[tid] = v; }); },
+      claimVisa: function () {
+        self.upd(function (x) {
+          x.visaStatus[tid] = true;
+          if (!x.passportStamps.some(function (p) { return p.id === tid; })) x.passportStamps.push({ id: tid, label: T.visa, date: new Date().toISOString() });
+        }, true);
+        self.go('visa', { t: tid });
+      },
+      afterVisaLabel: tid === 'soulland' ? 'Lanjut ke Immigration' : 'Lanjut ke ' + TERMINALS[TERMINALS.map(function (x) { return x.id; }).indexOf(tid) + 1].nameTitle,
+      afterVisa: function () { self.go('transition', { t: tid }); },
+      cta: function () {
+        if (d.visaStatus[tid]) { self.go('visa', { t: tid }); return; }
+        self.go(allDone ? 'visaq' : 'module', { t: tid, m: nextIdx });
+      },
+      ctaLabel: d.visaStatus[tid] ? 'Lihat Visa ' + T.nameTitle : allDone ? 'Ambil Visa ' + T.visa : dn > 0 ? 'Lanjut ke Modul ' + (nextIdx + 1) : 'Mulai Modul 1',
+      modules: T.modules.map(function (m, i) {
+        const r = self.resp(tid, i);
+        return {
+          n: i + 1, t: m.t, numBg: r.done ? tc.tint : '#F1F0EC', numFg: r.done ? tc.color : 'rgba(16,39,90,.55)',
+          check: r.done ? '\u2713' : '', ringColor: r.done ? tc.color : 'rgba(16,39,90,.2)', ringFill: r.done ? tc.color : 'transparent',
+          go: function () { self.go('module', { t: tid, m: i }); }
+        };
+      })
+    };
+
+    V.stampArch = React.createElement('text', {
+      fill: tc.color, fontFamily: 'Plus Jakarta Sans', fontSize: 13, fontWeight: 800, letterSpacing: 1.4
+    }, React.createElement('textPath', { href: '#visaArcTop', startOffset: '50%', textAnchor: 'middle' }, T.visa));
+
+    const mi = s.params.m == null ? 0 : s.params.m;
+    const M = T.modules[mi] || T.modules[0];
+    const R = self.resp(tid, mi);
+    const chipsSel = R.chips || [];
+    const setChip = function (label) {
+      self.upd(function (x) {
+        const r = x.responses[tid]['m' + mi] || (x.responses[tid]['m' + mi] = { chips: [], reflection: '' });
+        r.chips = r.chips || [];
+        const at = r.chips.indexOf(label);
+        if (at >= 0) r.chips.splice(at, 1); else r.chips.push(label);
+      });
+    };
+    const chipItem = function (label) {
+      const on = chipsSel.indexOf(label) >= 0;
+      return { label: label, bg: on ? tc.tint : '#fff', fg: on ? tc.color : 'rgba(16,39,90,.75)', border: on ? tc.color : 'rgba(16,39,90,.15)', toggle: function () { setChip(label); } };
+    };
+    V.mod = {
+      crumb: T.nameTitle + ' \u2022 Modul ' + (mi + 1), t: M.t, lead: M.lead, reflect: M.reflect,
+      color: tc.color, tint: tc.tint, points: M.points,
+      isVehicle: M.kind === 'vehicle', isPlain: M.kind === 'plain', isChips: M.kind === 'chips',
+      isTwoCol: M.kind === 'twocol', isTree: M.kind === 'tree',
+      isFinmap: M.kind === 'finmap', isStages: M.kind === 'stages', isCompass: M.kind === 'compass',
+      stages: STAGES, finzones: FINZONES, compassDirs: COMPASS_DIRS,
+      vparts: M.points.map(function (p, i) {
+        return { h: p.h, b: p.b, left: VPARTS[i].left, top: VPARTS[i].top, align: VPARTS[i].align, lineD: VPARTS[i].lineD };
+      }),
+      treeDots: LEAF_SLOTS.map(function (pt, i) {
+        const on = (R.leaves || []).length > i;
+        return { cx: pt[0], cy: pt[1], r: on ? 8 : 4.5, fill: on ? tc.color : 'none', stroke: on ? 'none' : 'rgba(16,39,90,.22)' };
+      }),
+      chipTitle: 'Packing Your Financial Luggage', chipHint: 'Pilih bekal yang paling penting untukmu. Tidak ada jawaban yang salah.',
+      chips: LUGGAGE.map(chipItem),
+      cols: [
+        { title: 'CARRY FORWARD', hint: 'Yang ingin kamu bawa ke bab berikutnya.', color: '#1E8A4C', chips: CARRY.map(chipItem) },
+        { title: 'LEAVE BEHIND', hint: 'Yang boleh kamu tinggalkan.', color: '#D9662F', chips: LEAVE.map(chipItem) }
+      ],
+      leaves: (R.leaves || []).map(function (text, i) {
+        return { text: text, remove: function () { self.upd(function (x) { x.responses[tid]['m' + mi].leaves.splice(i, 1); }); } };
+      }),
+      treeDraft: s.drafts.tree || '',
+      onTreeDraft: function (e) { const v = e.target.value; self.setState(function (st) { return { drafts: Object.assign({}, st.drafts, { tree: v }) }; }); },
+      addLeaf: function () {
+        const v = (s.drafts.tree || '').trim();
+        if (!v) return;
+        self.upd(function (x) {
+          const r = x.responses[tid]['m' + mi] || (x.responses[tid]['m' + mi] = { reflection: '' });
+          r.leaves = (r.leaves || []).concat([v]);
+        });
+        self.setState(function (st) { return { drafts: Object.assign({}, st.drafts, { tree: '' }) }; });
+      },
+      reflection: R.reflection || '',
+      onReflection: function (e) {
+        const v = e.target.value;
+        self.upd(function (x) {
+          const r = x.responses[tid]['m' + mi] || (x.responses[tid]['m' + mi] = {});
+          r.reflection = v;
+          if (d.visaStatus[tid]) r.editedAfterVisa = new Date().toISOString();
+        });
+      },
+      onReflectionFocus: function (e) { self._editBase = e.target.value; },
+      onReflectionBlur: function (e) {
+        const before = self._editBase;
+        const now = e.target.value;
+        self._editBase = null;
+        if (before == null || before === now || !String(before).trim()) return;
+        self.upd(function (x) {
+          const r = x.responses[tid]['m' + mi] || (x.responses[tid]['m' + mi] = {});
+          r.history = (r.history || []).concat([{ text: before, at: new Date().toISOString() }]).slice(-5);
+        }, true);
+      },
+      updatedBadge: R.editedAfterVisa ? 'Diperbarui ' + new Date(R.editedAfterVisa).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '',
+      hasHistory: !!(R.history && R.history.length),
+      historyOpen: s.drafts.histOpen === tid + mi,
+      historyLabel: (R.history && R.history.length ? 'Riwayat tulisan (' + R.history.length + ')' : 'Riwayat tulisan'),
+      toggleHistory: function () { self.setState(function (st) { return { drafts: Object.assign({}, st.drafts, { histOpen: st.drafts.histOpen === tid + mi ? null : tid + mi }) }; }); },
+      history: (R.history || []).slice().reverse().map(function (h) {
+        return {
+          at: new Date(h.at).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
+          text: h.text,
+          restore: function () {
+            self.upd(function (x) {
+              const r = x.responses[tid]['m' + mi];
+              r.history = (r.history || []).concat([{ text: r.reflection || '', at: new Date().toISOString() }]).slice(-5);
+              r.reflection = h.text;
+            });
+          }
+        };
+      }),
+      isDone: !!R.done,
+      doneLabel: R.done ? '\u2713 Ditandai selesai \u00b7 ketuk untuk batalkan' : 'Tandai modul ini selesai',
+      doneBg: R.done ? tc.tint : '#fff',
+      doneFg: R.done ? tc.color : 'rgba(16,39,90,.7)',
+      doneBorder: R.done ? tc.color : 'rgba(16,39,90,.15)',
+      toggleDone: function () {
+        self.upd(function (x) {
+          const r = x.responses[tid]['m' + mi] || (x.responses[tid]['m' + mi] = {});
+          r.done = !r.done;
+        }, true);
+      },
+      goTerminal: function () { self.go('terminal', { t: tid }); },
+      termSwitch: TERMINALS.map(function (t) {
+        const c2 = tone(t.id);
+        const on = t.id === tid;
+        return {
+          name: t.nameTitle, color: on ? '#fff' : c2.color,
+          bg: on ? c2.color : c2.tint, border: on ? c2.color : c2.border,
+          go: function () {
+            if (on) return;
+            var target = 0;
+            for (var j = 0; j < 8; j++) { if (!self.resp(t.id, j).done) { target = j; break; } }
+            self.go('module', { t: t.id, m: target });
+          }
+        };
+      }),
+      prev: function () { if (mi > 0) self.go('module', { t: tid, m: mi - 1 }); else self.go('terminal', { t: tid }); },
+      nextLabel: mi === 7 ? 'Selesai & Ambil Visa' : 'Selanjutnya',
+      next: function () {
+        self.upd(function (x) {
+          const r = x.responses[tid]['m' + mi] || (x.responses[tid]['m' + mi] = {});
+          r.done = true;
+        }, true);
+        if (mi < 7) self.go('module', { t: tid, m: mi + 1 }); else self.go('visaq', { t: tid });
+      }
+    };
+
+    V.trans = (function () {
+      const idx = TERMINALS.map(function (x) { return x.id; }).indexOf(tid);
+      const copy = [
+        { title: 'Kendaraanmu sudah dipersiapkan.', body: 'Sekarang waktunya memastikan bekal perjalananmu cukup.', cta: 'Berangkat ke Assetland' },
+        { title: 'Bekalmu sudah dihitung.', body: 'Sekarang waktunya menyiapkan hati dan identitasmu.', cta: 'Berangkat ke Mindland' },
+        { title: 'Hatimu sudah lebih siap.', body: 'Sekarang waktunya menemukan makna yang menjadi kompasmu.', cta: 'Berangkat ke Soulland' },
+        { title: 'Empat terminal telah kamu lalui.', body: 'Waktunya melewati Immigration dan melihat passport perjalananmu.', cta: 'Menuju Immigration' }
+      ][idx < 0 ? 0 : idx];
+      return {
+        title: copy.title, body: copy.body, cta: copy.cta,
+        go: function () { if (idx >= 3) self.go('immigration'); else self.go('terminal', { t: TERMINALS[idx + 1].id }); }
+      };
+    })();
+
+    V.visaRows = TERMINALS.map(function (t) {
+      const c = tone(t.id);
+      const on = !!d.visaStatus[t.id];
+      return {
+        visa: t.visa, name: t.nameTitle, color: on ? c.color : 'rgba(16,39,90,.45)',
+        bg: on ? c.tint : '#fff', border: on ? c.border : 'rgba(16,39,90,.10)',
+        check: on ? '\u2713' : '', statusText: on ? '\u2713 Selesai' : 'Belum diperoleh'
+      };
+    });
+    V.stamps = d.passportStamps.length ? d.passportStamps.map(function (p) {
+      return { label: p.label + ' \u00b7 ' + new Date(p.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }), color: tone(p.id).color };
+    }) : [{ label: 'Belum ada stamp', color: 'rgba(16,39,90,.4)' }];
+
+    const autoSummary = {
+      identitas: (self.resp('mindland', 7).reflection || ''),
+      nilai: ((self.resp('soulland', 3).leaves || []).join(', ')),
+      orang: (self.resp('mindland', 5).reflection || ''),
+      kebiasaan: (d.commitments.fitland || ''),
+      keuangan: ((self.resp('assetland', 3).chips || []).join(', ')) || (d.commitments.assetland || ''),
+      misi: (self.resp('soulland', 7).reflection || ''),
+      legacy: (self.resp('soulland', 3).reflection || '')
+    };
+    V.summaryFields = SUMMARY_FIELDS.map(function (f) {
+      const val = d.passportSummary[f.key] != null ? d.passportSummary[f.key] : autoSummary[f.key];
+      return {
+        label: f.label, value: val || '',
+        onChange: function (e) { const v = e.target.value; self.upd(function (x) { x.passportSummary[f.key] = v; }); }
+      };
+    });
+
+    const primary = d.nextChapter.primary;
+    V.ncIntro = 'Kamu sudah menyiapkan tubuh, bekal, hati, dan kompas perjalananmu. Sekarang, bab seperti apa yang ingin kamu jalani?';
+    V.archetypes = ARCHETYPES.map(function (a) {
+      const isP = primary === a.id;
+      const isS = d.nextChapter.secondary.indexOf(a.id) >= 0;
+      return {
+        title: a.title, sub: a.sub, color: a.color, iconPath: a.icon,
+        bg: isP || isS ? a.tint : '#fff', border: isP ? a.color : isS ? a.border || a.color : 'rgba(16,39,90,.10)',
+        badge: isP ? 'UTAMA \u2713' : isS ? 'PENDUKUNG' : '',
+        select: function () {
+          self.upd(function (x) {
+            const nc = x.nextChapter;
+            if (nc.primary === a.id) { nc.primary = null; return; }
+            if (!nc.primary) { nc.primary = a.id; nc.secondary = nc.secondary.filter(function (i) { return i !== a.id; }); return; }
+            const at = nc.secondary.indexOf(a.id);
+            if (at >= 0) nc.secondary.splice(at, 1);
+            else if (nc.secondary.length < 2) nc.secondary.push(a.id);
+          }, true);
+        }
+      };
+    });
+    V.ncHint = !allVisas ? 'Next Chapter terbuka setelah empat terminal selesai.' : primary ? 'Arketipe utama: ' + ARCHETYPES.filter(function (a) { return a.id === primary; })[0].title : 'Ketuk satu kartu untuk memilih arketipe utama.';
+    V.ncCtaBg = primary && allVisas ? '#1E8A4C' : 'rgba(16,39,90,.35)';
+    V.exploreArchetype = function () { if (primary && allVisas) self.go('archetype', { a: primary }); };
+    const A = ARCHETYPES.filter(function (a) { return a.id === (s.params.a || primary); })[0] || ARCHETYPES[0];
+    V.arch = { title: A.title, body: A.body, color: A.color, examples: A.examples.map(function (t) { return { text: t }; }) };
+
+    V.ncFields = NC_FIELDS.map(function (f) {
+      return {
+        label: f.label, value: d.nextChapter.plan[f.key] || '',
+        onChange: function (e) { const v = e.target.value; self.upd(function (x) { x.nextChapter.plan[f.key] = v; }); }
+      };
+    });
+
+    V.periods = [
+      { key: 'd30', title: '30 HARI', color: '#1E8A4C' },
+      { key: 'd60', title: '60 HARI', color: '#C9871A' },
+      { key: 'd90', title: '90 HARI', color: '#10275A' }
+    ].map(function (p) {
+      const list = d.ninetyDayPlan[p.key] || [];
+      return {
+        title: p.title, color: p.color,
+        draft: s.drafts[p.key] || '',
+        onDraft: function (e) { const v = e.target.value; self.setState(function (st) { const dr = {}; dr[p.key] = v; return { drafts: Object.assign({}, st.drafts, dr) }; }); },
+        add: function () {
+          const v = (s.drafts[p.key] || '').trim();
+          if (!v || list.length >= 3) return;
+          self.upd(function (x) { x.ninetyDayPlan[p.key].push({ text: v, status: 'Belum Dimulai' }); });
+          self.setState(function (st) { const dr = {}; dr[p.key] = ''; return { drafts: Object.assign({}, st.drafts, dr) }; });
+        },
+        actions: list.map(function (a, i) {
+          const done = a.status === 'Selesai';
+          const run = a.status === 'Sedang Berjalan';
+          return {
+            text: a.text, status: done ? '\u2713 Selesai' : a.status,
+            bg: done ? '#EAF4EC' : run ? '#FDF3DF' : '#fff',
+            fg: done ? '#1E6E42' : run ? '#8A5B10' : 'rgba(16,39,90,.7)',
+            border: done ? 'rgba(30,138,76,.35)' : run ? 'rgba(201,135,26,.35)' : 'rgba(16,39,90,.15)',
+            cycle: function () { self.upd(function (x) { const it = x.ninetyDayPlan[p.key][i]; it.status = STATUSES[(STATUSES.indexOf(it.status) + 1) % 3]; }, true); },
+            remove: function () { self.upd(function (x) { x.ninetyDayPlan[p.key].splice(i, 1); }); }
+          };
+        })
+      };
+    });
+
+    V.arrival = {
+      archetype: primary ? ARCHETYPES.filter(function (a) { return a.id === primary; })[0].title : 'Belum dipilih',
+      mission: d.nextChapter.plan.menjadi || self.resp('soulland', 7).reflection || 'Belum diisi',
+      firstStep: d.nextChapter.plan.langkah || 'Belum diisi'
+    };
+
+    V.events = [
+      { day: '24', month: 'MEI', title: 'Webinar Mindland', sub: 'Resiliensi di Bab Baru', time: '19.30 - 21.00 WIB', color: '#6C4FB6', tint: '#F0EBFA' },
+      { day: '02', month: 'JUN', title: 'Sesi Fitland', sub: 'Gerak untuk tetap mandiri', time: '08.00 - 09.30 WIB', color: '#1E8A4C', tint: '#EAF4EC' },
+      { day: '11', month: 'JUN', title: 'Kelas Assetland', sub: 'Menakar cukup dengan tenang', time: '16.00 - 17.30 WIB', color: '#C9871A', tint: '#FDF3DF' }
+    ];
+
+    const notes = [];
+    TERMINALS.forEach(function (t) {
+      const c = tone(t.id);
+      t.modules.forEach(function (m, i) {
+        const r = self.resp(t.id, i);
+        if (r.reflection) notes.push({
+          crumb: t.name + ' \u2022 MODUL ' + (i + 1), title: m.t, text: r.reflection, color: c.color,
+          go: function () { self.go('module', { t: t.id, m: i }); }
+        });
+      });
+    });
+    V.notes = notes.length ? notes : [{ crumb: 'BELUM ADA', title: 'Catatan refleksimu akan muncul di sini', text: 'Setiap refleksi yang kamu tulis di modul tersimpan otomatis di perangkat ini.', color: 'rgba(16,39,90,.45)', go: function () { self.go('journey'); } }];
+    V.notesSub = notes.length ? notes.length + ' catatan tersimpan di perangkat ini.' : 'Belum ada catatan.';
+
+    const na = function (k) { return { color: screen === k ? NAVY : 'rgba(16,39,90,.45)', weight: screen === k ? 700 : 500, go: function () { if (screen !== k) self.go(k); } }; };
+    V.nav = { beranda: na('home'), perjalanan: na('journey'), jadwal: na('jadwal'), catatan: na('catatan'), profil: na('profil') };
+    V.showBackBar = V.showNav && s.stack.length > 0;
+    V.backBarLabel = (function () {
+      const prev = s.stack[s.stack.length - 1] || {};
+      const names = { home: 'Beranda', journey: 'Perjalanan', jadwal: 'Jadwal', catatan: 'Catatan', profil: 'Profil', terminal: 'Terminal', module: 'Modul', passport: 'Passport', nextchapter: 'Next Chapter', mynext: 'My Next Chapter', plan90: 'Rencana 90 Hari', summary: 'Ringkasan', visa: 'Visa', visaq: 'Komitmen Visa', result: 'Titik Awal' };
+      return '\u2190 Kembali ke ' + (names[prev.screen] || 'sebelumnya');
+    })();
+
+    const tsz = d.appPreferences.textSize;
+    V.textNormal = { bg: tsz === 'normal' ? NAVY : '#fff', fg: tsz === 'normal' ? '#fff' : 'rgba(16,39,90,.75)', border: tsz === 'normal' ? NAVY : 'rgba(16,39,90,.15)' };
+    V.textBesar = { bg: tsz === 'besar' ? NAVY : '#fff', fg: tsz === 'besar' ? '#fff' : 'rgba(16,39,90,.75)', border: tsz === 'besar' ? NAVY : 'rgba(16,39,90,.15)' };
+
+    return V;
+  }
+}
+</script>
+</body>
+</html>

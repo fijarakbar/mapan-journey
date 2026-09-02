@@ -1,0 +1,37 @@
+body {
+  margin: 0;
+  background: #E9E5DE;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #10275A;
+}
+* {
+  box-sizing: border-box;
+}
+a {
+  color: #10275A;
+}
+a:hover {
+  color: #1E8A4C;
+}
+button {
+  font-family: inherit;
+}
+textarea,
+input {
+  font-family: inherit;
+}
+button:focus-visible,
+textarea:focus-visible,
+input:focus-visible {
+  outline: 3px solid #10275A;
+  outline-offset: 2px;
+}
+@keyframes stampIn {
+  0% { transform: scale(1.5) rotate(-12deg); opacity: 0; }
+  60% { transform: scale(.96) rotate(-4deg); opacity: 1; }
+  100% { transform: scale(1) rotate(-4deg); opacity: 1; }
+}
+@keyframes fadeUp {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
