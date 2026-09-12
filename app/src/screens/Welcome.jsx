@@ -1,4 +1,4 @@
-import IllustrationPlaceholder from '../components/IllustrationPlaceholder.jsx';
+import HeroIllustration from '../components/HeroIllustration.jsx';
 
 export default function Welcome({ app }) {
   return (
@@ -24,7 +24,7 @@ export default function Welcome({ app }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '20px 0 0', fontSize: 14, color: 'rgba(16,39,90,.6)' }}>
         Powered by <strong style={{ fontSize: 16, color: '#10275A' }}>MDI</strong>
       </div>
-      <IllustrationPlaceholder label="ilustrasi: pasangan berjalan di jalur pegunungan" height={190} style={{ margin: '22px 0 0' }} />
+      <HeroIllustration height={190} style={{ margin: '22px 0 0' }} />
       <button
         onClick={() => {
           app.upd((x) => { x.journeyProgress.started = true; }, true);
