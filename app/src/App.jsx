@@ -70,7 +70,8 @@ export default function App() {
   const showBackBar = showNav && app.stack.length > 0;
   const prevEntry = app.stack[app.stack.length - 1] || {};
   const backBarLabel = '← Kembali ke ' + (BACK_NAMES[prevEntry.screen] || 'sebelumnya');
-  const zoom = app.data.appPreferences.textSize === 'besar' ? 1.1 : 1;
+  const ts = app.data.appPreferences.textSize;
+  const zoom = ts === 'besar' ? 1.12 : ts === 'kecil' ? 0.92 : 1;
 
   return (
     <PhoneFrame zoom={zoom} nav={<BottomNav show={showNav} screen={app.screen} onGo={(s) => app.go(s)} />}>

@@ -1,7 +1,7 @@
 const NAVY = '#10275A';
 
 function toggleStyle(active) {
-  return { flex: 1, height: 50, borderRadius: 14, fontSize: 16, fontWeight: 700, cursor: 'pointer', border: `1.5px solid ${active ? NAVY : 'rgba(16,39,90,.15)'}`, background: active ? NAVY : '#fff', color: active ? '#fff' : 'rgba(16,39,90,.75)' };
+  return { flex: 1, height: 48, borderRadius: 14, fontSize: 14.5, fontWeight: 700, cursor: 'pointer', border: `1.5px solid ${active ? NAVY : 'rgba(16,39,90,.15)'}`, background: active ? NAVY : '#fff', color: active ? '#fff' : 'rgba(16,39,90,.75)' };
 }
 
 export default function Profil({ app }) {
@@ -23,8 +23,9 @@ export default function Profil({ app }) {
       <div style={{ fontSize: 17, fontWeight: 800, margin: '22px 0 10px' }}>Pengaturan</div>
       <div style={{ padding: 18, borderRadius: 18, background: '#fff', border: '1px solid rgba(16,39,90,.10)' }}>
         <div style={{ fontSize: 16, fontWeight: 700 }}>Ukuran Teks</div>
-        <div style={{ display: 'flex', gap: 10, margin: '12px 0 0' }}>
-          <button onClick={() => app.upd((x) => { x.appPreferences.textSize = 'normal'; }, true)} style={toggleStyle(tsz === 'normal')}>Normal</button>
+        <div style={{ display: 'flex', gap: 8, margin: '12px 0 0' }}>
+          <button onClick={() => app.upd((x) => { x.appPreferences.textSize = 'kecil'; }, true)} style={toggleStyle(tsz === 'kecil')}>Kecil</button>
+          <button onClick={() => app.upd((x) => { x.appPreferences.textSize = 'normal'; }, true)} style={toggleStyle(tsz === 'normal' || !tsz)}>Sedang</button>
           <button onClick={() => app.upd((x) => { x.appPreferences.textSize = 'besar'; }, true)} style={toggleStyle(tsz === 'besar')}>Besar</button>
         </div>
       </div>

@@ -25,7 +25,13 @@ export default function Terminal({ app }) {
       <div style={{ padding: '14px 20px 22px', background: tc.tint, position: 'relative' }}>
         <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(120deg,rgba(255,255,255,.55) 0 12px,rgba(255,255,255,0) 12px 24px)' }} />
         <div style={{ position: 'relative' }}>
-          <button onClick={() => app.back()} style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(16,39,90,.12)', background: 'rgba(255,255,255,.8)', fontSize: 19, cursor: 'pointer', color: '#10275A' }}>←</button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <button onClick={() => app.back()} style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(16,39,90,.12)', background: 'rgba(255,255,255,.8)', fontSize: 19, cursor: 'pointer', color: '#10275A' }}>←</button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => app.go('welcome')} style={{ height: 32, padding: '0 12px', borderRadius: 10, border: '1px solid rgba(16,39,90,.14)', background: 'rgba(255,255,255,.85)', fontSize: 12.5, fontWeight: 700, color: '#10275A', cursor: 'pointer' }}>↺ Onboarding</button>
+              <button onClick={() => app.go('home')} style={{ height: 32, padding: '0 12px', borderRadius: 10, border: '1px solid rgba(16,39,90,.14)', background: 'rgba(255,255,255,.85)', fontSize: 12.5, fontWeight: 700, color: '#10275A', cursor: 'pointer' }}>🏠 Beranda</button>
+            </div>
+          </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14 }}>
             <div>
               <div style={{ width: 44, height: 44, borderRadius: 14, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${tc.border}` }}>
