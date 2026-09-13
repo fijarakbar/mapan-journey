@@ -1,4 +1,3 @@
-import Icon from '../components/Icon.jsx';
 import RingProgress from '../components/RingProgress.jsx';
 import { tone } from '../data.js';
 
@@ -34,8 +33,8 @@ export default function Terminal({ app }) {
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14 }}>
             <div>
-              <div style={{ width: 44, height: 44, borderRadius: 14, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${tc.border}` }}>
-                <Icon path={tc.icon} size={25} color={tc.color} />
+              <div style={{ width: 44, height: 44, borderRadius: 14, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${tc.border}`, overflow: 'hidden' }}>
+                <img src={`/icons/badge-${tid}.png`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div style={{ fontSize: 27, fontWeight: 800, letterSpacing: 0.4, color: tc.color, marginTop: 12 }}>{T.name}</div>
               <div style={{ fontSize: 17, fontWeight: 700, marginTop: 2 }}>{T.tag}</div>
@@ -50,6 +49,9 @@ export default function Terminal({ app }) {
             </div>
           </div>
         </div>
+      </div>
+      <div style={{ padding: '18px 20px 0' }}>
+        <img src={`/illustrations/terminal-${tid}.png`} alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20 }} />
       </div>
       <div style={{ padding: '18px 20px 28px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

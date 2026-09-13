@@ -5,6 +5,39 @@ import StagesDiagram from '../diagrams/StagesDiagram.jsx';
 import CompassDiagram from '../diagrams/CompassDiagram.jsx';
 import TreeDiagram from '../diagrams/TreeDiagram.jsx';
 
+const MODULE_ILLUSTRATIONS = {
+  'Body as Your Vehicle': 'module-body-as-your-vehicle',
+  'Move to Stay Independent': 'module-move-to-stay-independent',
+  'Eat for Your Next Chapter': 'module-eat-for-your-next-chapter',
+  'Sleep & Recovery': 'module-sleep-and-recovery',
+  'Prevent, Don’t Wait': 'module-prevent-dont-wait',
+  'My Fit to Travel Plan': 'module-my-fit-to-travel-plan',
+  'Financial Check-In': 'module-financial-check-in',
+  'Defining Enough': 'module-defining-enough',
+  'My Financial Map': 'module-my-financial-map',
+  'Packing Your Financial Luggage': 'module-packing-your-financial-luggage',
+  'Protect Your Journey': 'module-protect-your-journey',
+  'The Second Journey': 'module-the-second-journey',
+  'Avoid Financial Turbulence': 'module-avoid-financial-turbulence',
+  'My Financial Flight Plan': 'module-my-financial-flight-plan',
+  'Emotional Check-In': 'module-emotional-check-in',
+  'Retirement as Life Transition': 'module-retirement-as-life-transition',
+  'Letting Go with Grace': 'module-letting-go-with-grace',
+  'Rediscovering My Identity': 'module-rediscovering-my-identity',
+  'Finding New Purpose': 'module-finding-new-purpose',
+  'Staying Connected': 'module-staying-connected',
+  'Building Emotional Resilience': 'module-building-emotional-resilience',
+  'Boarding to My Next Chapter': 'module-boarding-next-chapter',
+  'Spiritual Check-In': 'module-spiritual-check-in',
+  'What Truly Matters?': 'module-what-truly-matters',
+  'Gratitude Changes Perspective': 'module-gratitude-changes-perspective',
+  'Legacy Beyond Position': 'module-legacy-beyond-position',
+  'Serving Beyond Career': 'module-serving-beyond-career',
+  'Reconnecting with Yourself': 'module-reconnecting-with-yourself',
+  'Faith as Strength': 'module-faith-as-strength',
+  'My Meaningful Journey': 'module-my-meaningful-journey',
+};
+
 function chipStyle(on, tc) {
   return {
     padding: '14px 16px', minHeight: 52, borderRadius: 14, fontSize: 16, fontWeight: 700, cursor: 'pointer',
@@ -103,8 +136,17 @@ export default function Module({ app }) {
       <h1 style={{ fontSize: 25, fontWeight: 800, letterSpacing: -0.4, lineHeight: 1.2, margin: '18px 0 0', color: tc.color }}>{M.t}</h1>
       <p style={{ fontSize: 17, lineHeight: 1.6, color: 'rgba(16,39,90,.78)', margin: '12px 0 0', textWrap: 'pretty' }}>{M.lead}</p>
 
+      {!!MODULE_ILLUSTRATIONS[M.t] && (
+        <img src={`/illustrations/${MODULE_ILLUSTRATIONS[M.t]}.png`} alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20, margin: '18px 0 0' }} />
+      )}
+
       {M.kind === 'vehicle' && <VehicleDiagram color={tc.color} points={M.points} />}
-      {M.kind === 'finmap' && <FinancialMapDiagram color={tc.color} />}
+      {M.kind === 'finmap' && (
+        <>
+          <img src="/illustrations/module-financial-map-scale.png" alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20, margin: '18px 0 0' }} />
+          <FinancialMapDiagram color={tc.color} />
+        </>
+      )}
       {M.kind === 'stages' && <StagesDiagram color={tc.color} />}
       {M.kind === 'compass' && <CompassDiagram color={tc.color} />}
 

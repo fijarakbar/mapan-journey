@@ -1,5 +1,4 @@
 import { TERMINALS, tone } from '../data.js';
-import Icon from '../components/Icon.jsx';
 import RingProgress from '../components/RingProgress.jsx';
 
 export default function Home({ app }) {
@@ -113,8 +112,8 @@ export default function Home({ app }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             {terminals.map((t) => (
               <button key={t.id} onClick={() => app.go('terminal', { t: t.id })} style={{ textAlign: 'left', padding: 16, borderRadius: 18, border: `1px solid ${t.border}`, background: t.tint, cursor: 'pointer', color: '#10275A', minHeight: 132, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                <div style={{ width: 42, height: 42, borderRadius: 14, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${t.border}` }}>
-                  <Icon path={t.iconPath} size={23} color={t.color} />
+                <div style={{ width: 42, height: 42, borderRadius: 14, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${t.border}`, overflow: 'hidden' }}>
+                  <img src={`/icons/home-${t.id}.png`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div>
                   <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: 0.4, color: t.color }}>{t.name}</div>
@@ -124,11 +123,16 @@ export default function Home({ app }) {
               </button>
             ))}
           </div>
-          <button onClick={goNextChapter} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', textAlign: 'left', margin: '14px 0 0', padding: 18, borderRadius: 18, background: '#fff', border: '1px solid rgba(16,39,90,.10)', cursor: 'pointer', color: '#10275A' }}>
-            <span>
-              <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Next Chapter</span>
-              <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.65)', marginTop: 3 }}>{ncCardSub}</span>
-            </span>
+          <button onClick={goNextChapter} style={{ display: 'flex', alignItems: 'center', gap: 14, justifyContent: 'space-between', width: '100%', textAlign: 'left', margin: '14px 0 0', padding: 18, borderRadius: 18, background: '#fff', border: '1px solid rgba(16,39,90,.10)', cursor: 'pointer', color: '#10275A' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 42, height: 42, flex: 'none', borderRadius: 14, background: '#F1F0EC', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                <img src="/icons/home-nextchapter.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+              <span>
+                <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Next Chapter</span>
+                <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.65)', marginTop: 3 }}>{ncCardSub}</span>
+              </span>
+            </div>
             <span style={{ fontSize: 22, color: 'rgba(16,39,90,.35)' }}>›</span>
           </button>
           <button

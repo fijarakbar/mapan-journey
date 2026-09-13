@@ -1,0 +1,319 @@
+From 2f268cf592f5429c2b49b1dac0c5635a2f144e60 Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Sun, 13 Sep 2026 16:43:48 +0000
+Subject: [PATCH] Add real illustrations/icons from client assets (60 files,
+ optimized+transparent)
+
+- Welcome: real logo + hero illustration
+- Terminal: banner illustration + round badge icon (x4)
+- Home: sticker icons for terminal cards + Next Chapter
+- Module: per-module banner illustration (30/32 modules)
+- VisaStamp: real plane icon in stamp
+- Transition: real illustration for 2/4 transitions (rest keep generated SVG)
+- VisaQuestion: real illustration for Assetland only
+- NextChapter: sticker icons per archetype (6/6, incl. recovered corrupt investor file)
+- AvatarPicker: added 3rd option (hijab) + real photos for all 3
+- All assets trimmed, resized, and pngquant-compressed (71MB source -> 6.6MB)
+---
+ app/src/components/AvatarPicker.jsx |  1 +
+ app/src/screens/Home.jsx            | 20 +++++++------
+ app/src/screens/Module.jsx          | 44 ++++++++++++++++++++++++++++-
+ app/src/screens/NextChapter.jsx     |  8 ++++--
+ app/src/screens/Terminal.jsx        |  8 ++++--
+ app/src/screens/Transition.jsx      | 14 +++++----
+ app/src/screens/VisaQuestion.jsx    |  3 ++
+ app/src/screens/VisaStamp.jsx       |  6 ++--
+ app/src/screens/Welcome.jsx         | 17 ++---------
+ 9 files changed, 82 insertions(+), 39 deletions(-)
+
+diff --git a/app/src/components/AvatarPicker.jsx b/app/src/components/AvatarPicker.jsx
+index 25d1fb3..6fcc6d6 100644
+--- a/app/src/components/AvatarPicker.jsx
++++ b/app/src/components/AvatarPicker.jsx
+@@ -1,6 +1,7 @@
+ const OPTIONS = [
+   { key: 'male', label: 'Laki-laki', tint: '#DCEAFB' },
+   { key: 'female', label: 'Perempuan', tint: '#FCE0EA' },
++  { key: 'hijab', label: 'Berhijab', tint: '#E6F3E1' },
+ ];
+ 
+ // Simple monoline silhouette shown until a real photo exists at
+diff --git a/app/src/screens/Home.jsx b/app/src/screens/Home.jsx
+index c46ec30..ec8dd9c 100644
+--- a/app/src/screens/Home.jsx
++++ b/app/src/screens/Home.jsx
+@@ -1,5 +1,4 @@
+ import { TERMINALS, tone } from '../data.js';
+-import Icon from '../components/Icon.jsx';
+ import RingProgress from '../components/RingProgress.jsx';
+ 
+ export default function Home({ app }) {
+@@ -113,8 +112,8 @@ export default function Home({ app }) {
+           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+             {terminals.map((t) => (
+               <button key={t.id} onClick={() => app.go('terminal', { t: t.id })} style={{ textAlign: 'left', padding: 16, borderRadius: 18, border: `1px solid ${t.border}`, background: t.tint, cursor: 'pointer', color: '#10275A', minHeight: 132, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+-                <div style={{ width: 42, height: 42, borderRadius: 14, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${t.border}` }}>
+-                  <Icon path={t.iconPath} size={23} color={t.color} />
++                <div style={{ width: 42, height: 42, borderRadius: 14, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${t.border}`, overflow: 'hidden' }}>
++                  <img src={`/icons/home-${t.id}.png`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                 </div>
+                 <div>
+                   <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: 0.4, color: t.color }}>{t.name}</div>
+@@ -124,11 +123,16 @@ export default function Home({ app }) {
+               </button>
+             ))}
+           </div>
+-          <button onClick={goNextChapter} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', textAlign: 'left', margin: '14px 0 0', padding: 18, borderRadius: 18, background: '#fff', border: '1px solid rgba(16,39,90,.10)', cursor: 'pointer', color: '#10275A' }}>
+-            <span>
+-              <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Next Chapter</span>
+-              <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.65)', marginTop: 3 }}>{ncCardSub}</span>
+-            </span>
++          <button onClick={goNextChapter} style={{ display: 'flex', alignItems: 'center', gap: 14, justifyContent: 'space-between', width: '100%', textAlign: 'left', margin: '14px 0 0', padding: 18, borderRadius: 18, background: '#fff', border: '1px solid rgba(16,39,90,.10)', cursor: 'pointer', color: '#10275A' }}>
++            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
++              <div style={{ width: 42, height: 42, flex: 'none', borderRadius: 14, background: '#F1F0EC', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
++                <img src="/icons/home-nextchapter.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
++              </div>
++              <span>
++                <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Next Chapter</span>
++                <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.65)', marginTop: 3 }}>{ncCardSub}</span>
++              </span>
++            </div>
+             <span style={{ fontSize: 22, color: 'rgba(16,39,90,.35)' }}>›</span>
+           </button>
+           <button
+diff --git a/app/src/screens/Module.jsx b/app/src/screens/Module.jsx
+index abeff2e..310ca7f 100644
+--- a/app/src/screens/Module.jsx
++++ b/app/src/screens/Module.jsx
+@@ -5,6 +5,39 @@ import StagesDiagram from '../diagrams/StagesDiagram.jsx';
+ import CompassDiagram from '../diagrams/CompassDiagram.jsx';
+ import TreeDiagram from '../diagrams/TreeDiagram.jsx';
+ 
++const MODULE_ILLUSTRATIONS = {
++  'Body as Your Vehicle': 'module-body-as-your-vehicle',
++  'Move to Stay Independent': 'module-move-to-stay-independent',
++  'Eat for Your Next Chapter': 'module-eat-for-your-next-chapter',
++  'Sleep & Recovery': 'module-sleep-and-recovery',
++  'Prevent, Don’t Wait': 'module-prevent-dont-wait',
++  'My Fit to Travel Plan': 'module-my-fit-to-travel-plan',
++  'Financial Check-In': 'module-financial-check-in',
++  'Defining Enough': 'module-defining-enough',
++  'My Financial Map': 'module-my-financial-map',
++  'Packing Your Financial Luggage': 'module-packing-your-financial-luggage',
++  'Protect Your Journey': 'module-protect-your-journey',
++  'The Second Journey': 'module-the-second-journey',
++  'Avoid Financial Turbulence': 'module-avoid-financial-turbulence',
++  'My Financial Flight Plan': 'module-my-financial-flight-plan',
++  'Emotional Check-In': 'module-emotional-check-in',
++  'Retirement as Life Transition': 'module-retirement-as-life-transition',
++  'Letting Go with Grace': 'module-letting-go-with-grace',
++  'Rediscovering My Identity': 'module-rediscovering-my-identity',
++  'Finding New Purpose': 'module-finding-new-purpose',
++  'Staying Connected': 'module-staying-connected',
++  'Building Emotional Resilience': 'module-building-emotional-resilience',
++  'Boarding to My Next Chapter': 'module-boarding-next-chapter',
++  'Spiritual Check-In': 'module-spiritual-check-in',
++  'What Truly Matters?': 'module-what-truly-matters',
++  'Gratitude Changes Perspective': 'module-gratitude-changes-perspective',
++  'Legacy Beyond Position': 'module-legacy-beyond-position',
++  'Serving Beyond Career': 'module-serving-beyond-career',
++  'Reconnecting with Yourself': 'module-reconnecting-with-yourself',
++  'Faith as Strength': 'module-faith-as-strength',
++  'My Meaningful Journey': 'module-my-meaningful-journey',
++};
++
+ function chipStyle(on, tc) {
+   return {
+     padding: '14px 16px', minHeight: 52, borderRadius: 14, fontSize: 16, fontWeight: 700, cursor: 'pointer',
+@@ -103,8 +136,17 @@ export default function Module({ app }) {
+       <h1 style={{ fontSize: 25, fontWeight: 800, letterSpacing: -0.4, lineHeight: 1.2, margin: '18px 0 0', color: tc.color }}>{M.t}</h1>
+       <p style={{ fontSize: 17, lineHeight: 1.6, color: 'rgba(16,39,90,.78)', margin: '12px 0 0', textWrap: 'pretty' }}>{M.lead}</p>
+ 
++      {!!MODULE_ILLUSTRATIONS[M.t] && (
++        <img src={`/illustrations/${MODULE_ILLUSTRATIONS[M.t]}.png`} alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20, margin: '18px 0 0' }} />
++      )}
++
+       {M.kind === 'vehicle' && <VehicleDiagram color={tc.color} points={M.points} />}
+-      {M.kind === 'finmap' && <FinancialMapDiagram color={tc.color} />}
++      {M.kind === 'finmap' && (
++        <>
++          <img src="/illustrations/module-financial-map-scale.png" alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20, margin: '18px 0 0' }} />
++          <FinancialMapDiagram color={tc.color} />
++        </>
++      )}
+       {M.kind === 'stages' && <StagesDiagram color={tc.color} />}
+       {M.kind === 'compass' && <CompassDiagram color={tc.color} />}
+ 
+diff --git a/app/src/screens/NextChapter.jsx b/app/src/screens/NextChapter.jsx
+index 8b442a5..3225967 100644
+--- a/app/src/screens/NextChapter.jsx
++++ b/app/src/screens/NextChapter.jsx
+@@ -1,5 +1,4 @@
+ import { TERMINALS, ARCHETYPES } from '../data.js';
+-import Icon from '../components/Icon.jsx';
+ 
+ export default function NextChapter({ app }) {
+   const { data } = app;
+@@ -34,6 +33,9 @@ export default function NextChapter({ app }) {
+     <div style={{ padding: '14px 20px 28px' }}>
+       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+         <button onClick={() => app.back()} style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(16,39,90,.12)', background: '#fff', fontSize: 19, cursor: 'pointer', color: '#10275A' }}>←</button>
++        <div style={{ width: 44, height: 44, borderRadius: 14, background: '#fff', border: '1px solid rgba(16,39,90,.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
++          <img src="/icons/badge-nextchapter.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
++        </div>
+         <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.3 }}>Next Chapter</span>
+       </div>
+       <p style={{ fontSize: 17, lineHeight: 1.6, color: 'rgba(16,39,90,.75)', margin: '14px 0 0', textWrap: 'pretty' }}>
+@@ -44,8 +46,8 @@ export default function NextChapter({ app }) {
+         {archetypes.map((a) => (
+           <button key={a.id} onClick={() => select(a.id)} style={{ textAlign: 'left', padding: 16, borderRadius: 18, border: `1.5px solid ${a.border}`, background: a.bg, cursor: 'pointer', color: '#10275A', minHeight: 152, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
+-              <div style={{ width: 38, height: 38, borderRadius: 12, background: '#fff', border: `1px solid ${a.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+-                <Icon path={a.icon} size={21} color={a.color} />
++              <div style={{ width: 38, height: 38, borderRadius: 12, background: '#fff', border: `1px solid ${a.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
++                <img src={`/icons/archetype-${a.id}.png`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+               </div>
+               <span style={{ fontSize: 11, fontWeight: 800, color: a.color }}>{a.badge}</span>
+             </div>
+diff --git a/app/src/screens/Terminal.jsx b/app/src/screens/Terminal.jsx
+index a41720d..0d30ad4 100644
+--- a/app/src/screens/Terminal.jsx
++++ b/app/src/screens/Terminal.jsx
+@@ -1,4 +1,3 @@
+-import Icon from '../components/Icon.jsx';
+ import RingProgress from '../components/RingProgress.jsx';
+ import { tone } from '../data.js';
+ 
+@@ -34,8 +33,8 @@ export default function Terminal({ app }) {
+           </div>
+           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14 }}>
+             <div>
+-              <div style={{ width: 44, height: 44, borderRadius: 14, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${tc.border}` }}>
+-                <Icon path={tc.icon} size={25} color={tc.color} />
++              <div style={{ width: 44, height: 44, borderRadius: 14, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${tc.border}`, overflow: 'hidden' }}>
++                <img src={`/icons/badge-${tid}.png`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+               </div>
+               <div style={{ fontSize: 27, fontWeight: 800, letterSpacing: 0.4, color: tc.color, marginTop: 12 }}>{T.name}</div>
+               <div style={{ fontSize: 17, fontWeight: 700, marginTop: 2 }}>{T.tag}</div>
+@@ -51,6 +50,9 @@ export default function Terminal({ app }) {
+           </div>
+         </div>
+       </div>
++      <div style={{ padding: '18px 20px 0' }}>
++        <img src={`/illustrations/terminal-${tid}.png`} alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20 }} />
++      </div>
+       <div style={{ padding: '18px 20px 28px' }}>
+         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+           <span style={{ fontSize: 19, fontWeight: 800 }}>Materi</span>
+diff --git a/app/src/screens/Transition.jsx b/app/src/screens/Transition.jsx
+index 394c596..bc58f69 100644
+--- a/app/src/screens/Transition.jsx
++++ b/app/src/screens/Transition.jsx
+@@ -2,10 +2,10 @@ import { TERMINALS, tone, NAVY } from '../data.js';
+ import TransitionIllustration from '../components/TransitionIllustration.jsx';
+ 
+ const COPY = [
+-  { title: 'Kendaraanmu sudah dipersiapkan.', body: 'Sekarang waktunya memastikan bekal perjalananmu cukup.', cta: 'Berangkat ke Assetland' },
+-  { title: 'Bekalmu sudah dihitung.', body: 'Sekarang waktunya menyiapkan hati dan identitasmu.', cta: 'Berangkat ke Mindland' },
+-  { title: 'Hatimu sudah lebih siap.', body: 'Sekarang waktunya menemukan makna yang menjadi kompasmu.', cta: 'Berangkat ke Soulland' },
+-  { title: 'Empat terminal telah kamu lalui.', body: 'Waktunya melewati Immigration dan melihat passport perjalananmu.', cta: 'Menuju Immigration' },
++  { title: 'Kendaraanmu sudah dipersiapkan.', body: 'Sekarang waktunya memastikan bekal perjalananmu cukup.', cta: 'Berangkat ke Assetland', image: null },
++  { title: 'Bekalmu sudah dihitung.', body: 'Sekarang waktunya menyiapkan hati dan identitasmu.', cta: 'Berangkat ke Mindland', image: null },
++  { title: 'Hatimu sudah lebih siap.', body: 'Sekarang waktunya menemukan makna yang menjadi kompasmu.', cta: 'Berangkat ke Soulland', image: '/illustrations/transition-soulland.png' },
++  { title: 'Empat terminal telah kamu lalui.', body: 'Waktunya melewati Immigration dan melihat passport perjalananmu.', cta: 'Menuju Immigration', image: '/illustrations/transition-immigration.png' },
+ ];
+ 
+ export default function Transition({ app }) {
+@@ -18,7 +18,11 @@ export default function Transition({ app }) {
+ 
+   return (
+     <div style={{ padding: '30px 24px', minHeight: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+-      <TransitionIllustration color={destColor} height={170} />
++      {copy.image ? (
++        <img src={copy.image} alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20 }} />
++      ) : (
++        <TransitionIllustration color={destColor} height={170} />
++      )}
+       <h1 style={{ fontSize: 26, fontWeight: 800, lineHeight: 1.25, letterSpacing: -0.5, margin: '26px 0 0', textWrap: 'pretty' }}>{copy.title}</h1>
+       <p style={{ fontSize: 17, lineHeight: 1.6, color: 'rgba(16,39,90,.75)', margin: '12px 0 0', textWrap: 'pretty' }}>{copy.body}</p>
+       <button onClick={go} style={{ width: '100%', height: 56, margin: '26px 0 0', border: 'none', borderRadius: 16, background: '#10275A', color: '#fff', fontSize: 18, fontWeight: 700, cursor: 'pointer' }}>
+diff --git a/app/src/screens/VisaQuestion.jsx b/app/src/screens/VisaQuestion.jsx
+index 8f0cba1..595cd00 100644
+--- a/app/src/screens/VisaQuestion.jsx
++++ b/app/src/screens/VisaQuestion.jsx
+@@ -20,6 +20,9 @@ export default function VisaQuestion({ app }) {
+       <button onClick={() => app.back()} style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(16,39,90,.12)', background: '#fff', fontSize: 19, cursor: 'pointer', color: '#10275A' }}>←</button>
+       <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.2, color: tc.color, margin: '18px 0 0' }}>SEBELUM VISA {T.name}</div>
+       <h1 style={{ fontSize: 23, fontWeight: 800, lineHeight: 1.35, letterSpacing: -0.3, margin: '8px 0 0', textWrap: 'pretty' }}>{T.visaQ}</h1>
++      {tid === 'assetland' && (
++        <img src="/illustrations/visaq-assetland.png" alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20, margin: '16px 0 0' }} />
++      )}
+       <textarea
+         value={commitment}
+         onChange={(e) => { const v = e.target.value; app.upd((x) => { x.commitments[tid] = v; }); }}
+diff --git a/app/src/screens/VisaStamp.jsx b/app/src/screens/VisaStamp.jsx
+index bee83cc..bbf1075 100644
+--- a/app/src/screens/VisaStamp.jsx
++++ b/app/src/screens/VisaStamp.jsx
+@@ -1,5 +1,5 @@
+ import { useId } from 'react';
+-import { TERMINALS, ICON, tone } from '../data.js';
++import { TERMINALS, tone } from '../data.js';
+ 
+ export default function VisaStamp({ app }) {
+   const { params } = app;
+@@ -25,15 +25,13 @@ export default function VisaStamp({ app }) {
+           <circle cx="100" cy="100" r="92" fill="none" stroke={tc.color} strokeWidth="4" />
+           <circle cx="100" cy="100" r="78" fill="none" stroke={tc.color} strokeWidth="2" strokeDasharray="3 5" />
+           <circle cx="100" cy="100" r="44" fill="none" stroke={tc.color} strokeWidth="2" />
+-          <g transform="translate(100 91) scale(1.5) translate(-12 -12)">
+-            <path d={ICON.plane} fill="none" stroke={tc.color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+-          </g>
+           <path d="M82 114q4.5-4.5 9 0t9 0 9 0" fill="none" stroke={tc.color} strokeWidth="2" strokeLinecap="round" />
+           <path d="M82 122q4.5-4.5 9 0t9 0 9 0" fill="none" stroke={tc.color} strokeWidth="2" strokeLinecap="round" />
+           <text fill={tc.color} fontFamily="Plus Jakarta Sans" fontSize="13" fontWeight="800" letterSpacing="1.4">
+             <textPath href={`#${arcId}`} startOffset="50%" textAnchor="middle">{T.visa}</textPath>
+           </text>
+         </svg>
++        <img src="/icons/visa-plane.png" alt="" style={{ position: 'absolute', left: '50%', top: 33, width: 56, height: 56, transform: 'translateX(-50%)', objectFit: 'contain' }} />
+       </div>
+       <p style={{ fontSize: 17, lineHeight: 1.6, color: 'rgba(16,39,90,.75)', margin: '24px 0 0', textWrap: 'pretty' }}>
+         Kamu telah menyelesaikan {T.name} dan siap melanjutkan perjalanan ke terminal berikutnya.
+diff --git a/app/src/screens/Welcome.jsx b/app/src/screens/Welcome.jsx
+index 774c54d..7789457 100644
+--- a/app/src/screens/Welcome.jsx
++++ b/app/src/screens/Welcome.jsx
+@@ -1,20 +1,7 @@
+-import HeroIllustration from '../components/HeroIllustration.jsx';
+-
+ export default function Welcome({ app }) {
+   return (
+     <div style={{ padding: '26px 24px 32px', animation: 'fadeUp .4s ease both' }}>
+-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+-        <div style={{ width: 54, height: 54, borderRadius: 16, background: '#EAF4EC', border: '1px solid rgba(30,138,76,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+-          <svg width="30" height="30" viewBox="0 0 30 30">
+-            <circle cx="21" cy="9" r="4" fill="#E0A32A" />
+-            <path d="M3 24 L11 12 L17 20 L21 15 L27 24 Z" fill="#1E8A4C" />
+-          </svg>
+-        </div>
+-        <div>
+-          <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: -0.5, lineHeight: 1 }}>MAPAN</div>
+-          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: 5, color: 'rgba(16,39,90,.6)' }}>JOURNEY</div>
+-        </div>
+-      </div>
++      <img src="/icons/logo.png" alt="MAPAN Journey" style={{ height: 34, display: 'block' }} />
+       <h1 style={{ fontSize: 36, lineHeight: 1.12, fontWeight: 800, letterSpacing: -1, margin: '28px 0 0', textWrap: 'pretty' }}>
+         Menuju Purna Tugas Yang <span style={{ color: '#1E8A4C' }}>MAPAN.</span>
+       </h1>
+@@ -24,7 +11,7 @@ export default function Welcome({ app }) {
+       <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '20px 0 0', fontSize: 14, color: 'rgba(16,39,90,.6)' }}>
+         Powered by <strong style={{ fontSize: 16, color: '#10275A' }}>MDI</strong>
+       </div>
+-      <HeroIllustration height={190} style={{ margin: '22px 0 0' }} />
++      <img src="/illustrations/hero.png" alt="" style={{ width: '100%', height: 'auto', display: 'block', margin: '22px 0 0' }} />
+       <button
+         onClick={() => {
+           app.upd((x) => { x.journeyProgress.started = true; }, true);
+-- 
+2.43.0
+

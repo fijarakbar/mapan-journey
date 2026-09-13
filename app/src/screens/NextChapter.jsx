@@ -1,5 +1,4 @@
 import { TERMINALS, ARCHETYPES } from '../data.js';
-import Icon from '../components/Icon.jsx';
 
 export default function NextChapter({ app }) {
   const { data } = app;
@@ -34,6 +33,9 @@ export default function NextChapter({ app }) {
     <div style={{ padding: '14px 20px 28px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <button onClick={() => app.back()} style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(16,39,90,.12)', background: '#fff', fontSize: 19, cursor: 'pointer', color: '#10275A' }}>←</button>
+        <div style={{ width: 44, height: 44, borderRadius: 14, background: '#fff', border: '1px solid rgba(16,39,90,.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+          <img src="/icons/badge-nextchapter.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </div>
         <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.3 }}>Next Chapter</span>
       </div>
       <p style={{ fontSize: 17, lineHeight: 1.6, color: 'rgba(16,39,90,.75)', margin: '14px 0 0', textWrap: 'pretty' }}>
@@ -44,8 +46,8 @@ export default function NextChapter({ app }) {
         {archetypes.map((a) => (
           <button key={a.id} onClick={() => select(a.id)} style={{ textAlign: 'left', padding: 16, borderRadius: 18, border: `1.5px solid ${a.border}`, background: a.bg, cursor: 'pointer', color: '#10275A', minHeight: 152, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
-              <div style={{ width: 38, height: 38, borderRadius: 12, background: '#fff', border: `1px solid ${a.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Icon path={a.icon} size={21} color={a.color} />
+              <div style={{ width: 38, height: 38, borderRadius: 12, background: '#fff', border: `1px solid ${a.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                <img src={`/icons/archetype-${a.id}.png`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <span style={{ fontSize: 11, fontWeight: 800, color: a.color }}>{a.badge}</span>
             </div>

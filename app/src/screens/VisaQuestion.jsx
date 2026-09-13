@@ -20,6 +20,9 @@ export default function VisaQuestion({ app }) {
       <button onClick={() => app.back()} style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(16,39,90,.12)', background: '#fff', fontSize: 19, cursor: 'pointer', color: '#10275A' }}>←</button>
       <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.2, color: tc.color, margin: '18px 0 0' }}>SEBELUM VISA {T.name}</div>
       <h1 style={{ fontSize: 23, fontWeight: 800, lineHeight: 1.35, letterSpacing: -0.3, margin: '8px 0 0', textWrap: 'pretty' }}>{T.visaQ}</h1>
+      {tid === 'assetland' && (
+        <img src="/illustrations/visaq-assetland.png" alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20, margin: '16px 0 0' }} />
+      )}
       <textarea
         value={commitment}
         onChange={(e) => { const v = e.target.value; app.upd((x) => { x.commitments[tid] = v; }); }}

@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { TERMINALS, ICON, tone } from '../data.js';
+import { TERMINALS, tone } from '../data.js';
 
 export default function VisaStamp({ app }) {
   const { params } = app;
@@ -25,15 +25,13 @@ export default function VisaStamp({ app }) {
           <circle cx="100" cy="100" r="92" fill="none" stroke={tc.color} strokeWidth="4" />
           <circle cx="100" cy="100" r="78" fill="none" stroke={tc.color} strokeWidth="2" strokeDasharray="3 5" />
           <circle cx="100" cy="100" r="44" fill="none" stroke={tc.color} strokeWidth="2" />
-          <g transform="translate(100 91) scale(1.5) translate(-12 -12)">
-            <path d={ICON.plane} fill="none" stroke={tc.color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-          </g>
           <path d="M82 114q4.5-4.5 9 0t9 0 9 0" fill="none" stroke={tc.color} strokeWidth="2" strokeLinecap="round" />
           <path d="M82 122q4.5-4.5 9 0t9 0 9 0" fill="none" stroke={tc.color} strokeWidth="2" strokeLinecap="round" />
           <text fill={tc.color} fontFamily="Plus Jakarta Sans" fontSize="13" fontWeight="800" letterSpacing="1.4">
             <textPath href={`#${arcId}`} startOffset="50%" textAnchor="middle">{T.visa}</textPath>
           </text>
         </svg>
+        <img src="/icons/visa-plane.png" alt="" style={{ position: 'absolute', left: '50%', top: 33, width: 56, height: 56, transform: 'translateX(-50%)', objectFit: 'contain' }} />
       </div>
       <p style={{ fontSize: 17, lineHeight: 1.6, color: 'rgba(16,39,90,.75)', margin: '24px 0 0', textWrap: 'pretty' }}>
         Kamu telah menyelesaikan {T.name} dan siap melanjutkan perjalanan ke terminal berikutnya.

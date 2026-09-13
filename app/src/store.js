@@ -8,7 +8,7 @@ export function blank() {
     appVersion: '0.1.0',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    participantProfile: { nama: '', instansi: '', purna: '', harapan: '' },
+    participantProfile: { nama: '', instansi: '', purna: '', harapan: '', avatar: '' },
     initialAssessment: { answers: {}, scores: null, done: false },
     responses: { fitland: {}, assetland: {}, mindland: {}, soulland: {} },
     commitments: {},
