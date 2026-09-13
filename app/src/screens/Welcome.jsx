@@ -11,7 +11,9 @@ export default function Welcome({ app }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '20px 0 0', fontSize: 14, color: 'rgba(16,39,90,.6)' }}>
         Powered by <strong style={{ fontSize: 16, color: '#10275A' }}>MDI</strong>
       </div>
-      <img src="/illustrations/hero.png" alt="" style={{ width: '100%', height: 'auto', display: 'block', margin: '22px 0 0' }} />
+      <div style={{ textAlign: 'center' }}>
+        <img src="/illustrations/hero.png" alt="" style={{ width: '92%', maxWidth: 380, height: 'auto', display: 'inline-block', margin: '22px 0 0' }} />
+      </div>
       <button
         onClick={() => {
           app.upd((x) => { x.journeyProgress.started = true; }, true);

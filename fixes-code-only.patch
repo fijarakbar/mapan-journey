@@ -1,0 +1,176 @@
+git apply fixes-code-only.patchFrom 929f778bcc4725d146f1cf2182b7d632b8c3b433 Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Sun, 13 Sep 2026 17:25:11 +0000
+Subject: [PATCH] Fix sizing, contrast, and add remaining transition
+ illustrations
+
+- Recompress all illustrations/icons smaller (6.6MB -> ~2.7MB + 2 new files)
+- Module illustrations: wrap in tinted+shaded card, shrink to ~68% width
+- Body as Your Vehicle: remove duplicate diagram, show single labeled illustration
+- VisaStamp: recenter plane icon within stamp circle
+- Transition: add real illustrations for last 2 missing (Fitland->Assetland, Assetland->Mindland) from user uploads
+- Shrink Welcome hero, Terminal banner, VisaQuestion illustration to ~85-92% width
+---
+ app/src/components/ModuleIllustration.jsx | 25 +++++++++++++++++++++++
+ app/src/screens/Module.jsx                |  9 ++++----
+ app/src/screens/Terminal.jsx              |  4 ++--
+ app/src/screens/Transition.jsx            |  8 +++++---
+ app/src/screens/VisaQuestion.jsx          |  4 +++-
+ app/src/screens/VisaStamp.jsx             |  2 +-
+ app/src/screens/Welcome.jsx               |  4 +++-
+ 7 files changed, 43 insertions(+), 13 deletions(-)
+ create mode 100644 app/src/components/ModuleIllustration.jsx
+
+diff --git a/app/src/components/ModuleIllustration.jsx b/app/src/components/ModuleIllustration.jsx
+new file mode 100644
+index 0000000..9be7e4a
+--- /dev/null
++++ b/app/src/components/ModuleIllustration.jsx
+@@ -0,0 +1,25 @@
++// A tinted, shaded card for module illustrations — matches the Terminal.jsx
++// header language (color tint + diagonal hatch) instead of a bare floating
++// image, and keeps the image modestly sized rather than edge-to-edge.
++export default function ModuleIllustration({ src, tc, maxWidth = 260, widthPct = '68%' }) {
++  return (
++    <div
++      style={{
++        margin: '18px 0 0',
++        borderRadius: 20,
++        background: tc.tint,
++        border: `1px solid ${tc.border}`,
++        position: 'relative',
++        overflow: 'hidden',
++        padding: '16px 0',
++      }}
++    >
++      <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(120deg,rgba(255,255,255,.5) 0 10px,rgba(255,255,255,0) 10px 20px)' }} />
++      <img
++        src={src}
++        alt=""
++        style={{ position: 'relative', width: widthPct, maxWidth, height: 'auto', display: 'block', margin: '0 auto' }}
++      />
++    </div>
++  );
++}
+diff --git a/app/src/screens/Module.jsx b/app/src/screens/Module.jsx
+index 310ca7f..6de1343 100644
+--- a/app/src/screens/Module.jsx
++++ b/app/src/screens/Module.jsx
+@@ -1,12 +1,11 @@
+ import { TERMINALS, LUGGAGE, CARRY, LEAVE, tone } from '../data.js';
+-import VehicleDiagram from '../diagrams/VehicleDiagram.jsx';
+ import FinancialMapDiagram from '../diagrams/FinancialMapDiagram.jsx';
+ import StagesDiagram from '../diagrams/StagesDiagram.jsx';
+ import CompassDiagram from '../diagrams/CompassDiagram.jsx';
+ import TreeDiagram from '../diagrams/TreeDiagram.jsx';
++import ModuleIllustration from '../components/ModuleIllustration.jsx';
+ 
+ const MODULE_ILLUSTRATIONS = {
+-  'Body as Your Vehicle': 'module-body-as-your-vehicle',
+   'Move to Stay Independent': 'module-move-to-stay-independent',
+   'Eat for Your Next Chapter': 'module-eat-for-your-next-chapter',
+   'Sleep & Recovery': 'module-sleep-and-recovery',
+@@ -137,13 +136,13 @@ export default function Module({ app }) {
+       <p style={{ fontSize: 17, lineHeight: 1.6, color: 'rgba(16,39,90,.78)', margin: '12px 0 0', textWrap: 'pretty' }}>{M.lead}</p>
+ 
+       {!!MODULE_ILLUSTRATIONS[M.t] && (
+-        <img src={`/illustrations/${MODULE_ILLUSTRATIONS[M.t]}.png`} alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20, margin: '18px 0 0' }} />
++        <ModuleIllustration src={`/illustrations/${MODULE_ILLUSTRATIONS[M.t]}.png`} tc={tc} />
+       )}
+ 
+-      {M.kind === 'vehicle' && <VehicleDiagram color={tc.color} points={M.points} />}
++      {M.kind === 'vehicle' && <ModuleIllustration src="/illustrations/module-body-as-your-vehicle.png" tc={tc} maxWidth={340} widthPct="92%" />}
+       {M.kind === 'finmap' && (
+         <>
+-          <img src="/illustrations/module-financial-map-scale.png" alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20, margin: '18px 0 0' }} />
++          <ModuleIllustration src="/illustrations/module-financial-map-scale.png" tc={tc} />
+           <FinancialMapDiagram color={tc.color} />
+         </>
+       )}
+diff --git a/app/src/screens/Terminal.jsx b/app/src/screens/Terminal.jsx
+index 0d30ad4..a223a73 100644
+--- a/app/src/screens/Terminal.jsx
++++ b/app/src/screens/Terminal.jsx
+@@ -50,8 +50,8 @@ export default function Terminal({ app }) {
+           </div>
+         </div>
+       </div>
+-      <div style={{ padding: '18px 20px 0' }}>
+-        <img src={`/illustrations/terminal-${tid}.png`} alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20 }} />
++      <div style={{ padding: '18px 20px 0', textAlign: 'center' }}>
++        <img src={`/illustrations/terminal-${tid}.png`} alt="" style={{ width: '88%', maxWidth: 360, height: 'auto', display: 'inline-block', borderRadius: 20 }} />
+       </div>
+       <div style={{ padding: '18px 20px 28px' }}>
+         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+diff --git a/app/src/screens/Transition.jsx b/app/src/screens/Transition.jsx
+index bc58f69..1db7417 100644
+--- a/app/src/screens/Transition.jsx
++++ b/app/src/screens/Transition.jsx
+@@ -2,8 +2,8 @@ import { TERMINALS, tone, NAVY } from '../data.js';
+ import TransitionIllustration from '../components/TransitionIllustration.jsx';
+ 
+ const COPY = [
+-  { title: 'Kendaraanmu sudah dipersiapkan.', body: 'Sekarang waktunya memastikan bekal perjalananmu cukup.', cta: 'Berangkat ke Assetland', image: null },
+-  { title: 'Bekalmu sudah dihitung.', body: 'Sekarang waktunya menyiapkan hati dan identitasmu.', cta: 'Berangkat ke Mindland', image: null },
++  { title: 'Kendaraanmu sudah dipersiapkan.', body: 'Sekarang waktunya memastikan bekal perjalananmu cukup.', cta: 'Berangkat ke Assetland', image: '/illustrations/transition-assetland.png' },
++  { title: 'Bekalmu sudah dihitung.', body: 'Sekarang waktunya menyiapkan hati dan identitasmu.', cta: 'Berangkat ke Mindland', image: '/illustrations/transition-mindland.png' },
+   { title: 'Hatimu sudah lebih siap.', body: 'Sekarang waktunya menemukan makna yang menjadi kompasmu.', cta: 'Berangkat ke Soulland', image: '/illustrations/transition-soulland.png' },
+   { title: 'Empat terminal telah kamu lalui.', body: 'Waktunya melewati Immigration dan melihat passport perjalananmu.', cta: 'Menuju Immigration', image: '/illustrations/transition-immigration.png' },
+ ];
+@@ -19,7 +19,9 @@ export default function Transition({ app }) {
+   return (
+     <div style={{ padding: '30px 24px', minHeight: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+       {copy.image ? (
+-        <img src={copy.image} alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20 }} />
++        <div style={{ textAlign: 'center' }}>
++          <img src={copy.image} alt="" style={{ width: '88%', maxWidth: 340, height: 'auto', display: 'inline-block', borderRadius: 20 }} />
++        </div>
+       ) : (
+         <TransitionIllustration color={destColor} height={170} />
+       )}
+diff --git a/app/src/screens/VisaQuestion.jsx b/app/src/screens/VisaQuestion.jsx
+index 595cd00..02a14da 100644
+--- a/app/src/screens/VisaQuestion.jsx
++++ b/app/src/screens/VisaQuestion.jsx
+@@ -21,7 +21,9 @@ export default function VisaQuestion({ app }) {
+       <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.2, color: tc.color, margin: '18px 0 0' }}>SEBELUM VISA {T.name}</div>
+       <h1 style={{ fontSize: 23, fontWeight: 800, lineHeight: 1.35, letterSpacing: -0.3, margin: '8px 0 0', textWrap: 'pretty' }}>{T.visaQ}</h1>
+       {tid === 'assetland' && (
+-        <img src="/illustrations/visaq-assetland.png" alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20, margin: '16px 0 0' }} />
++        <div style={{ textAlign: 'center' }}>
++          <img src="/illustrations/visaq-assetland.png" alt="" style={{ width: '85%', maxWidth: 320, height: 'auto', display: 'inline-block', margin: '16px 0 0' }} />
++        </div>
+       )}
+       <textarea
+         value={commitment}
+diff --git a/app/src/screens/VisaStamp.jsx b/app/src/screens/VisaStamp.jsx
+index bbf1075..3ef6d59 100644
+--- a/app/src/screens/VisaStamp.jsx
++++ b/app/src/screens/VisaStamp.jsx
+@@ -31,7 +31,7 @@ export default function VisaStamp({ app }) {
+             <textPath href={`#${arcId}`} startOffset="50%" textAnchor="middle">{T.visa}</textPath>
+           </text>
+         </svg>
+-        <img src="/icons/visa-plane.png" alt="" style={{ position: 'absolute', left: '50%', top: 33, width: 56, height: 56, transform: 'translateX(-50%)', objectFit: 'contain' }} />
++        <img src="/icons/visa-plane.png" alt="" style={{ position: 'absolute', left: '50%', top: 92, width: 50, height: 50, transform: 'translate(-50%,-50%)', objectFit: 'contain' }} />
+       </div>
+       <p style={{ fontSize: 17, lineHeight: 1.6, color: 'rgba(16,39,90,.75)', margin: '24px 0 0', textWrap: 'pretty' }}>
+         Kamu telah menyelesaikan {T.name} dan siap melanjutkan perjalanan ke terminal berikutnya.
+diff --git a/app/src/screens/Welcome.jsx b/app/src/screens/Welcome.jsx
+index 7789457..4aaf31f 100644
+--- a/app/src/screens/Welcome.jsx
++++ b/app/src/screens/Welcome.jsx
+@@ -11,7 +11,9 @@ export default function Welcome({ app }) {
+       <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '20px 0 0', fontSize: 14, color: 'rgba(16,39,90,.6)' }}>
+         Powered by <strong style={{ fontSize: 16, color: '#10275A' }}>MDI</strong>
+       </div>
+-      <img src="/illustrations/hero.png" alt="" style={{ width: '100%', height: 'auto', display: 'block', margin: '22px 0 0' }} />
++      <div style={{ textAlign: 'center' }}>
++        <img src="/illustrations/hero.png" alt="" style={{ width: '92%', maxWidth: 380, height: 'auto', display: 'inline-block', margin: '22px 0 0' }} />
++      </div>
+       <button
+         onClick={() => {
+           app.upd((x) => { x.journeyProgress.started = true; }, true);
+-- 
+2.43.0
+

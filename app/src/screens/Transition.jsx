@@ -2,8 +2,8 @@ import { TERMINALS, tone, NAVY } from '../data.js';
 import TransitionIllustration from '../components/TransitionIllustration.jsx';
 
 const COPY = [
-  { title: 'Kendaraanmu sudah dipersiapkan.', body: 'Sekarang waktunya memastikan bekal perjalananmu cukup.', cta: 'Berangkat ke Assetland', image: null },
-  { title: 'Bekalmu sudah dihitung.', body: 'Sekarang waktunya menyiapkan hati dan identitasmu.', cta: 'Berangkat ke Mindland', image: null },
+  { title: 'Kendaraanmu sudah dipersiapkan.', body: 'Sekarang waktunya memastikan bekal perjalananmu cukup.', cta: 'Berangkat ke Assetland', image: '/illustrations/transition-assetland.png' },
+  { title: 'Bekalmu sudah dihitung.', body: 'Sekarang waktunya menyiapkan hati dan identitasmu.', cta: 'Berangkat ke Mindland', image: '/illustrations/transition-mindland.png' },
   { title: 'Hatimu sudah lebih siap.', body: 'Sekarang waktunya menemukan makna yang menjadi kompasmu.', cta: 'Berangkat ke Soulland', image: '/illustrations/transition-soulland.png' },
   { title: 'Empat terminal telah kamu lalui.', body: 'Waktunya melewati Immigration dan melihat passport perjalananmu.', cta: 'Menuju Immigration', image: '/illustrations/transition-immigration.png' },
 ];
@@ -19,7 +19,9 @@ export default function Transition({ app }) {
   return (
     <div style={{ padding: '30px 24px', minHeight: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       {copy.image ? (
-        <img src={copy.image} alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20 }} />
+        <div style={{ textAlign: 'center' }}>
+          <img src={copy.image} alt="" style={{ width: '88%', maxWidth: 340, height: 'auto', display: 'inline-block', borderRadius: 20 }} />
+        </div>
       ) : (
         <TransitionIllustration color={destColor} height={170} />
       )}

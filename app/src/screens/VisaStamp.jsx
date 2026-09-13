@@ -31,7 +31,7 @@ export default function VisaStamp({ app }) {
             <textPath href={`#${arcId}`} startOffset="50%" textAnchor="middle">{T.visa}</textPath>
           </text>
         </svg>
-        <img src="/icons/visa-plane.png" alt="" style={{ position: 'absolute', left: '50%', top: 33, width: 56, height: 56, transform: 'translateX(-50%)', objectFit: 'contain' }} />
+        <img src="/icons/visa-plane.png" alt="" style={{ position: 'absolute', left: '50%', top: 92, width: 50, height: 50, transform: 'translate(-50%,-50%)', objectFit: 'contain' }} />
       </div>
       <p style={{ fontSize: 17, lineHeight: 1.6, color: 'rgba(16,39,90,.75)', margin: '24px 0 0', textWrap: 'pretty' }}>
         Kamu telah menyelesaikan {T.name} dan siap melanjutkan perjalanan ke terminal berikutnya.

@@ -21,7 +21,9 @@ export default function VisaQuestion({ app }) {
       <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.2, color: tc.color, margin: '18px 0 0' }}>SEBELUM VISA {T.name}</div>
       <h1 style={{ fontSize: 23, fontWeight: 800, lineHeight: 1.35, letterSpacing: -0.3, margin: '8px 0 0', textWrap: 'pretty' }}>{T.visaQ}</h1>
       {tid === 'assetland' && (
-        <img src="/illustrations/visaq-assetland.png" alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20, margin: '16px 0 0' }} />
+        <div style={{ textAlign: 'center' }}>
+          <img src="/illustrations/visaq-assetland.png" alt="" style={{ width: '85%', maxWidth: 320, height: 'auto', display: 'inline-block', margin: '16px 0 0' }} />
+        </div>
       )}
       <textarea
         value={commitment}

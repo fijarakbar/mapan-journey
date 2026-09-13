@@ -50,8 +50,8 @@ export default function Terminal({ app }) {
           </div>
         </div>
       </div>
-      <div style={{ padding: '18px 20px 0' }}>
-        <img src={`/illustrations/terminal-${tid}.png`} alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20 }} />
+      <div style={{ padding: '18px 20px 0', textAlign: 'center' }}>
+        <img src={`/illustrations/terminal-${tid}.png`} alt="" style={{ width: '88%', maxWidth: 360, height: 'auto', display: 'inline-block', borderRadius: 20 }} />
       </div>
       <div style={{ padding: '18px 20px 28px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

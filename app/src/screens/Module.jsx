@@ -1,12 +1,11 @@
 import { TERMINALS, LUGGAGE, CARRY, LEAVE, tone } from '../data.js';
-import VehicleDiagram from '../diagrams/VehicleDiagram.jsx';
 import FinancialMapDiagram from '../diagrams/FinancialMapDiagram.jsx';
 import StagesDiagram from '../diagrams/StagesDiagram.jsx';
 import CompassDiagram from '../diagrams/CompassDiagram.jsx';
 import TreeDiagram from '../diagrams/TreeDiagram.jsx';
+import ModuleIllustration from '../components/ModuleIllustration.jsx';
 
 const MODULE_ILLUSTRATIONS = {
-  'Body as Your Vehicle': 'module-body-as-your-vehicle',
   'Move to Stay Independent': 'module-move-to-stay-independent',
   'Eat for Your Next Chapter': 'module-eat-for-your-next-chapter',
   'Sleep & Recovery': 'module-sleep-and-recovery',
@@ -137,13 +136,13 @@ export default function Module({ app }) {
       <p style={{ fontSize: 17, lineHeight: 1.6, color: 'rgba(16,39,90,.78)', margin: '12px 0 0', textWrap: 'pretty' }}>{M.lead}</p>
 
       {!!MODULE_ILLUSTRATIONS[M.t] && (
-        <img src={`/illustrations/${MODULE_ILLUSTRATIONS[M.t]}.png`} alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20, margin: '18px 0 0' }} />
+        <ModuleIllustration src={`/illustrations/${MODULE_ILLUSTRATIONS[M.t]}.png`} tc={tc} />
       )}
 
-      {M.kind === 'vehicle' && <VehicleDiagram color={tc.color} points={M.points} />}
+      {M.kind === 'vehicle' && <ModuleIllustration src="/illustrations/module-body-as-your-vehicle.png" tc={tc} maxWidth={340} widthPct="92%" />}
       {M.kind === 'finmap' && (
         <>
-          <img src="/illustrations/module-financial-map-scale.png" alt="" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20, margin: '18px 0 0' }} />
+          <ModuleIllustration src="/illustrations/module-financial-map-scale.png" tc={tc} />
           <FinancialMapDiagram color={tc.color} />
         </>
       )}
