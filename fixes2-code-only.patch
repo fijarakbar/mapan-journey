@@ -1,0 +1,74 @@
+From 5d0711454b850c99bce4a2f697a7a10e0e5ddc00 Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Sun, 13 Sep 2026 17:50:28 +0000
+Subject: [PATCH] Remove redundant diagrams, shrink illustrations further, drop
+ VisaQuestion image
+
+- My Financial Map: remove code-drawn FinancialMapDiagram (redundant with real scale illustration), keep just the caption text
+- VisaQuestion Assetland: remove illustration, back to standard layout (matches other terminals)
+- ModuleIllustration: shrink default from 68%/260 to 56%/210
+- Body as Your Vehicle illustration: shrink from 92%/340 to 72%/260
+---
+ app/src/components/ModuleIllustration.jsx | 2 +-
+ app/src/screens/Module.jsx                | 7 ++++---
+ app/src/screens/VisaQuestion.jsx          | 5 -----
+ 3 files changed, 5 insertions(+), 9 deletions(-)
+
+diff --git a/app/src/components/ModuleIllustration.jsx b/app/src/components/ModuleIllustration.jsx
+index 9be7e4a..fa1315c 100644
+--- a/app/src/components/ModuleIllustration.jsx
++++ b/app/src/components/ModuleIllustration.jsx
+@@ -1,7 +1,7 @@
+ // A tinted, shaded card for module illustrations — matches the Terminal.jsx
+ // header language (color tint + diagonal hatch) instead of a bare floating
+ // image, and keeps the image modestly sized rather than edge-to-edge.
+-export default function ModuleIllustration({ src, tc, maxWidth = 260, widthPct = '68%' }) {
++export default function ModuleIllustration({ src, tc, maxWidth = 210, widthPct = '56%' }) {
+   return (
+     <div
+       style={{
+diff --git a/app/src/screens/Module.jsx b/app/src/screens/Module.jsx
+index 6de1343..dce9d4a 100644
+--- a/app/src/screens/Module.jsx
++++ b/app/src/screens/Module.jsx
+@@ -1,5 +1,4 @@
+ import { TERMINALS, LUGGAGE, CARRY, LEAVE, tone } from '../data.js';
+-import FinancialMapDiagram from '../diagrams/FinancialMapDiagram.jsx';
+ import StagesDiagram from '../diagrams/StagesDiagram.jsx';
+ import CompassDiagram from '../diagrams/CompassDiagram.jsx';
+ import TreeDiagram from '../diagrams/TreeDiagram.jsx';
+@@ -139,11 +138,13 @@ export default function Module({ app }) {
+         <ModuleIllustration src={`/illustrations/${MODULE_ILLUSTRATIONS[M.t]}.png`} tc={tc} />
+       )}
+ 
+-      {M.kind === 'vehicle' && <ModuleIllustration src="/illustrations/module-body-as-your-vehicle.png" tc={tc} maxWidth={340} widthPct="92%" />}
++      {M.kind === 'vehicle' && <ModuleIllustration src="/illustrations/module-body-as-your-vehicle.png" tc={tc} maxWidth={260} widthPct="72%" />}
+       {M.kind === 'finmap' && (
+         <>
+           <ModuleIllustration src="/illustrations/module-financial-map-scale.png" tc={tc} />
+-          <FinancialMapDiagram color={tc.color} />
++          <div style={{ fontSize: 14, lineHeight: 1.5, color: 'rgba(16,39,90,.62)', textAlign: 'center', padding: '12px 14px 0' }}>
++            Kerangka ini kamu isi lewat refleksi di bawah, dengan angka kasar sekalipun.
++          </div>
+         </>
+       )}
+       {M.kind === 'stages' && <StagesDiagram color={tc.color} />}
+diff --git a/app/src/screens/VisaQuestion.jsx b/app/src/screens/VisaQuestion.jsx
+index 02a14da..8f0cba1 100644
+--- a/app/src/screens/VisaQuestion.jsx
++++ b/app/src/screens/VisaQuestion.jsx
+@@ -20,11 +20,6 @@ export default function VisaQuestion({ app }) {
+       <button onClick={() => app.back()} style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(16,39,90,.12)', background: '#fff', fontSize: 19, cursor: 'pointer', color: '#10275A' }}>←</button>
+       <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.2, color: tc.color, margin: '18px 0 0' }}>SEBELUM VISA {T.name}</div>
+       <h1 style={{ fontSize: 23, fontWeight: 800, lineHeight: 1.35, letterSpacing: -0.3, margin: '8px 0 0', textWrap: 'pretty' }}>{T.visaQ}</h1>
+-      {tid === 'assetland' && (
+-        <div style={{ textAlign: 'center' }}>
+-          <img src="/illustrations/visaq-assetland.png" alt="" style={{ width: '85%', maxWidth: 320, height: 'auto', display: 'inline-block', margin: '16px 0 0' }} />
+-        </div>
+-      )}
+       <textarea
+         value={commitment}
+         onChange={(e) => { const v = e.target.value; app.upd((x) => { x.commitments[tid] = v; }); }}
+-- 
+2.43.0
+

@@ -1,7 +1,7 @@
 // A tinted, shaded card for module illustrations — matches the Terminal.jsx
 // header language (color tint + diagonal hatch) instead of a bare floating
 // image, and keeps the image modestly sized rather than edge-to-edge.
-export default function ModuleIllustration({ src, tc, maxWidth = 260, widthPct = '68%' }) {
+export default function ModuleIllustration({ src, tc, maxWidth = 210, widthPct = '56%' }) {
   return (
     <div
       style={{

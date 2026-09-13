@@ -1,5 +1,4 @@
 import { TERMINALS, LUGGAGE, CARRY, LEAVE, tone } from '../data.js';
-import FinancialMapDiagram from '../diagrams/FinancialMapDiagram.jsx';
 import StagesDiagram from '../diagrams/StagesDiagram.jsx';
 import CompassDiagram from '../diagrams/CompassDiagram.jsx';
 import TreeDiagram from '../diagrams/TreeDiagram.jsx';
@@ -139,11 +138,13 @@ export default function Module({ app }) {
         <ModuleIllustration src={`/illustrations/${MODULE_ILLUSTRATIONS[M.t]}.png`} tc={tc} />
       )}
 
-      {M.kind === 'vehicle' && <ModuleIllustration src="/illustrations/module-body-as-your-vehicle.png" tc={tc} maxWidth={340} widthPct="92%" />}
+      {M.kind === 'vehicle' && <ModuleIllustration src="/illustrations/module-body-as-your-vehicle.png" tc={tc} maxWidth={260} widthPct="72%" />}
       {M.kind === 'finmap' && (
         <>
           <ModuleIllustration src="/illustrations/module-financial-map-scale.png" tc={tc} />
-          <FinancialMapDiagram color={tc.color} />
+          <div style={{ fontSize: 14, lineHeight: 1.5, color: 'rgba(16,39,90,.62)', textAlign: 'center', padding: '12px 14px 0' }}>
+            Kerangka ini kamu isi lewat refleksi di bawah, dengan angka kasar sekalipun.
+          </div>
         </>
       )}
       {M.kind === 'stages' && <StagesDiagram color={tc.color} />}

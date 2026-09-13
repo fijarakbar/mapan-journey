@@ -21,8 +21,9 @@ export default function Terminal({ app }) {
 
   return (
     <div>
-      <div style={{ padding: '14px 20px 22px', background: tc.tint, position: 'relative' }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(120deg,rgba(255,255,255,.55) 0 12px,rgba(255,255,255,0) 12px 24px)' }} />
+      <div style={{ padding: '14px 20px 22px', background: tc.tint, position: 'relative', overflow: 'hidden' }}>
+        <img src={`/illustrations/terminal-${tid}.png`} alt="" style={{ position: 'absolute', right: -30, bottom: -20, width: 230, height: 'auto', opacity: 0.9 }} />
+        <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(100deg, ${tc.tint} 0%, ${tc.tint} 42%, rgba(255,255,255,0) 78%)` }} />
         <div style={{ position: 'relative' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <button onClick={() => app.back()} style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(16,39,90,.12)', background: 'rgba(255,255,255,.8)', fontSize: 19, cursor: 'pointer', color: '#10275A' }}>←</button>
@@ -31,27 +32,22 @@ export default function Terminal({ app }) {
               <button onClick={() => app.go('home')} style={{ height: 32, padding: '0 12px', borderRadius: 10, border: '1px solid rgba(16,39,90,.14)', background: 'rgba(255,255,255,.85)', fontSize: 12.5, fontWeight: 700, color: '#10275A', cursor: 'pointer' }}>🏠 Beranda</button>
             </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14 }}>
-            <div>
-              <div style={{ width: 44, height: 44, borderRadius: 14, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${tc.border}`, overflow: 'hidden' }}>
-                <img src={`/icons/badge-${tid}.png`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </div>
-              <div style={{ fontSize: 27, fontWeight: 800, letterSpacing: 0.4, color: tc.color, marginTop: 12 }}>{T.name}</div>
-              <div style={{ fontSize: 17, fontWeight: 700, marginTop: 2 }}>{T.tag}</div>
-              <div style={{ fontSize: 15, lineHeight: 1.45, color: 'rgba(16,39,90,.7)', marginTop: 8, maxWidth: 210, textWrap: 'pretty' }}>{T.q}</div>
+          <div style={{ marginTop: 14, maxWidth: 205 }}>
+            <div style={{ width: 44, height: 44, borderRadius: 14, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${tc.border}`, overflow: 'hidden' }}>
+              <img src={`/icons/badge-${tid}.png`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
-            <div style={{ position: 'relative', flex: 'none', width: 82, height: 82 }}>
-              <svg width="82" height="82" viewBox="0 0 82 82" style={{ position: 'absolute', left: 0, top: 0 }}>
-                <circle cx="41" cy="41" r="33" fill="#fff" />
+            <div style={{ fontSize: 27, fontWeight: 800, letterSpacing: 0.4, color: tc.color, marginTop: 12 }}>{T.name}</div>
+            <div style={{ fontSize: 17, fontWeight: 700, marginTop: 2 }}>{T.tag}</div>
+            <div style={{ fontSize: 15, lineHeight: 1.45, color: 'rgba(16,39,90,.7)', marginTop: 8, textWrap: 'pretty' }}>{T.q}</div>
+            <div style={{ position: 'relative', width: 66, height: 66, marginTop: 14 }}>
+              <svg width="66" height="66" viewBox="0 0 66 66" style={{ position: 'absolute', left: 0, top: 0 }}>
+                <circle cx="33" cy="33" r="27" fill="#fff" />
               </svg>
-              <RingProgress size={82} center={41} radius={33} strokeWidth={7} trackColor="rgba(16,39,90,.10)" valueColor={tc.color} circumference={207.3} pct={pct} />
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: '#10275A' }}>{pct}%</div>
+              <RingProgress size={66} center={33} radius={27} strokeWidth={6} trackColor="rgba(16,39,90,.10)" valueColor={tc.color} circumference={169.6} pct={pct} />
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 800, color: '#10275A' }}>{pct}%</div>
             </div>
           </div>
         </div>
-      </div>
-      <div style={{ padding: '18px 20px 0', textAlign: 'center' }}>
-        <img src={`/illustrations/terminal-${tid}.png`} alt="" style={{ width: '88%', maxWidth: 360, height: 'auto', display: 'inline-block', borderRadius: 20 }} />
       </div>
       <div style={{ padding: '18px 20px 28px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
