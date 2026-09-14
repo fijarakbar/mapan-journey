@@ -1,5 +1,5 @@
 import { useJourney } from './store.js';
-import PhoneFrame from './components/PhoneFrame.jsx';
+import AppShell from './components/AppShell.jsx';
 import BackBar from './components/BackBar.jsx';
 import BottomNav from './components/BottomNav.jsx';
 
@@ -74,9 +74,9 @@ export default function App() {
   const zoom = ts === 'besar' ? 1.12 : ts === 'kecil' ? 0.92 : 1;
 
   return (
-    <PhoneFrame zoom={zoom} nav={<BottomNav show={showNav} screen={app.screen} onGo={(s) => app.go(s)} />}>
+    <AppShell zoom={zoom} nav={<BottomNav show={showNav} screen={app.screen} onGo={(s) => app.go(s)} />}>
       <BackBar show={showBackBar} label={backBarLabel} onBack={app.back} />
       <Screen app={app} />
-    </PhoneFrame>
+    </AppShell>
   );
 }

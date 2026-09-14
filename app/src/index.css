@@ -1,6 +1,12 @@
-body {
+html, body, #root {
   margin: 0;
-  background: #E9E5DE;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+body {
+  overflow-x: hidden;
+  background: #FBF9F5;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   color: #10275A;
 }

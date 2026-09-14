@@ -52,7 +52,7 @@ function NavIcon({ item, color }) {
 export default function BottomNav({ show, screen, onGo }) {
   if (!show) return null;
   return (
-    <div style={{ flex: 'none', display: 'flex', alignItems: 'stretch', background: '#fff', borderTop: '1px solid rgba(16,39,90,.10)', padding: '8px 6px 14px' }}>
+    <div style={{ flex: 'none', display: 'flex', alignItems: 'stretch', background: '#fff', borderTop: '1px solid rgba(16,39,90,.10)', padding: '8px 6px calc(10px + env(safe-area-inset-bottom))' }}>
       {ITEMS.map((item) => {
         const active = screen === item.key;
         const color = active ? NAVY : INACTIVE;

@@ -1,0 +1,170 @@
+cd /workspaces/mapan-journeyFrom 840d9f28869da37fe586d24473987a593a49df97 Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Sun, 13 Sep 2026 18:19:23 +0000
+Subject: [PATCH] =?UTF-8?q?Remove=20fake=20phone=20mockup=20frame=20?=
+ =?UTF-8?q?=E2=80=94=20app=20now=20fills=20the=20real=20device=20screen?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Delete PhoneFrame.jsx (had hardcoded 390x844 size, fake status bar with
+  9:41/signal/wifi/battery, rounded corners, shadow — was fine for desktop
+  preview but was shipping to real phones, causing a 'phone inside phone' look)
+- New AppShell.jsx: full width/100dvh, no fixed size, no mockup chrome,
+  uses env(safe-area-inset-top/bottom) for real notch/Dynamic Island/home
+  indicator/gesture-bar spacing on both iOS and Android
+- index.html: viewport meta now includes viewport-fit=cover (required for
+  safe-area-inset-* to resolve on iOS)
+- index.css: html/body/#root sized to fill the viewport; app background
+  color moved from the old outer preview bg to the real page background
+- BottomNav: bottom padding now uses env(safe-area-inset-bottom) instead
+  of a hardcoded 14px guess
+---
+ app/index.html                    |  2 +-
+ app/src/App.jsx                   |  6 +++---
+ app/src/components/AppShell.jsx   | 23 ++++++++++++++++++++++
+ app/src/components/BottomNav.jsx  |  2 +-
+ app/src/components/PhoneFrame.jsx | 32 -------------------------------
+ app/src/index.css                 | 10 ++++++++--
+ 6 files changed, 36 insertions(+), 39 deletions(-)
+ create mode 100644 app/src/components/AppShell.jsx
+ delete mode 100644 app/src/components/PhoneFrame.jsx
+
+diff --git a/app/index.html b/app/index.html
+index 6b1b35b..aef4fe4 100644
+--- a/app/index.html
++++ b/app/index.html
+@@ -2,7 +2,7 @@
+ <html lang="id">
+ <head>
+ <meta charset="utf-8">
+-<meta name="viewport" content="width=device-width, initial-scale=1">
++<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+ <title>MAPAN Journey</title>
+ <link rel="manifest" href="/manifest.json">
+ <link rel="icon" href="/pwa/favicon-32.png" sizes="32x32">
+diff --git a/app/src/App.jsx b/app/src/App.jsx
+index b45cc12..bb35422 100644
+--- a/app/src/App.jsx
++++ b/app/src/App.jsx
+@@ -1,5 +1,5 @@
+ import { useJourney } from './store.js';
+-import PhoneFrame from './components/PhoneFrame.jsx';
++import AppShell from './components/AppShell.jsx';
+ import BackBar from './components/BackBar.jsx';
+ import BottomNav from './components/BottomNav.jsx';
+ 
+@@ -74,9 +74,9 @@ export default function App() {
+   const zoom = ts === 'besar' ? 1.12 : ts === 'kecil' ? 0.92 : 1;
+ 
+   return (
+-    <PhoneFrame zoom={zoom} nav={<BottomNav show={showNav} screen={app.screen} onGo={(s) => app.go(s)} />}>
++    <AppShell zoom={zoom} nav={<BottomNav show={showNav} screen={app.screen} onGo={(s) => app.go(s)} />}>
+       <BackBar show={showBackBar} label={backBarLabel} onBack={app.back} />
+       <Screen app={app} />
+-    </PhoneFrame>
++    </AppShell>
+   );
+ }
+diff --git a/app/src/components/AppShell.jsx b/app/src/components/AppShell.jsx
+new file mode 100644
+index 0000000..0b02acf
+--- /dev/null
++++ b/app/src/components/AppShell.jsx
+@@ -0,0 +1,23 @@
++// The real device screen IS the frame — this shell just fills it, full
++// width/height, respecting the device's own safe areas (notch, Dynamic
++// Island, home indicator, gesture bar). No fake status bar, no phone
++// bezel, no rounded-corner "card" — that was only ever meant for
++// desktop-browser preview and should never ship to real phones.
++export default function AppShell({ zoom, nav, children }) {
++  return (
++    <div
++      style={{
++        width: '100%',
++        minHeight: '100dvh',
++        display: 'flex',
++        flexDirection: 'column',
++        paddingTop: 'env(safe-area-inset-top)',
++      }}
++    >
++      <div data-scroll style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', zoom, paddingBottom: 'env(safe-area-inset-bottom)' }}>
++        {children}
++      </div>
++      {nav}
++    </div>
++  );
++}
+diff --git a/app/src/components/BottomNav.jsx b/app/src/components/BottomNav.jsx
+index ffe226c..a30c3ff 100644
+--- a/app/src/components/BottomNav.jsx
++++ b/app/src/components/BottomNav.jsx
+@@ -52,7 +52,7 @@ function NavIcon({ item, color }) {
+ export default function BottomNav({ show, screen, onGo }) {
+   if (!show) return null;
+   return (
+-    <div style={{ flex: 'none', display: 'flex', alignItems: 'stretch', background: '#fff', borderTop: '1px solid rgba(16,39,90,.10)', padding: '8px 6px 14px' }}>
++    <div style={{ flex: 'none', display: 'flex', alignItems: 'stretch', background: '#fff', borderTop: '1px solid rgba(16,39,90,.10)', padding: '8px 6px calc(10px + env(safe-area-inset-bottom))' }}>
+       {ITEMS.map((item) => {
+         const active = screen === item.key;
+         const color = active ? NAVY : INACTIVE;
+diff --git a/app/src/components/PhoneFrame.jsx b/app/src/components/PhoneFrame.jsx
+deleted file mode 100644
+index 8a6a7f3..0000000
+--- a/app/src/components/PhoneFrame.jsx
++++ /dev/null
+@@ -1,32 +0,0 @@
+-function StatusBar() {
+-  return (
+-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 26px 6px', flex: 'none' }}>
+-      <span style={{ fontSize: 14, fontWeight: 700 }}>9:41</span>
+-      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2 }}>
+-          <div style={{ width: 3, height: 5, background: '#10275A', borderRadius: 1 }} />
+-          <div style={{ width: 3, height: 8, background: '#10275A', borderRadius: 1 }} />
+-          <div style={{ width: 3, height: 11, background: '#10275A', borderRadius: 1 }} />
+-        </div>
+-        <div style={{ width: 14, height: 11, border: '1.6px solid #10275A', borderRadius: 3 }} />
+-        <div style={{ width: 22, height: 11, border: '1.6px solid #10275A', borderRadius: 3, padding: 1.6 }}>
+-          <div style={{ width: '100%', height: '100%', background: '#10275A', borderRadius: 1 }} />
+-        </div>
+-      </div>
+-    </div>
+-  );
+-}
+-
+-export default function PhoneFrame({ zoom, nav, children }) {
+-  return (
+-    <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '26px 16px 40px', fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", color: '#10275A' }}>
+-      <div style={{ width: 390, height: 844, background: '#FBF9F5', borderRadius: 42, overflow: 'hidden', display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: '0 26px 70px rgba(16,39,90,.22)', border: '1px solid rgba(16,39,90,.10)' }}>
+-        <StatusBar />
+-        <div data-scroll style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', zoom }}>
+-          {children}
+-        </div>
+-        {nav}
+-      </div>
+-    </div>
+-  );
+-}
+diff --git a/app/src/index.css b/app/src/index.css
+index 0cb079e..df7c240 100644
+--- a/app/src/index.css
++++ b/app/src/index.css
+@@ -1,6 +1,12 @@
+-body {
++html, body, #root {
+   margin: 0;
+-  background: #E9E5DE;
++  padding: 0;
++  width: 100%;
++  min-height: 100%;
++}
++body {
++  overflow-x: hidden;
++  background: #FBF9F5;
+   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+   color: #10275A;
+ }
+-- 
+2.43.0
+
