@@ -1,0 +1,653 @@
+From a4917a06f7ddaec08dd7e18f854149e48531f145 Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Tue, 15 Sep 2026 04:08:07 +0000
+Subject: [PATCH] Add Supabase backend: auth, cloud sync, and live facilitator
+ dashboard
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- New tables (prefixed mapan_ to avoid collision with existing Supabase project): mapan_profiles, mapan_journey_state (full state blob per user), mapan_checkin_results (denormalized, for live dashboard)
+- RLS enabled on all 3 tables: users can only read/write their own rows; checkin_results is readable by any signed-in user (for the dashboard)
+- Realtime enabled on mapan_checkin_results
+- New Login.jsx screen (signup/signin), wired in after Welcome's 'Mulai Perjalanan'
+- store.js: tracks Supabase auth session, pulls saved journey_state on login, pushes state to Supabase (debounced) on every update, exposes signUp/signIn/signOut/syncCheckinResult
+- CheckIn.jsx: pushes check-in scores to mapan_checkin_results on completion
+- New Dashboard.jsx: live facilitator view via Supabase Realtime — per-domain averages + recent submissions feed, accessible from Profil
+- Profil.jsx: privacy copy updated to reflect cloud storage (no longer claims device-only), added Sign Out button and Dashboard link
+- Supabase URL + anon/publishable key added via .env (safe to expose client-side; protection comes from RLS, not secrecy)
+
+NOTE: could not fully browser-test signup/login end-to-end — this sandbox's network egress does not allow reaching *.supabase.co (confirmed via direct curl: 'Host not in allowlist'). Database schema, RLS, and Realtime were verified directly via the Supabase API/SQL, which is unaffected by this restriction. Please test the live signup flow once deployed.
+---
+ app/.env                      |   2 +
+ app/package-lock.json         | 106 +++++++++++++++++++++++++++++++++-
+ app/package.json              |   1 +
+ app/src/App.jsx               |   4 ++
+ app/src/screens/CheckIn.jsx   |   1 +
+ app/src/screens/Dashboard.jsx |  99 +++++++++++++++++++++++++++++++
+ app/src/screens/Login.jsx     |  93 +++++++++++++++++++++++++++++
+ app/src/screens/Profil.jsx    |  21 ++++++-
+ app/src/screens/Welcome.jsx   |   2 +-
+ app/src/store.js              |  83 +++++++++++++++++++++++++-
+ app/src/supabaseClient.js     |   9 +++
+ 11 files changed, 412 insertions(+), 9 deletions(-)
+ create mode 100644 app/.env
+ create mode 100644 app/src/screens/Dashboard.jsx
+ create mode 100644 app/src/screens/Login.jsx
+ create mode 100644 app/src/supabaseClient.js
+
+diff --git a/app/.env b/app/.env
+new file mode 100644
+index 0000000..09d2bfd
+--- /dev/null
++++ b/app/.env
+@@ -0,0 +1,2 @@
++VITE_SUPABASE_URL=https://rglrelllsmyinarqahvm.supabase.co
++VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnbHJlbGxsc215aW5hcnFhaHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNzkzODAsImV4cCI6MjEwNDk1NTM4MH0.PcPNhrmTXGp7YH6iUwu-kVwU2hSC6jFXj92EZqaWwO8
+diff --git a/app/package-lock.json b/app/package-lock.json
+index 78caa9d..36a2a61 100644
+--- a/app/package-lock.json
++++ b/app/package-lock.json
+@@ -8,6 +8,7 @@
+       "name": "mapan-journey",
+       "version": "0.1.0",
+       "dependencies": {
++        "@supabase/supabase-js": "^2.116.0",
+         "react": "^18.3.1",
+         "react-dom": "^18.3.1"
+       },
+@@ -1887,6 +1888,98 @@
+       "dev": true,
+       "license": "CC0-1.0"
+     },
++    "node_modules/@supabase/auth-js": {
++      "version": "2.116.0",
++      "resolved": "https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.116.0.tgz",
++      "integrity": "sha512-Cmosty12gyKGK9N3bQb+lMmuAFev5nmUzaR1AsmZHqKOAGzqX1VQzmp49CNPwOx/pw0H9Qqk4rs9yhwTlKpfDg==",
++      "license": "MIT",
++      "dependencies": {
++        "tslib": "2.8.1"
++      },
++      "engines": {
++        "node": ">=22.0.0"
++      }
++    },
++    "node_modules/@supabase/functions-js": {
++      "version": "2.116.0",
++      "resolved": "https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.116.0.tgz",
++      "integrity": "sha512-E+VOc2QDcni/fySqkBFiZhnoB3SGydEdZgFI6/dEAGAHx6yEhB46TN9qb2wXs+E+RSzOBV0R6dasiSlw4xlZAA==",
++      "license": "MIT",
++      "dependencies": {
++        "tslib": "2.8.1"
++      },
++      "engines": {
++        "node": ">=22.0.0"
++      }
++    },
++    "node_modules/@supabase/phoenix": {
++      "version": "0.4.5",
++      "resolved": "https://registry.npmjs.org/@supabase/phoenix/-/phoenix-0.4.5.tgz",
++      "integrity": "sha512-aAn9H9ovVyeApKy11OWOrrOGq8DV68yWeH4ud2lN9fzn4aO8Zb5GLL9m1pUg9nLqIcT+ZDfAcsZe0E/nqdv2lw==",
++      "license": "MIT"
++    },
++    "node_modules/@supabase/postgrest-js": {
++      "version": "2.116.0",
++      "resolved": "https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-2.116.0.tgz",
++      "integrity": "sha512-kGpVZTDHxFTJS3tu+rU0iTAZ+4U0bcLVjxwCk8f3gRhjw3qdCZjTBlgYvc4kGH2XccmAzbkKwXL/mrNHMGSc+A==",
++      "license": "MIT",
++      "dependencies": {
++        "tslib": "2.8.1"
++      },
++      "engines": {
++        "node": ">=22.0.0"
++      }
++    },
++    "node_modules/@supabase/realtime-js": {
++      "version": "2.116.0",
++      "resolved": "https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.116.0.tgz",
++      "integrity": "sha512-MHAnlXxi2s6yiJsZsQMfs2B3RFxeVfQWxerqYhIMqcCQV/FuY3LIeouPEkXw/ah7wUWMLYwempF9MOCUScyddg==",
++      "license": "MIT",
++      "dependencies": {
++        "@supabase/phoenix": "0.4.5",
++        "tslib": "2.8.1"
++      },
++      "engines": {
++        "node": ">=22.0.0"
++      }
++    },
++    "node_modules/@supabase/storage-js": {
++      "version": "2.116.0",
++      "resolved": "https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.116.0.tgz",
++      "integrity": "sha512-6/3hR6vccBP6oGM5B6RfbwZcTCKmQOodd/ZWQdsw8yJsU5zO/a//oBL6yLnmgxcjnHSrelW8rsO7hL5DPybyUQ==",
++      "license": "MIT",
++      "dependencies": {
++        "iceberg-js": "^0.8.1",
++        "tslib": "2.8.1"
++      },
++      "engines": {
++        "node": ">=22.0.0"
++      }
++    },
++    "node_modules/@supabase/supabase-js": {
++      "version": "2.116.0",
++      "resolved": "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.116.0.tgz",
++      "integrity": "sha512-YyWmKXt2NspV9iO8FPnlswUFJIRnrLd3oTCb+3ZyYRuKZtBH0xCUDgnUqoyA0fGUxpM/UhfwDjYf/dht/9bp7g==",
++      "license": "MIT",
++      "dependencies": {
++        "@supabase/auth-js": "2.116.0",
++        "@supabase/functions-js": "2.116.0",
++        "@supabase/postgrest-js": "2.116.0",
++        "@supabase/realtime-js": "2.116.0",
++        "@supabase/storage-js": "2.116.0"
++      },
++      "engines": {
++        "node": ">=22.0.0"
++      },
++      "peerDependencies": {
++        "@opentelemetry/api": ">=1.0.0"
++      },
++      "peerDependenciesMeta": {
++        "@opentelemetry/api": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/@types/babel__core": {
+       "version": "7.20.5",
+       "resolved": "https://registry.npmjs.org/@types/babel__core/-/babel__core-7.20.5.tgz",
+@@ -2175,6 +2268,15 @@
+         "node": ">=6.9.0"
+       }
+     },
++    "node_modules/iceberg-js": {
++      "version": "0.8.1",
++      "resolved": "https://registry.npmjs.org/iceberg-js/-/iceberg-js-0.8.1.tgz",
++      "integrity": "sha512-1dhVQZXhcHje7798IVM+xoo/1ZdVfzOMIc8/rgVSijRK38EDqOJoGula9N/8ZI5RD8QTxNQtK/Gozpr+qUqRRA==",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      }
++    },
+     "node_modules/js-tokens": {
+       "version": "4.0.0",
+       "resolved": "https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz",
+@@ -2533,9 +2635,7 @@
+       "version": "2.8.1",
+       "resolved": "https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz",
+       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==",
+-      "dev": true,
+-      "license": "0BSD",
+-      "optional": true
++      "license": "0BSD"
+     },
+     "node_modules/undici": {
+       "version": "7.29.0",
+diff --git a/app/package.json b/app/package.json
+index 34c8e34..ab74d05 100644
+--- a/app/package.json
++++ b/app/package.json
+@@ -10,6 +10,7 @@
+     "deploy": "vite build && wrangler deploy"
+   },
+   "dependencies": {
++    "@supabase/supabase-js": "^2.116.0",
+     "react": "^18.3.1",
+     "react-dom": "^18.3.1"
+   },
+diff --git a/app/src/App.jsx b/app/src/App.jsx
+index bb35422..0c656c5 100644
+--- a/app/src/App.jsx
++++ b/app/src/App.jsx
+@@ -4,6 +4,7 @@ import BackBar from './components/BackBar.jsx';
+ import BottomNav from './components/BottomNav.jsx';
+ 
+ import Welcome from './screens/Welcome.jsx';
++import Login from './screens/Login.jsx';
+ import Intro from './screens/Intro.jsx';
+ import ProfileForm from './screens/ProfileForm.jsx';
+ import CheckIn from './screens/CheckIn.jsx';
+@@ -27,9 +28,11 @@ import Jadwal from './screens/Jadwal.jsx';
+ import Catatan from './screens/Catatan.jsx';
+ import Profil from './screens/Profil.jsx';
+ import Program from './screens/Program.jsx';
++import Dashboard from './screens/Dashboard.jsx';
+ 
+ const SCREENS = {
+   welcome: Welcome,
++  login: Login,
+   intro: Intro,
+   profile: ProfileForm,
+   checkin: CheckIn,
+@@ -53,6 +56,7 @@ const SCREENS = {
+   catatan: Catatan,
+   profil: Profil,
+   program: Program,
++  dashboard: Dashboard,
+ };
+ 
+ const NAV_SCREENS = ['home', 'journey', 'jadwal', 'catatan', 'profil'];
+diff --git a/app/src/screens/CheckIn.jsx b/app/src/screens/CheckIn.jsx
+index 1d2fb50..4a34a85 100644
+--- a/app/src/screens/CheckIn.jsx
++++ b/app/src/screens/CheckIn.jsx
+@@ -21,6 +21,7 @@ export default function CheckIn({ app }) {
+     const scores = {};
+     Object.keys(sum).forEach((k) => { scores[k] = Math.round((sum[k] / cnt[k] / 5) * 100); });
+     app.upd((x) => { x.initialAssessment.scores = scores; x.initialAssessment.done = true; }, true);
++    app.syncCheckinResult({ ...data, initialAssessment: { ...data.initialAssessment, scores } });
+     app.go('result');
+   };
+ 
+diff --git a/app/src/screens/Dashboard.jsx b/app/src/screens/Dashboard.jsx
+new file mode 100644
+index 0000000..2f637b6
+--- /dev/null
++++ b/app/src/screens/Dashboard.jsx
+@@ -0,0 +1,99 @@
++import { useEffect, useState } from 'react';
++import { supabase } from '../supabaseClient.js';
++
++const DOMAINS = [
++  { key: 'fitland_score', label: 'Fitland', color: '#1E8A4C' },
++  { key: 'assetland_score', label: 'Assetland', color: '#C9871A' },
++  { key: 'mindland_score', label: 'Mindland', color: '#6C4FB6' },
++  { key: 'soulland_score', label: 'Soulland', color: '#D9662F' },
++  { key: 'next_score', label: 'Next Chapter', color: '#10275A' },
++];
++
++function avg(rows, key) {
++  const vals = rows.map((r) => r[key]).filter((v) => v !== null && v !== undefined);
++  if (!vals.length) return null;
++  return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
++}
++
++export default function Dashboard({ app }) {
++  const [rows, setRows] = useState([]);
++  const [loading, setLoading] = useState(true);
++
++  useEffect(() => {
++    let channel;
++    (async () => {
++      const { data } = await supabase.from('mapan_checkin_results').select('*').order('submitted_at', { ascending: false });
++      setRows(data || []);
++      setLoading(false);
++    })();
++
++    // Live updates: any insert/update to the results table refreshes the list.
++    channel = supabase
++      .channel('mapan_checkin_results_live')
++      .on('postgres_changes', { event: '*', schema: 'public', table: 'mapan_checkin_results' }, (payload) => {
++        setRows((prev) => {
++          const next = prev.filter((r) => r.id !== payload.new?.id && r.id !== payload.old?.id);
++          if (payload.eventType !== 'DELETE') next.unshift(payload.new);
++          return next.sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at));
++        });
++      })
++      .subscribe();
++
++    return () => { if (channel) supabase.removeChannel(channel); };
++  }, []);
++
++  return (
++    <div style={{ padding: '14px 20px 32px' }}>
++      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
++        <button onClick={() => app.go('profil')} style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(16,39,90,.12)', background: '#fff', fontSize: 19, cursor: 'pointer', color: '#10275A' }}>←</button>
++        <div>
++          <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.3, margin: 0 }}>Dashboard Live</h1>
++          <div style={{ fontSize: 13, color: 'rgba(16,39,90,.55)', display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
++            <span style={{ width: 8, height: 8, borderRadius: 999, background: '#1E8A4C', display: 'inline-block' }} />
++            {rows.length} peserta sudah check-in
++          </div>
++        </div>
++      </div>
++
++      {loading ? (
++        <div style={{ marginTop: 40, textAlign: 'center', color: 'rgba(16,39,90,.5)' }}>Memuat...</div>
++      ) : (
++        <>
++          <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
++            {DOMAINS.map((d) => {
++              const a = avg(rows, d.key);
++              return (
++                <div key={d.key} style={{ padding: 16, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.10)' }}>
++                  <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, color: d.color }}>{d.label.toUpperCase()}</div>
++                  <div style={{ fontSize: 30, fontWeight: 800, marginTop: 6, color: '#10275A' }}>{a === null ? '—' : `${a}%`}</div>
++                  <div style={{ fontSize: 12, color: 'rgba(16,39,90,.5)', marginTop: 2 }}>rata-rata</div>
++                </div>
++              );
++            })}
++          </div>
++
++          <div style={{ marginTop: 24, fontSize: 14, fontWeight: 800, color: 'rgba(16,39,90,.6)', letterSpacing: 0.5 }}>SUBMISI TERBARU</div>
++          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
++            {rows.length === 0 && <div style={{ color: 'rgba(16,39,90,.5)', fontSize: 14 }}>Belum ada peserta check-in.</div>}
++            {rows.map((r) => (
++              <div key={r.id} style={{ padding: 14, borderRadius: 14, background: '#fff', border: '1px solid rgba(16,39,90,.10)' }}>
++                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
++                  <div style={{ fontWeight: 800, fontSize: 15 }}>{r.nama || 'Tanpa nama'}</div>
++                  <div style={{ fontSize: 12, color: 'rgba(16,39,90,.45)' }}>{new Date(r.submitted_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</div>
++                </div>
++                {!!r.instansi && <div style={{ fontSize: 13, color: 'rgba(16,39,90,.55)' }}>{r.instansi}</div>}
++                <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
++                  {DOMAINS.map((d) => r[d.key] != null && (
++                    <span key={d.key} style={{ fontSize: 11.5, fontWeight: 700, padding: '4px 9px', borderRadius: 999, background: d.color + '1A', color: d.color }}>
++                      {d.label} {r[d.key]}%
++                    </span>
++                  ))}
++                </div>
++              </div>
++            ))}
++          </div>
++        </>
++      )}
++    </div>
++  );
++}
+diff --git a/app/src/screens/Login.jsx b/app/src/screens/Login.jsx
+new file mode 100644
+index 0000000..1326532
+--- /dev/null
++++ b/app/src/screens/Login.jsx
+@@ -0,0 +1,93 @@
++import { useState } from 'react';
++
++export default function Login({ app }) {
++  const [mode, setMode] = useState('signup'); // 'signup' | 'signin'
++  const [email, setEmail] = useState('');
++  const [password, setPassword] = useState('');
++  const [busy, setBusy] = useState(false);
++  const [error, setError] = useState('');
++  const [sentConfirm, setSentConfirm] = useState(false);
++
++  const submit = async () => {
++    if (!email || !password) { setError('Isi email dan kata sandi dulu ya.'); return; }
++    setBusy(true);
++    setError('');
++    const fn = mode === 'signup' ? app.signUp : app.signIn;
++    const err = await fn(email.trim(), password);
++    setBusy(false);
++    if (err) { setError(err); return; }
++    if (mode === 'signup') { setSentConfirm(true); return; }
++    app.go('intro');
++  };
++
++  return (
++    <div style={{ padding: '26px 24px 32px', animation: 'fadeUp .4s ease both' }}>
++      <button onClick={() => app.go('welcome')} style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(16,39,90,.12)', background: '#fff', fontSize: 19, cursor: 'pointer', color: '#10275A' }}>←</button>
++
++      <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: -0.5, margin: '20px 0 0' }}>
++        {mode === 'signup' ? 'Buat akun MAPAN' : 'Masuk ke MAPAN'}
++      </h1>
++      <p style={{ fontSize: 15, lineHeight: 1.55, color: 'rgba(16,39,90,.7)', margin: '8px 0 0', textWrap: 'pretty' }}>
++        {mode === 'signup'
++          ? 'Akun ini dipakai supaya progres perjalananmu tersimpan aman di cloud dan bisa dibuka lagi dari perangkat mana pun.'
++          : 'Masuk dengan akun yang sudah kamu buat sebelumnya untuk melanjutkan perjalanan.'}
++      </p>
++
++      {sentConfirm ? (
++        <div style={{ marginTop: 24, padding: 18, borderRadius: 16, background: '#EAF4EC', border: '1px solid rgba(30,138,76,.25)', fontSize: 15, lineHeight: 1.55 }}>
++          Akun berhasil dibuat. Cek email <strong>{email}</strong> untuk link konfirmasi, lalu kembali ke sini dan pilih <strong>Masuk</strong>.
++          <button
++            onClick={() => { setMode('signin'); setSentConfirm(false); }}
++            style={{ display: 'block', width: '100%', height: 48, marginTop: 14, border: 'none', borderRadius: 12, background: '#10275A', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}
++          >
++            Ke halaman Masuk
++          </button>
++        </div>
++      ) : (
++        <>
++          <div style={{ marginTop: 22 }}>
++            <label style={{ fontSize: 13, fontWeight: 700, color: 'rgba(16,39,90,.7)' }}>Email</label>
++            <input
++              type="email"
++              value={email}
++              onChange={(e) => setEmail(e.target.value)}
++              placeholder="nama@email.com"
++              style={{ width: '100%', height: 52, marginTop: 6, padding: '0 16px', fontSize: 16, borderRadius: 14, border: '1px solid rgba(16,39,90,.18)', background: '#fff' }}
++            />
++          </div>
++          <div style={{ marginTop: 14 }}>
++            <label style={{ fontSize: 13, fontWeight: 700, color: 'rgba(16,39,90,.7)' }}>Kata Sandi</label>
++            <input
++              type="password"
++              value={password}
++              onChange={(e) => setPassword(e.target.value)}
++              placeholder="Minimal 6 karakter"
++              style={{ width: '100%', height: 52, marginTop: 6, padding: '0 16px', fontSize: 16, borderRadius: 14, border: '1px solid rgba(16,39,90,.18)', background: '#fff' }}
++            />
++          </div>
++
++          {!!error && <div style={{ marginTop: 12, fontSize: 14, color: '#B3261E' }}>{error}</div>}
++
++          <button
++            onClick={submit}
++            disabled={busy}
++            style={{ width: '100%', height: 56, margin: '22px 0 0', border: 'none', borderRadius: 16, background: busy ? 'rgba(16,39,90,.4)' : '#10275A', color: '#fff', fontSize: 18, fontWeight: 700, cursor: busy ? 'default' : 'pointer' }}
++          >
++            {busy ? 'Memproses...' : mode === 'signup' ? 'Buat Akun & Mulai' : 'Masuk'}
++          </button>
++
++          <button
++            onClick={() => { setMode(mode === 'signup' ? 'signin' : 'signup'); setError(''); }}
++            style={{ display: 'block', margin: '16px auto 0', background: 'none', border: 'none', color: '#10275A', fontSize: 14, fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
++          >
++            {mode === 'signup' ? 'Sudah punya akun? Masuk' : 'Belum punya akun? Daftar'}
++          </button>
++
++          <p style={{ fontSize: 12.5, lineHeight: 1.5, color: 'rgba(16,39,90,.5)', marginTop: 22, textAlign: 'center' }}>
++            Dengan mendaftar, kamu setuju data perjalananmu (profil, jawaban refleksi, progres) disimpan di server MAPAN Journey untuk keperluan program.
++          </p>
++        </>
++      )}
++    </div>
++  );
++}
+diff --git a/app/src/screens/Profil.jsx b/app/src/screens/Profil.jsx
+index 435d9f3..5235e97 100644
+--- a/app/src/screens/Profil.jsx
++++ b/app/src/screens/Profil.jsx
+@@ -7,7 +7,7 @@ function toggleStyle(active) {
+ export default function Profil({ app }) {
+   const { data } = app;
+   const nama = data.participantProfile.nama || 'Sahabat';
+-  const profileMeta = [data.participantProfile.instansi, data.participantProfile.purna ? 'Purna tugas ' + data.participantProfile.purna : ''].filter(Boolean).join(' · ') || 'Data tersimpan di perangkat ini';
++  const profileMeta = [data.participantProfile.instansi, data.participantProfile.purna ? 'Purna tugas ' + data.participantProfile.purna : ''].filter(Boolean).join(' · ') || (app.session ? app.session.user.email : 'Belum masuk akun');
+   const tsz = data.appPreferences.textSize;
+ 
+   return (
+@@ -52,6 +52,21 @@ export default function Profil({ app }) {
+           </span>
+           <span style={{ fontSize: 22, color: 'rgba(16,39,90,.35)' }}>›</span>
+         </button>
++        {!!app.session && (
++          <button onClick={() => app.go('dashboard')} style={{ width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.14)', cursor: 'pointer', color: '#10275A', minHeight: 56, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
++            <span>
++              <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Dashboard Fasilitator</span>
++              <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.65)', marginTop: 3 }}>Lihat hasil check-in seluruh peserta (live)</span>
++            </span>
++            <span style={{ fontSize: 22, color: 'rgba(16,39,90,.35)' }}>›</span>
++          </button>
++        )}
++        {!!app.session && (
++          <button onClick={app.signOut} style={{ width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.14)', cursor: 'pointer', color: '#10275A', minHeight: 56 }}>
++            <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Keluar</span>
++            <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.6)', marginTop: 3 }}>{app.session.user.email}</span>
++          </button>
++        )}
+         <button onClick={app.reset} style={{ width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(226,116,58,.35)', cursor: 'pointer', color: '#B0521F', minHeight: 56 }}>
+           <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Mulai Ulang Perjalanan</span>
+           <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.6)', marginTop: 3 }}>Perlu konfirmasi dua kali</span>
+@@ -59,10 +74,10 @@ export default function Profil({ app }) {
+       </div>
+       <div style={{ fontSize: 14, lineHeight: 1.6, color: 'rgba(16,39,90,.6)', margin: '20px 0 0' }}>
+         <div style={{ fontWeight: 700, color: '#10275A' }}>Tentang MAPAN</div>
+-        MAPAN Journey membantu persiapan purna tugas melalui empat terminal kesiapan. Semua datamu tersimpan di perangkat ini saja.
++        MAPAN Journey membantu persiapan purna tugas melalui empat terminal kesiapan. {app.session ? 'Datamu tersimpan aman di cloud dan tersalin juga di perangkat ini.' : 'Data sementara tersimpan di perangkat ini — masuk akun supaya tersimpan di cloud.'}
+         <div style={{ marginTop: 8 }}>Versi Aplikasi {data.appVersion} · Powered by MDI</div>
+       </div>
+-      <div style={{ fontSize: 13, fontWeight: 600, color: '#1E8A4C', margin: '12px 0 0', height: 18 }}>{app.saved ? 'Tersimpan di perangkat' : ''}</div>
++      <div style={{ fontSize: 13, fontWeight: 600, color: '#1E8A4C', margin: '12px 0 0', height: 18 }}>{app.saved ? (app.session ? 'Tersimpan' : 'Tersimpan di perangkat') : ''}</div>
+     </div>
+   );
+ }
+diff --git a/app/src/screens/Welcome.jsx b/app/src/screens/Welcome.jsx
+index 4aaf31f..9cc66fb 100644
+--- a/app/src/screens/Welcome.jsx
++++ b/app/src/screens/Welcome.jsx
+@@ -17,7 +17,7 @@ export default function Welcome({ app }) {
+       <button
+         onClick={() => {
+           app.upd((x) => { x.journeyProgress.started = true; }, true);
+-          app.go('intro');
++          app.go(app.session ? 'intro' : 'login');
+         }}
+         style={{ width: '100%', height: 56, margin: '20px 0 0', border: 'none', borderRadius: 16, background: '#10275A', color: '#fff', fontSize: 18, fontWeight: 700, cursor: 'pointer' }}
+       >
+diff --git a/app/src/store.js b/app/src/store.js
+index 137ec5b..1621681 100644
+--- a/app/src/store.js
++++ b/app/src/store.js
+@@ -1,5 +1,6 @@
+-import { useCallback, useMemo, useRef, useState } from 'react';
++import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+ import { TERMINALS } from './data.js';
++import { supabase } from './supabaseClient.js';
+ 
+ const KEY = 'mapan-journey-v1';
+ 
+@@ -55,9 +56,45 @@ export function useJourney() {
+   const [saved, setSaved] = useState(false);
+   const [drafts, setDrafts] = useState({});
+   const [resetStep, setResetStep] = useState(0);
++  const [session, setSession] = useState(null);
++  const [authLoading, setAuthLoading] = useState(true);
+   const savedTimer = useRef(null);
+   const editBase = useRef(null);
+   const fileRef = useRef(null);
++  const syncTimer = useRef(null);
++
++  // Pick up an existing Supabase session on load, and keep it in sync.
++  useEffect(() => {
++    supabase.auth.getSession().then(({ data: { session: s } }) => {
++      setSession(s);
++      setAuthLoading(false);
++    });
++    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
++      setSession(s);
++    });
++    return () => sub.subscription.unsubscribe();
++  }, []);
++
++  // When a session appears (sign in / sign up), pull that user's saved
++  // journey_state from Supabase if it exists; otherwise push whatever is
++  // currently local (e.g. a fresh blank journey) as their first row.
++  useEffect(() => {
++    if (!session) return;
++    let cancelled = false;
++    (async () => {
++      const { data: row } = await supabase.from('mapan_journey_state').select('data').eq('user_id', session.user.id).maybeSingle();
++      if (cancelled) return;
++      if (row && row.data && row.data.participantProfile) {
++        persist(row.data);
++        setData(row.data);
++        setScreen(row.data.journeyProgress.started ? 'home' : 'welcome');
++      } else {
++        await supabase.from('mapan_journey_state').upsert({ user_id: session.user.id, data });
++      }
++    })();
++    return () => { cancelled = true; };
++    // eslint-disable-next-line react-hooks/exhaustive-deps
++  }, [session]);
+ 
+   const upd = useCallback((fn, quiet) => {
+     setData((prev) => {
+@@ -65,6 +102,12 @@ export function useJourney() {
+       fn(next);
+       next.updatedAt = new Date().toISOString();
+       persist(next);
++      if (session) {
++        clearTimeout(syncTimer.current);
++        syncTimer.current = setTimeout(() => {
++          supabase.from('mapan_journey_state').upsert({ user_id: session.user.id, data: next, updated_at: new Date().toISOString() }).then(() => {});
++        }, 800);
++      }
+       return next;
+     });
+     if (!quiet) {
+@@ -74,7 +117,7 @@ export function useJourney() {
+     } else {
+       setSaved(false);
+     }
+-  }, []);
++  }, [session]);
+ 
+   const go = useCallback((nextScreen, nextParams) => {
+     setStack((s) => s.concat([{ screen, params }]));
+@@ -187,6 +230,36 @@ export function useJourney() {
+     });
+   }, []);
+ 
++  const signUp = useCallback(async (email, password) => {
++    const { error } = await supabase.auth.signUp({ email, password });
++    return error ? error.message : null;
++  }, []);
++
++  const signIn = useCallback(async (email, password) => {
++    const { error } = await supabase.auth.signInWithPassword({ email, password });
++    return error ? error.message : null;
++  }, []);
++
++  const signOut = useCallback(async () => {
++    await supabase.auth.signOut();
++  }, []);
++
++  const syncCheckinResult = useCallback((d) => {
++    if (!session) return;
++    const s = d.initialAssessment.scores || {};
++    supabase.from('mapan_checkin_results').upsert({
++      user_id: session.user.id,
++      nama: d.participantProfile.nama || null,
++      instansi: d.participantProfile.instansi || null,
++      fitland_score: s.fitland ?? null,
++      assetland_score: s.assetland ?? null,
++      mindland_score: s.mindland ?? null,
++      soulland_score: s.soulland ?? null,
++      next_score: s.next ?? null,
++      submitted_at: new Date().toISOString(),
++    }).then(() => {});
++  }, [session]);
++
+   return {
+     data,
+     screen,
+@@ -198,6 +271,12 @@ export function useJourney() {
+     resetStep,
+     fileRef,
+     editBase,
++    session,
++    authLoading,
++    signUp,
++    signIn,
++    signOut,
++    syncCheckinResult,
+     upd,
+     go,
+     back,
+diff --git a/app/src/supabaseClient.js b/app/src/supabaseClient.js
+new file mode 100644
+index 0000000..5810da4
+--- /dev/null
++++ b/app/src/supabaseClient.js
+@@ -0,0 +1,9 @@
++import { createClient } from '@supabase/supabase-js';
++
++const url = import.meta.env.VITE_SUPABASE_URL;
++const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
++
++// The anon/publishable key is designed to be safe in client bundles —
++// real protection comes from the Row Level Security policies on each
++// table (see the mapan_* migrations), not from keeping this key secret.
++export const supabase = createClient(url, anonKey);
+-- 
+2.43.0
+

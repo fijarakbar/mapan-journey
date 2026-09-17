@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TERMINALS } from './data.js';
+import { supabase } from './supabaseClient.js';
 
 const KEY = 'mapan-journey-v1';
 
@@ -55,9 +56,45 @@ export function useJourney() {
   const [saved, setSaved] = useState(false);
   const [drafts, setDrafts] = useState({});
   const [resetStep, setResetStep] = useState(0);
+  const [session, setSession] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const savedTimer = useRef(null);
   const editBase = useRef(null);
   const fileRef = useRef(null);
+  const syncTimer = useRef(null);
+
+  // Pick up an existing Supabase session on load, and keep it in sync.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
+      setSession(s);
+      setAuthLoading(false);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  // When a session appears (sign in / sign up), pull that user's saved
+  // journey_state from Supabase if it exists; otherwise push whatever is
+  // currently local (e.g. a fresh blank journey) as their first row.
+  useEffect(() => {
+    if (!session) return;
+    let cancelled = false;
+    (async () => {
+      const { data: row } = await supabase.from('mapan_journey_state').select('data').eq('user_id', session.user.id).maybeSingle();
+      if (cancelled) return;
+      if (row && row.data && row.data.participantProfile) {
+        persist(row.data);
+        setData(row.data);
+        setScreen(row.data.journeyProgress.started ? 'home' : 'welcome');
+      } else {
+        await supabase.from('mapan_journey_state').upsert({ user_id: session.user.id, data });
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
 
   const upd = useCallback((fn, quiet) => {
     setData((prev) => {
@@ -65,6 +102,12 @@ export function useJourney() {
       fn(next);
       next.updatedAt = new Date().toISOString();
       persist(next);
+      if (session) {
+        clearTimeout(syncTimer.current);
+        syncTimer.current = setTimeout(() => {
+          supabase.from('mapan_journey_state').upsert({ user_id: session.user.id, data: next, updated_at: new Date().toISOString() }).then(() => {});
+        }, 800);
+      }
       return next;
     });
     if (!quiet) {
@@ -74,7 +117,7 @@ export function useJourney() {
     } else {
       setSaved(false);
     }
-  }, []);
+  }, [session]);
 
   const go = useCallback((nextScreen, nextParams) => {
     setStack((s) => s.concat([{ screen, params }]));
@@ -187,6 +230,36 @@ export function useJourney() {
     });
   }, []);
 
+  const signUp = useCallback(async (email, password) => {
+    const { error } = await supabase.auth.signUp({ email, password });
+    return error ? error.message : null;
+  }, []);
+
+  const signIn = useCallback(async (email, password) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return error ? error.message : null;
+  }, []);
+
+  const signOut = useCallback(async () => {
+    await supabase.auth.signOut();
+  }, []);
+
+  const syncCheckinResult = useCallback((d) => {
+    if (!session) return;
+    const s = d.initialAssessment.scores || {};
+    supabase.from('mapan_checkin_results').upsert({
+      user_id: session.user.id,
+      nama: d.participantProfile.nama || null,
+      instansi: d.participantProfile.instansi || null,
+      fitland_score: s.fitland ?? null,
+      assetland_score: s.assetland ?? null,
+      mindland_score: s.mindland ?? null,
+      soulland_score: s.soulland ?? null,
+      next_score: s.next ?? null,
+      submitted_at: new Date().toISOString(),
+    }).then(() => {});
+  }, [session]);
+
   return {
     data,
     screen,
@@ -198,6 +271,12 @@ export function useJourney() {
     resetStep,
     fileRef,
     editBase,
+    session,
+    authLoading,
+    signUp,
+    signIn,
+    signOut,
+    syncCheckinResult,
     upd,
     go,
     back,

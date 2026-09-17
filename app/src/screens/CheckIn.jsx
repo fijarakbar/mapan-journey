@@ -21,6 +21,7 @@ export default function CheckIn({ app }) {
     const scores = {};
     Object.keys(sum).forEach((k) => { scores[k] = Math.round((sum[k] / cnt[k] / 5) * 100); });
     app.upd((x) => { x.initialAssessment.scores = scores; x.initialAssessment.done = true; }, true);
+    app.syncCheckinResult({ ...data, initialAssessment: { ...data.initialAssessment, scores } });
     app.go('result');
   };
 

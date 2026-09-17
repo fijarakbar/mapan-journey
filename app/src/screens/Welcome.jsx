@@ -17,7 +17,7 @@ export default function Welcome({ app }) {
       <button
         onClick={() => {
           app.upd((x) => { x.journeyProgress.started = true; }, true);
-          app.go('intro');
+          app.go(app.session ? 'intro' : 'login');
         }}
         style={{ width: '100%', height: 56, margin: '20px 0 0', border: 'none', borderRadius: 16, background: '#10275A', color: '#fff', fontSize: 18, fontWeight: 700, cursor: 'pointer' }}
       >

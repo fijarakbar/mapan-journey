@@ -4,6 +4,7 @@ import BackBar from './components/BackBar.jsx';
 import BottomNav from './components/BottomNav.jsx';
 
 import Welcome from './screens/Welcome.jsx';
+import Login from './screens/Login.jsx';
 import Intro from './screens/Intro.jsx';
 import ProfileForm from './screens/ProfileForm.jsx';
 import CheckIn from './screens/CheckIn.jsx';
@@ -27,9 +28,11 @@ import Jadwal from './screens/Jadwal.jsx';
 import Catatan from './screens/Catatan.jsx';
 import Profil from './screens/Profil.jsx';
 import Program from './screens/Program.jsx';
+import Dashboard from './screens/Dashboard.jsx';
 
 const SCREENS = {
   welcome: Welcome,
+  login: Login,
   intro: Intro,
   profile: ProfileForm,
   checkin: CheckIn,
@@ -53,6 +56,7 @@ const SCREENS = {
   catatan: Catatan,
   profil: Profil,
   program: Program,
+  dashboard: Dashboard,
 };
 
 const NAV_SCREENS = ['home', 'journey', 'jadwal', 'catatan', 'profil'];

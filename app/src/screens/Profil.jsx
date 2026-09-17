@@ -7,7 +7,7 @@ function toggleStyle(active) {
 export default function Profil({ app }) {
   const { data } = app;
   const nama = data.participantProfile.nama || 'Sahabat';
-  const profileMeta = [data.participantProfile.instansi, data.participantProfile.purna ? 'Purna tugas ' + data.participantProfile.purna : ''].filter(Boolean).join(' · ') || 'Data tersimpan di perangkat ini';
+  const profileMeta = [data.participantProfile.instansi, data.participantProfile.purna ? 'Purna tugas ' + data.participantProfile.purna : ''].filter(Boolean).join(' · ') || (app.session ? app.session.user.email : 'Belum masuk akun');
   const tsz = data.appPreferences.textSize;
 
   return (
@@ -52,6 +52,21 @@ export default function Profil({ app }) {
           </span>
           <span style={{ fontSize: 22, color: 'rgba(16,39,90,.35)' }}>›</span>
         </button>
+        {!!app.session && (
+          <button onClick={() => app.go('dashboard')} style={{ width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.14)', cursor: 'pointer', color: '#10275A', minHeight: 56, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>
+              <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Dashboard Fasilitator</span>
+              <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.65)', marginTop: 3 }}>Lihat hasil check-in seluruh peserta (live)</span>
+            </span>
+            <span style={{ fontSize: 22, color: 'rgba(16,39,90,.35)' }}>›</span>
+          </button>
+        )}
+        {!!app.session && (
+          <button onClick={app.signOut} style={{ width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.14)', cursor: 'pointer', color: '#10275A', minHeight: 56 }}>
+            <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Keluar</span>
+            <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.6)', marginTop: 3 }}>{app.session.user.email}</span>
+          </button>
+        )}
         <button onClick={app.reset} style={{ width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(226,116,58,.35)', cursor: 'pointer', color: '#B0521F', minHeight: 56 }}>
           <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Mulai Ulang Perjalanan</span>
           <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.6)', marginTop: 3 }}>Perlu konfirmasi dua kali</span>
@@ -59,10 +74,10 @@ export default function Profil({ app }) {
       </div>
       <div style={{ fontSize: 14, lineHeight: 1.6, color: 'rgba(16,39,90,.6)', margin: '20px 0 0' }}>
         <div style={{ fontWeight: 700, color: '#10275A' }}>Tentang MAPAN</div>
-        MAPAN Journey membantu persiapan purna tugas melalui empat terminal kesiapan. Semua datamu tersimpan di perangkat ini saja.
+        MAPAN Journey membantu persiapan purna tugas melalui empat terminal kesiapan. {app.session ? 'Datamu tersimpan aman di cloud dan tersalin juga di perangkat ini.' : 'Data sementara tersimpan di perangkat ini — masuk akun supaya tersimpan di cloud.'}
         <div style={{ marginTop: 8 }}>Versi Aplikasi {data.appVersion} · Powered by MDI</div>
       </div>
-      <div style={{ fontSize: 13, fontWeight: 600, color: '#1E8A4C', margin: '12px 0 0', height: 18 }}>{app.saved ? 'Tersimpan di perangkat' : ''}</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: '#1E8A4C', margin: '12px 0 0', height: 18 }}>{app.saved ? (app.session ? 'Tersimpan' : 'Tersimpan di perangkat') : ''}</div>
     </div>
   );
 }
