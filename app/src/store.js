@@ -58,9 +58,9 @@ export function useJourney() {
   const [resetStep, setResetStep] = useState(0);
   const [session, setSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [role, setRole] = useState('participant');
   const savedTimer = useRef(null);
   const editBase = useRef(null);
-  const fileRef = useRef(null);
   const syncTimer = useRef(null);
 
   // Pick up an existing Supabase session on load, and keep it in sync.
@@ -94,6 +94,25 @@ export function useJourney() {
     })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
+
+  // Ensure a mapan_profiles row exists for this user (role defaults to
+  // 'participant' — facilitators are flagged manually via SQL after their
+  // account is created), and read back whatever role they actually have.
+  useEffect(() => {
+    if (!session) { setRole('participant'); return; }
+    let cancelled = false;
+    (async () => {
+      const { data: row } = await supabase.from('mapan_profiles').select('role').eq('id', session.user.id).maybeSingle();
+      if (cancelled) return;
+      if (row) {
+        setRole(row.role || 'participant');
+      } else {
+        await supabase.from('mapan_profiles').insert({ id: session.user.id });
+        setRole('participant');
+      }
+    })();
+    return () => { cancelled = true; };
   }, [session]);
 
   const upd = useCallback((fn, quiet) => {
@@ -168,56 +187,13 @@ export function useJourney() {
     return { screen: 'plan90', params: {}, label: 'Rencana 90 Hari' };
   }, [data, resp]);
 
-  const backup = useCallback(() => {
-    const nama = (data.participantProfile.nama || 'Peserta').replace(/\s+/g, '-');
-    const date = new Date().toISOString().slice(0, 10);
-    const payload = { format: 'MAPAN-JOURNEY-BACKUP', version: 1, exportedAt: new Date().toISOString(), data };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'MAPAN-Backup-' + nama + '-' + date + '.json';
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-    setSaved(true);
-    clearTimeout(savedTimer.current);
-    savedTimer.current = setTimeout(() => setSaved(false), 2500);
-  }, [data]);
-
-  const restore = useCallback((e) => {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      let parsed = null;
-      try {
-        parsed = JSON.parse(reader.result);
-      } catch (err) {
-        parsed = null;
-      }
-      if (!parsed || parsed.format !== 'MAPAN-JOURNEY-BACKUP' || !parsed.data || !parsed.data.participantProfile) {
-        window.alert('File ini sepertinya bukan backup MAPAN yang utuh. Coba pilih file lain.');
-        return;
-      }
-      if (!window.confirm('Data MAPAN yang ada di perangkat ini akan diganti dengan data dari file backup. Lanjutkan?')) return;
-      const d = Object.assign(blank(), parsed.data);
-      persist(d);
-      setData(d);
-      setScreen('home');
-      setParams({});
-      setStack([]);
-      setSaved(true);
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-  }, []);
-
   const reset = useCallback(() => {
     setResetStep((step) => {
       if (step === 0) {
         window.alert('Tekan sekali lagi untuk mengulang perjalanan. Semua refleksi, visa, dan rencana di perangkat ini akan dihapus.');
         return 1;
       }
-      if (!window.confirm('Yakin ingin mengulang perjalanan dari awal? Sebaiknya lakukan Backup Data terlebih dahulu.')) {
+      if (!window.confirm('Yakin ingin mengulang perjalanan dari awal?')) {
         return 0;
       }
       const d = blank();
@@ -270,10 +246,10 @@ export function useJourney() {
     drafts,
     setDrafts,
     resetStep,
-    fileRef,
     editBase,
     session,
     authLoading,
+    role,
     signUp,
     signIn,
     signOut,
@@ -291,8 +267,6 @@ export function useJourney() {
     doneCount,
     totalDone,
     nextStop,
-    backup,
-    restore,
     reset,
   };
 }

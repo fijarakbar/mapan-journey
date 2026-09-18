@@ -51,6 +51,7 @@ export default function Dashboard({ app }) {
   const [openDomain, setOpenDomain] = useState(null);
 
   useEffect(() => {
+    if (app.role !== 'facilitator') return;
     let channel;
     (async () => {
       const { data } = await supabase.from('mapan_checkin_results').select('*').order('submitted_at', { ascending: false });
@@ -70,7 +71,18 @@ export default function Dashboard({ app }) {
       .subscribe();
 
     return () => { if (channel) supabase.removeChannel(channel); };
-  }, []);
+  }, [app.role]);
+
+  if (app.role !== 'facilitator') {
+    return (
+      <div style={{ padding: '14px 20px 32px' }}>
+        <button onClick={() => app.go('profil')} style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(16,39,90,.12)', background: '#fff', fontSize: 19, cursor: 'pointer', color: '#10275A' }}>←</button>
+        <div style={{ marginTop: 40, textAlign: 'center', color: 'rgba(16,39,90,.55)', fontSize: 15, lineHeight: 1.6 }}>
+          Halaman ini khusus fasilitator.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: '14px 20px 32px' }}>

@@ -1,0 +1,218 @@
+cd /workspaces/mapan-journeyFrom 4661d9b9f8add2f836938491bd5be54debdf33c4 Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Fri, 18 Sep 2026 06:09:51 +0000
+Subject: [PATCH] Remove backup/restore (redundant with cloud sync), add
+ facilitator role gating
+
+- store.js: removed backup() and restore() entirely -- now that Supabase
+  syncs everyone's state automatically on login, a manual JSON
+  export/import is redundant, and importing an outdated backup file
+  could silently overwrite newer cloud-synced data.
+- store.js: on session, ensures a mapan_profiles row exists for the user
+  (defaults to role='participant') and reads back their actual role.
+- Profil.jsx: Backup Data / Pulihkan Data buttons removed; Dashboard
+  Fasilitator button now only shows when role === 'facilitator'.
+- Dashboard.jsx: added a role check at the top of the component itself
+  (not just hiding the button) -- shows 'Halaman ini khusus fasilitator.'
+  and skips the data fetch entirely for non-facilitators.
+- Supabase migration: added role column to mapan_profiles (default
+  'participant'); marked vzhar.akbar@gmail.com as 'facilitator'; replaced
+  the mapan_checkin_results SELECT policy so only rows from a user whose
+  profile role is 'facilitator' can read it -- real DB-level enforcement,
+  not just a hidden UI button.
+---
+ app/src/screens/Dashboard.jsx | 14 ++++++-
+ app/src/screens/Profil.jsx    | 17 +--------
+ app/src/store.js              | 70 +++++++++++------------------------
+ 3 files changed, 36 insertions(+), 65 deletions(-)
+
+diff --git a/app/src/screens/Dashboard.jsx b/app/src/screens/Dashboard.jsx
+index 768a1d4..32b0a5f 100644
+--- a/app/src/screens/Dashboard.jsx
++++ b/app/src/screens/Dashboard.jsx
+@@ -51,6 +51,7 @@ export default function Dashboard({ app }) {
+   const [openDomain, setOpenDomain] = useState(null);
+ 
+   useEffect(() => {
++    if (app.role !== 'facilitator') return;
+     let channel;
+     (async () => {
+       const { data } = await supabase.from('mapan_checkin_results').select('*').order('submitted_at', { ascending: false });
+@@ -70,7 +71,18 @@ export default function Dashboard({ app }) {
+       .subscribe();
+ 
+     return () => { if (channel) supabase.removeChannel(channel); };
+-  }, []);
++  }, [app.role]);
++
++  if (app.role !== 'facilitator') {
++    return (
++      <div style={{ padding: '14px 20px 32px' }}>
++        <button onClick={() => app.go('profil')} style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(16,39,90,.12)', background: '#fff', fontSize: 19, cursor: 'pointer', color: '#10275A' }}>←</button>
++        <div style={{ marginTop: 40, textAlign: 'center', color: 'rgba(16,39,90,.55)', fontSize: 15, lineHeight: 1.6 }}>
++          Halaman ini khusus fasilitator.
++        </div>
++      </div>
++    );
++  }
+ 
+   return (
+     <div style={{ padding: '14px 20px 32px' }}>
+diff --git a/app/src/screens/Profil.jsx b/app/src/screens/Profil.jsx
+index 5235e97..f379f20 100644
+--- a/app/src/screens/Profil.jsx
++++ b/app/src/screens/Profil.jsx
+@@ -30,21 +30,6 @@ export default function Profil({ app }) {
+         </div>
+       </div>
+       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, margin: '12px 0 0' }}>
+-        <button onClick={app.backup} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.10)', cursor: 'pointer', color: '#10275A', minHeight: 56 }}>
+-          <span>
+-            <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Backup Data</span>
+-            <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.65)', marginTop: 3 }}>Simpan satu file JSON ke perangkat</span>
+-          </span>
+-          <span style={{ fontSize: 20, color: 'rgba(16,39,90,.35)' }}>↓</span>
+-        </button>
+-        <button onClick={() => app.fileRef.current && app.fileRef.current.click()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.10)', cursor: 'pointer', color: '#10275A', minHeight: 56 }}>
+-          <span>
+-            <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Pulihkan Data</span>
+-            <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.65)', marginTop: 3 }}>Ambil dari file backup MAPAN</span>
+-          </span>
+-          <span style={{ fontSize: 20, color: 'rgba(16,39,90,.35)' }}>↑</span>
+-        </button>
+-        <input type="file" accept="application/json" ref={app.fileRef} onChange={app.restore} style={{ display: 'none' }} />
+         <button onClick={() => app.go('program')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.10)', cursor: 'pointer', color: '#10275A', minHeight: 56 }}>
+           <span>
+             <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Program Next Chapter</span>
+@@ -52,7 +37,7 @@ export default function Profil({ app }) {
+           </span>
+           <span style={{ fontSize: 22, color: 'rgba(16,39,90,.35)' }}>›</span>
+         </button>
+-        {!!app.session && (
++        {app.role === 'facilitator' && (
+           <button onClick={() => app.go('dashboard')} style={{ width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.14)', cursor: 'pointer', color: '#10275A', minHeight: 56, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+             <span>
+               <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Dashboard Fasilitator</span>
+diff --git a/app/src/store.js b/app/src/store.js
+index fc17d01..eb6a15c 100644
+--- a/app/src/store.js
++++ b/app/src/store.js
+@@ -58,9 +58,9 @@ export function useJourney() {
+   const [resetStep, setResetStep] = useState(0);
+   const [session, setSession] = useState(null);
+   const [authLoading, setAuthLoading] = useState(true);
++  const [role, setRole] = useState('participant');
+   const savedTimer = useRef(null);
+   const editBase = useRef(null);
+-  const fileRef = useRef(null);
+   const syncTimer = useRef(null);
+ 
+   // Pick up an existing Supabase session on load, and keep it in sync.
+@@ -96,6 +96,25 @@ export function useJourney() {
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [session]);
+ 
++  // Ensure a mapan_profiles row exists for this user (role defaults to
++  // 'participant' — facilitators are flagged manually via SQL after their
++  // account is created), and read back whatever role they actually have.
++  useEffect(() => {
++    if (!session) { setRole('participant'); return; }
++    let cancelled = false;
++    (async () => {
++      const { data: row } = await supabase.from('mapan_profiles').select('role').eq('id', session.user.id).maybeSingle();
++      if (cancelled) return;
++      if (row) {
++        setRole(row.role || 'participant');
++      } else {
++        await supabase.from('mapan_profiles').insert({ id: session.user.id });
++        setRole('participant');
++      }
++    })();
++    return () => { cancelled = true; };
++  }, [session]);
++
+   const upd = useCallback((fn, quiet) => {
+     setData((prev) => {
+       const next = JSON.parse(JSON.stringify(prev));
+@@ -168,56 +187,13 @@ export function useJourney() {
+     return { screen: 'plan90', params: {}, label: 'Rencana 90 Hari' };
+   }, [data, resp]);
+ 
+-  const backup = useCallback(() => {
+-    const nama = (data.participantProfile.nama || 'Peserta').replace(/\s+/g, '-');
+-    const date = new Date().toISOString().slice(0, 10);
+-    const payload = { format: 'MAPAN-JOURNEY-BACKUP', version: 1, exportedAt: new Date().toISOString(), data };
+-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+-    const a = document.createElement('a');
+-    a.href = URL.createObjectURL(blob);
+-    a.download = 'MAPAN-Backup-' + nama + '-' + date + '.json';
+-    a.click();
+-    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+-    setSaved(true);
+-    clearTimeout(savedTimer.current);
+-    savedTimer.current = setTimeout(() => setSaved(false), 2500);
+-  }, [data]);
+-
+-  const restore = useCallback((e) => {
+-    const file = e.target.files && e.target.files[0];
+-    if (!file) return;
+-    const reader = new FileReader();
+-    reader.onload = () => {
+-      let parsed = null;
+-      try {
+-        parsed = JSON.parse(reader.result);
+-      } catch (err) {
+-        parsed = null;
+-      }
+-      if (!parsed || parsed.format !== 'MAPAN-JOURNEY-BACKUP' || !parsed.data || !parsed.data.participantProfile) {
+-        window.alert('File ini sepertinya bukan backup MAPAN yang utuh. Coba pilih file lain.');
+-        return;
+-      }
+-      if (!window.confirm('Data MAPAN yang ada di perangkat ini akan diganti dengan data dari file backup. Lanjutkan?')) return;
+-      const d = Object.assign(blank(), parsed.data);
+-      persist(d);
+-      setData(d);
+-      setScreen('home');
+-      setParams({});
+-      setStack([]);
+-      setSaved(true);
+-    };
+-    reader.readAsText(file);
+-    e.target.value = '';
+-  }, []);
+-
+   const reset = useCallback(() => {
+     setResetStep((step) => {
+       if (step === 0) {
+         window.alert('Tekan sekali lagi untuk mengulang perjalanan. Semua refleksi, visa, dan rencana di perangkat ini akan dihapus.');
+         return 1;
+       }
+-      if (!window.confirm('Yakin ingin mengulang perjalanan dari awal? Sebaiknya lakukan Backup Data terlebih dahulu.')) {
++      if (!window.confirm('Yakin ingin mengulang perjalanan dari awal?')) {
+         return 0;
+       }
+       const d = blank();
+@@ -270,10 +246,10 @@ export function useJourney() {
+     drafts,
+     setDrafts,
+     resetStep,
+-    fileRef,
+     editBase,
+     session,
+     authLoading,
++    role,
+     signUp,
+     signIn,
+     signOut,
+@@ -291,8 +267,6 @@ export function useJourney() {
+     doneCount,
+     totalDone,
+     nextStop,
+-    backup,
+-    restore,
+     reset,
+   };
+ }
+-- 
+2.43.0
+

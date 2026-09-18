@@ -30,21 +30,6 @@ export default function Profil({ app }) {
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, margin: '12px 0 0' }}>
-        <button onClick={app.backup} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.10)', cursor: 'pointer', color: '#10275A', minHeight: 56 }}>
-          <span>
-            <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Backup Data</span>
-            <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.65)', marginTop: 3 }}>Simpan satu file JSON ke perangkat</span>
-          </span>
-          <span style={{ fontSize: 20, color: 'rgba(16,39,90,.35)' }}>↓</span>
-        </button>
-        <button onClick={() => app.fileRef.current && app.fileRef.current.click()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.10)', cursor: 'pointer', color: '#10275A', minHeight: 56 }}>
-          <span>
-            <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Pulihkan Data</span>
-            <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.65)', marginTop: 3 }}>Ambil dari file backup MAPAN</span>
-          </span>
-          <span style={{ fontSize: 20, color: 'rgba(16,39,90,.35)' }}>↑</span>
-        </button>
-        <input type="file" accept="application/json" ref={app.fileRef} onChange={app.restore} style={{ display: 'none' }} />
         <button onClick={() => app.go('program')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.10)', cursor: 'pointer', color: '#10275A', minHeight: 56 }}>
           <span>
             <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Program Next Chapter</span>
@@ -52,7 +37,7 @@ export default function Profil({ app }) {
           </span>
           <span style={{ fontSize: 22, color: 'rgba(16,39,90,.35)' }}>›</span>
         </button>
-        {!!app.session && (
+        {app.role === 'facilitator' && (
           <button onClick={() => app.go('dashboard')} style={{ width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.14)', cursor: 'pointer', color: '#10275A', minHeight: 56, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>
               <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Dashboard Fasilitator</span>
