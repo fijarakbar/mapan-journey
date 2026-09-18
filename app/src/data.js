@@ -129,16 +129,58 @@ export const CARRY = ['Pengalaman', 'Kebijaksanaan', 'Persahabatan', 'Integritas
 export const LEAVE = ['Ego jabatan', 'Perfeksionisme', 'Takut gagal', 'Terlalu sibuk', 'Membandingkan diri'];
 
 export const QUESTIONS = [
-  { area: 'FITLAND', id: 'fitland', text: 'Saya merasa tubuh saya cukup bugar untuk aktivitas harian.' },
-  { area: 'FITLAND', id: 'fitland', text: 'Saya rutin bergerak atau berolahraga setiap minggu.' },
-  { area: 'ASSETLAND', id: 'assetland', text: 'Saya punya gambaran jelas tentang kebutuhan biaya hidup setelah purna tugas.' },
-  { area: 'ASSETLAND', id: 'assetland', text: 'Saya sudah menyiapkan dana darurat dan dana kesehatan.' },
-  { area: 'MINDLAND', id: 'mindland', text: 'Saya merasa siap melepas peran dan jabatan saat ini.' },
-  { area: 'MINDLAND', id: 'mindland', text: 'Saya punya gambaran tentang diri saya di luar pekerjaan.' },
-  { area: 'SOULLAND', id: 'soulland', text: 'Saya tahu apa yang paling bermakna dalam hidup saya.' },
-  { area: 'SOULLAND', id: 'soulland', text: 'Saya punya kegiatan yang memberi rasa berguna.' },
-  { area: 'NEXT CHAPTER', id: 'next', text: 'Saya punya gambaran ingin melakukan apa setelah purna tugas.' },
-  { area: 'NEXT CHAPTER', id: 'next', text: 'Saya sudah membicarakan rencana ini dengan keluarga.' },
+  // A. Dimensi Keuangan -> assetland
+  { area: 'KEUANGAN', id: 'assetland', text: 'Saya memahami dengan baik berapa jumlah dana yang saya butuhkan untuk hidup nyaman setelah pensiun.' },
+  { area: 'KEUANGAN', id: 'assetland', text: 'Saya memiliki pengetahuan yang cukup tentang produk keuangan (tabungan, investasi, asuransi) yang relevan untuk masa pensiun.' },
+  { area: 'KEUANGAN', id: 'assetland', text: 'Saya terbiasa membuat anggaran dan mengontrol pengeluaran saya secara rutin.' },
+  { area: 'KEUANGAN', id: 'assetland', text: 'Saya merasa yakin mampu mengelola keuangan saya sendiri setelah tidak lagi menerima gaji tetap.' },
+  { area: 'KEUANGAN', id: 'assetland', text: 'Saya sudah memiliki sumber penghasilan pasca pensiun yang jelas (manfaat pensiun, investasi, usaha, dan lain-lain).' },
+  { area: 'KEUANGAN', id: 'assetland', text: 'Saya merasa yakin dan tenang saat harus mengambil keputusan keuangan penting.' },
+
+  // B. Dimensi Psikologis -> mindland
+  { area: 'PSIKOLOGIS', id: 'mindland', text: 'Saya sudah memiliki rencana konkret tentang apa yang akan saya lakukan setelah pensiun.' },
+  { area: 'PSIKOLOGIS', id: 'mindland', text: 'Saya telah menetapkan tujuan yang jelas untuk kehidupan saya pasca pensiun.' },
+  { area: 'PSIKOLOGIS', id: 'mindland', text: 'Saya merasa tenang memikirkan kehidupan sehari-hari saya setelah pensiun nanti.' },
+  { area: 'PSIKOLOGIS', id: 'mindland', text: 'Saya merasa siap menghadapi perubahan rutinitas harian setelah pensiun.' },
+  { area: 'PSIKOLOGIS', id: 'mindland', text: 'Saya sudah mendiskusikan rencana pensiun saya dengan keluarga/pasangan.' },
+  { area: 'PSIKOLOGIS', id: 'mindland', text: 'Saya merasa yakin dapat beradaptasi dengan hal-hal yang belum saya ketahui di masa pensiun nanti.' },
+
+  // C. Dimensi Kesehatan -> fitland
+  { area: 'KESEHATAN', id: 'fitland', text: 'Saya secara rutin menjaga pola makan dan aktivitas fisik saya.' },
+  { area: 'KESEHATAN', id: 'fitland', text: 'Saya melakukan pemeriksaan kesehatan secara berkala.' },
+  { area: 'KESEHATAN', id: 'fitland', text: 'Secara umum, saya menilai kondisi kesehatan fisik saya saat ini baik.' },
+  { area: 'KESEHATAN', id: 'fitland', text: 'Saya mampu menjaga ketenangan pikiran dalam menjalani aktivitas sehari-hari.' },
+  { area: 'KESEHATAN', id: 'fitland', text: 'Saya memiliki cara yang efektif untuk mengelola stres.' },
+  { area: 'KESEHATAN', id: 'fitland', text: 'Saya cukup tidur dan istirahat setiap hari.' },
+
+  // D. Dimensi Sosial -> sosial (berdiri sendiri)
+  { area: 'SOSIAL', id: 'sosial', text: 'Saya memiliki hubungan yang dekat dengan keluarga dan/atau pasangan.' },
+  { area: 'SOSIAL', id: 'sosial', text: 'Saya aktif dalam komunitas atau kelompok sosial di luar pekerjaan.' },
+  { area: 'SOSIAL', id: 'sosial', text: 'Saya memiliki teman atau kerabat yang dapat saya andalkan saat membutuhkan dukungan.' },
+  { area: 'SOSIAL', id: 'sosial', text: 'Saya yakin hubungan sosial saya akan tetap terjaga setelah saya tidak lagi bekerja.' },
+  { area: 'SOSIAL', id: 'sosial', text: 'Saya merasa memiliki peran yang berarti dalam keluarga/komunitas saya.' },
+  { area: 'SOSIAL', id: 'sosial', text: 'Saya sudah memiliki rencana untuk membangun atau memperluas jejaring sosial baru setelah pensiun.' },
+
+  // E. Dimensi Spiritual/Makna Hidup -> soulland
+  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya merasa hidup saya memiliki makna dan tujuan yang jelas.' },
+  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya rutin meluangkan waktu untuk refleksi diri, doa, atau ibadah sesuai keyakinan saya.' },
+  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya merasa tenang secara batin ketika menghadapi ketidakpastian hidup.' },
+  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya mampu menerima hal-hal dalam hidup yang berada di luar kendali saya.' },
+  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya merasa terhubung dengan sesuatu yang lebih besar dari diri saya sendiri (Tuhan/alam semesta).' },
+  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya percaya fase kehidupan setelah pensiun dapat menjadi kesempatan untuk berkontribusi bagi orang lain.' },
+  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya merasa bersyukur atas perjalanan hidup yang telah saya lalui sejauh ini.' },
+  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya memiliki nilai-nilai atau prinsip hidup yang menjadi pegangan dalam mengambil keputusan penting.' },
+];
+
+// Domain metadata for the check-in instrument specifically. 'sosial' is a
+// standalone 5th dimension — distinct from the 4 journey Terminals — so it
+// needs its own label/color here rather than reusing tone()/TERMINALS.
+export const CHECKIN_DOMAINS = [
+  { id: 'assetland', label: 'Keuangan', color: '#C9871A' },
+  { id: 'mindland', label: 'Psikologis', color: '#6C4FB6' },
+  { id: 'fitland', label: 'Kesehatan', color: '#1E8A4C' },
+  { id: 'sosial', label: 'Sosial', color: '#2E86AB' },
+  { id: 'soulland', label: 'Spiritual / Makna Hidup', color: '#D9662F' },
 ];
 
 export const ARCHETYPES = [

@@ -1,4 +1,7 @@
-import { QUESTIONS, tone } from '../data.js';
+import { QUESTIONS, CHECKIN_DOMAINS } from '../data.js';
+
+const domainByArea = {};
+QUESTIONS.forEach((q) => { domainByArea[q.area] = CHECKIN_DOMAINS.find((d) => d.id === q.id); });
 
 export default function CheckIn({ app }) {
   const { data } = app;
@@ -25,33 +28,48 @@ export default function CheckIn({ app }) {
     app.go('result');
   };
 
+  let lastArea = null;
+
   return (
     <div style={{ padding: '22px 24px 32px' }}>
       <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: -0.5, margin: 0 }}>Check-In Awal</h1>
       <p style={{ fontSize: 16, lineHeight: 1.55, color: 'rgba(16,39,90,.7)', margin: '10px 0 0', textWrap: 'pretty' }}>
-        Bukan tes, bukan diagnosa. Hanya cara melihat titik awal perjalananmu. Pilih 1 (belum) sampai 5 (sudah sangat).
+        Bukan tes, bukan diagnosa. Ini gambaran posisimu dibanding peserta lain secara keseluruhan, bukan penilaian pribadi mutlak. Pilih 1 (sangat tidak setuju) sampai 5 (sangat setuju).
       </p>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, margin: '22px 0 0' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 5, background: '#FBF9F5', padding: '10px 0', marginTop: 6 }}>
+        <div style={{ height: 8, borderRadius: 999, background: 'rgba(16,39,90,.10)', overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${Math.round((answered / QUESTIONS.length) * 100)}%`, background: '#10275A', borderRadius: 999, transition: 'width .2s' }} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, margin: '10px 0 0' }}>
         {QUESTIONS.map((q, i) => {
-          const c = tone(q.id);
+          const c = domainByArea[q.area];
           const val = answers['q' + i];
+          const showHeader = q.area !== lastArea;
+          lastArea = q.area;
           return (
-            <div key={i} style={{ padding: 18, borderRadius: 18, background: '#fff', border: '1px solid rgba(16,39,90,.10)', boxShadow: '0 1px 2px rgba(16,39,90,.04)' }}>
-              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.2, color: c.color }}>{q.area}</div>
-              <div style={{ fontSize: 16, lineHeight: 1.5, fontWeight: 600, margin: '6px 0 14px', textWrap: 'pretty' }}>{q.text}</div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                {[1, 2, 3, 4, 5].map((n) => {
-                  const on = val === n;
-                  return (
-                    <button
-                      key={n}
-                      onClick={() => pick(i, n)}
-                      style={{ flex: 1, height: 48, borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: 'pointer', border: `1px solid ${on ? c.color : 'rgba(16,39,90,.15)'}`, background: on ? c.color : '#FBF9F5', color: on ? '#fff' : 'rgba(16,39,90,.75)' }}
-                    >
-                      {n}
-                    </button>
-                  );
-                })}
+            <div key={i}>
+              {showHeader && (
+                <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.4, color: c.color, margin: '18px 0 10px' }}>
+                  {c.label.toUpperCase()}
+                </div>
+              )}
+              <div style={{ padding: 18, borderRadius: 18, background: '#fff', border: '1px solid rgba(16,39,90,.10)', boxShadow: '0 1px 2px rgba(16,39,90,.04)' }}>
+                <div style={{ fontSize: 15.5, lineHeight: 1.5, fontWeight: 600, marginBottom: 14, textWrap: 'pretty' }}>{q.text}</div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {[1, 2, 3, 4, 5].map((n) => {
+                    const on = val === n;
+                    return (
+                      <button
+                        key={n}
+                        onClick={() => pick(i, n)}
+                        style={{ flex: 1, height: 48, borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: 'pointer', border: `1px solid ${on ? c.color : 'rgba(16,39,90,.15)'}`, background: on ? c.color : '#FBF9F5', color: on ? '#fff' : 'rgba(16,39,90,.75)' }}
+                      >
+                        {n}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           );

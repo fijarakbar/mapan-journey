@@ -255,7 +255,7 @@ export function useJourney() {
       assetland_score: s.assetland ?? null,
       mindland_score: s.mindland ?? null,
       soulland_score: s.soulland ?? null,
-      next_score: s.next ?? null,
+      sosial_score: s.sosial ?? null,
       submitted_at: new Date().toISOString(),
     }).then(() => {});
   }, [session]);
