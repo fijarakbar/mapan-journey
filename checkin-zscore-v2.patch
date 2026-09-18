@@ -1,0 +1,715 @@
+From 426d27d82c251ad5ca1e049f6110988c9d9ae590 Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Fri, 18 Sep 2026 00:35:04 +0000
+Subject: [PATCH 1/3] Replace check-in with 32-item instrument (5 dimensions) +
+ population z-score levels
+
+- data.js: QUESTIONS replaced with the revised 32-item instrument (Keuangan,
+  Psikologis, Kesehatan, Sosial, Spiritual/Makna Hidup). Sosial is a new
+  standalone domain, separate from the 4 journey Terminals, no longer tied
+  to 'Next Chapter'. Added CHECKIN_DOMAINS metadata (label + color per
+  domain) since 'sosial' has no matching Terminal/tone().
+- CheckIn.jsx: renders all 32 items grouped under a sticky-progress header
+  per dimension; scoring math unchanged (still 0-100 average per domain).
+- New statsHelper.js: fetches population stats from mapan_checkin_results,
+  computes z-score per domain, and buckets it into 5 readiness levels
+  (Perlu Perhatian / Mulai Berkembang / Cukup Siap / Siap / Sangat Siap)
+  using standard-normal-ish bands. Falls back to nothing until at least
+  MIN_POPULATION (30) respondents exist, since mean/SD from a tiny sample
+  isn't meaningful.
+- Result.jsx (participant's own phone): shows the 5 domains; once >=30
+  people have checked in, shows their level relative to everyone else
+  instead of an absolute band, with a disclaimer that this is relative
+  standing, not a personal diagnosis. Falls back to the old absolute-score
+  bands below that threshold.
+- Dashboard.jsx (facilitator/projector): now shows, per domain, the
+  population average PLUS a stacked bar of what % of all respondents fall
+  in each level -- aggregate only, no individual names (per prior request).
+- store.js: syncCheckinResult now writes sosial_score instead of the
+  removed next_score.
+- Supabase migration: added sosial_score column to mapan_checkin_results
+  (next_score column kept, just unused, for backward compatibility).
+---
+ app/src/data.js               |  62 +++++++++++++++----
+ app/src/screens/CheckIn.jsx   |  58 +++++++++++-------
+ app/src/screens/Dashboard.jsx | 108 ++++++++++++++++++++--------------
+ app/src/screens/Result.jsx    |  49 +++++++++++----
+ app/src/statsHelper.js        |  55 +++++++++++++++++
+ app/src/store.js              |   2 +-
+ 6 files changed, 246 insertions(+), 88 deletions(-)
+ create mode 100644 app/src/statsHelper.js
+
+diff --git a/app/src/data.js b/app/src/data.js
+index ec8c556..5629938 100644
+--- a/app/src/data.js
++++ b/app/src/data.js
+@@ -129,16 +129,58 @@ export const CARRY = ['Pengalaman', 'Kebijaksanaan', 'Persahabatan', 'Integritas
+ export const LEAVE = ['Ego jabatan', 'Perfeksionisme', 'Takut gagal', 'Terlalu sibuk', 'Membandingkan diri'];
+ 
+ export const QUESTIONS = [
+-  { area: 'FITLAND', id: 'fitland', text: 'Saya merasa tubuh saya cukup bugar untuk aktivitas harian.' },
+-  { area: 'FITLAND', id: 'fitland', text: 'Saya rutin bergerak atau berolahraga setiap minggu.' },
+-  { area: 'ASSETLAND', id: 'assetland', text: 'Saya punya gambaran jelas tentang kebutuhan biaya hidup setelah purna tugas.' },
+-  { area: 'ASSETLAND', id: 'assetland', text: 'Saya sudah menyiapkan dana darurat dan dana kesehatan.' },
+-  { area: 'MINDLAND', id: 'mindland', text: 'Saya merasa siap melepas peran dan jabatan saat ini.' },
+-  { area: 'MINDLAND', id: 'mindland', text: 'Saya punya gambaran tentang diri saya di luar pekerjaan.' },
+-  { area: 'SOULLAND', id: 'soulland', text: 'Saya tahu apa yang paling bermakna dalam hidup saya.' },
+-  { area: 'SOULLAND', id: 'soulland', text: 'Saya punya kegiatan yang memberi rasa berguna.' },
+-  { area: 'NEXT CHAPTER', id: 'next', text: 'Saya punya gambaran ingin melakukan apa setelah purna tugas.' },
+-  { area: 'NEXT CHAPTER', id: 'next', text: 'Saya sudah membicarakan rencana ini dengan keluarga.' },
++  // A. Dimensi Keuangan -> assetland
++  { area: 'KEUANGAN', id: 'assetland', text: 'Saya memahami dengan baik berapa jumlah dana yang saya butuhkan untuk hidup nyaman setelah pensiun.' },
++  { area: 'KEUANGAN', id: 'assetland', text: 'Saya memiliki pengetahuan yang cukup tentang produk keuangan (tabungan, investasi, asuransi) yang relevan untuk masa pensiun.' },
++  { area: 'KEUANGAN', id: 'assetland', text: 'Saya terbiasa membuat anggaran dan mengontrol pengeluaran saya secara rutin.' },
++  { area: 'KEUANGAN', id: 'assetland', text: 'Saya merasa yakin mampu mengelola keuangan saya sendiri setelah tidak lagi menerima gaji tetap.' },
++  { area: 'KEUANGAN', id: 'assetland', text: 'Saya sudah memiliki sumber penghasilan pasca pensiun yang jelas (manfaat pensiun, investasi, usaha, dan lain-lain).' },
++  { area: 'KEUANGAN', id: 'assetland', text: 'Saya merasa yakin dan tenang saat harus mengambil keputusan keuangan penting.' },
++
++  // B. Dimensi Psikologis -> mindland
++  { area: 'PSIKOLOGIS', id: 'mindland', text: 'Saya sudah memiliki rencana konkret tentang apa yang akan saya lakukan setelah pensiun.' },
++  { area: 'PSIKOLOGIS', id: 'mindland', text: 'Saya telah menetapkan tujuan yang jelas untuk kehidupan saya pasca pensiun.' },
++  { area: 'PSIKOLOGIS', id: 'mindland', text: 'Saya merasa tenang memikirkan kehidupan sehari-hari saya setelah pensiun nanti.' },
++  { area: 'PSIKOLOGIS', id: 'mindland', text: 'Saya merasa siap menghadapi perubahan rutinitas harian setelah pensiun.' },
++  { area: 'PSIKOLOGIS', id: 'mindland', text: 'Saya sudah mendiskusikan rencana pensiun saya dengan keluarga/pasangan.' },
++  { area: 'PSIKOLOGIS', id: 'mindland', text: 'Saya merasa yakin dapat beradaptasi dengan hal-hal yang belum saya ketahui di masa pensiun nanti.' },
++
++  // C. Dimensi Kesehatan -> fitland
++  { area: 'KESEHATAN', id: 'fitland', text: 'Saya secara rutin menjaga pola makan dan aktivitas fisik saya.' },
++  { area: 'KESEHATAN', id: 'fitland', text: 'Saya melakukan pemeriksaan kesehatan secara berkala.' },
++  { area: 'KESEHATAN', id: 'fitland', text: 'Secara umum, saya menilai kondisi kesehatan fisik saya saat ini baik.' },
++  { area: 'KESEHATAN', id: 'fitland', text: 'Saya mampu menjaga ketenangan pikiran dalam menjalani aktivitas sehari-hari.' },
++  { area: 'KESEHATAN', id: 'fitland', text: 'Saya memiliki cara yang efektif untuk mengelola stres.' },
++  { area: 'KESEHATAN', id: 'fitland', text: 'Saya cukup tidur dan istirahat setiap hari.' },
++
++  // D. Dimensi Sosial -> sosial (berdiri sendiri)
++  { area: 'SOSIAL', id: 'sosial', text: 'Saya memiliki hubungan yang dekat dengan keluarga dan/atau pasangan.' },
++  { area: 'SOSIAL', id: 'sosial', text: 'Saya aktif dalam komunitas atau kelompok sosial di luar pekerjaan.' },
++  { area: 'SOSIAL', id: 'sosial', text: 'Saya memiliki teman atau kerabat yang dapat saya andalkan saat membutuhkan dukungan.' },
++  { area: 'SOSIAL', id: 'sosial', text: 'Saya yakin hubungan sosial saya akan tetap terjaga setelah saya tidak lagi bekerja.' },
++  { area: 'SOSIAL', id: 'sosial', text: 'Saya merasa memiliki peran yang berarti dalam keluarga/komunitas saya.' },
++  { area: 'SOSIAL', id: 'sosial', text: 'Saya sudah memiliki rencana untuk membangun atau memperluas jejaring sosial baru setelah pensiun.' },
++
++  // E. Dimensi Spiritual/Makna Hidup -> soulland
++  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya merasa hidup saya memiliki makna dan tujuan yang jelas.' },
++  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya rutin meluangkan waktu untuk refleksi diri, doa, atau ibadah sesuai keyakinan saya.' },
++  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya merasa tenang secara batin ketika menghadapi ketidakpastian hidup.' },
++  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya mampu menerima hal-hal dalam hidup yang berada di luar kendali saya.' },
++  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya merasa terhubung dengan sesuatu yang lebih besar dari diri saya sendiri (Tuhan/alam semesta).' },
++  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya percaya fase kehidupan setelah pensiun dapat menjadi kesempatan untuk berkontribusi bagi orang lain.' },
++  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya merasa bersyukur atas perjalanan hidup yang telah saya lalui sejauh ini.' },
++  { area: 'SPIRITUAL', id: 'soulland', text: 'Saya memiliki nilai-nilai atau prinsip hidup yang menjadi pegangan dalam mengambil keputusan penting.' },
++];
++
++// Domain metadata for the check-in instrument specifically. 'sosial' is a
++// standalone 5th dimension — distinct from the 4 journey Terminals — so it
++// needs its own label/color here rather than reusing tone()/TERMINALS.
++export const CHECKIN_DOMAINS = [
++  { id: 'assetland', label: 'Keuangan', color: '#C9871A' },
++  { id: 'mindland', label: 'Psikologis', color: '#6C4FB6' },
++  { id: 'fitland', label: 'Kesehatan', color: '#1E8A4C' },
++  { id: 'sosial', label: 'Sosial', color: '#2E86AB' },
++  { id: 'soulland', label: 'Spiritual / Makna Hidup', color: '#D9662F' },
+ ];
+ 
+ export const ARCHETYPES = [
+diff --git a/app/src/screens/CheckIn.jsx b/app/src/screens/CheckIn.jsx
+index 4a34a85..5101082 100644
+--- a/app/src/screens/CheckIn.jsx
++++ b/app/src/screens/CheckIn.jsx
+@@ -1,4 +1,7 @@
+-import { QUESTIONS, tone } from '../data.js';
++import { QUESTIONS, CHECKIN_DOMAINS } from '../data.js';
++
++const domainByArea = {};
++QUESTIONS.forEach((q) => { domainByArea[q.area] = CHECKIN_DOMAINS.find((d) => d.id === q.id); });
+ 
+ export default function CheckIn({ app }) {
+   const { data } = app;
+@@ -25,33 +28,48 @@ export default function CheckIn({ app }) {
+     app.go('result');
+   };
+ 
++  let lastArea = null;
++
+   return (
+     <div style={{ padding: '22px 24px 32px' }}>
+       <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: -0.5, margin: 0 }}>Check-In Awal</h1>
+       <p style={{ fontSize: 16, lineHeight: 1.55, color: 'rgba(16,39,90,.7)', margin: '10px 0 0', textWrap: 'pretty' }}>
+-        Bukan tes, bukan diagnosa. Hanya cara melihat titik awal perjalananmu. Pilih 1 (belum) sampai 5 (sudah sangat).
++        Bukan tes, bukan diagnosa. Ini gambaran posisimu dibanding peserta lain secara keseluruhan, bukan penilaian pribadi mutlak. Pilih 1 (sangat tidak setuju) sampai 5 (sangat setuju).
+       </p>
+-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, margin: '22px 0 0' }}>
++      <div style={{ position: 'sticky', top: 0, zIndex: 5, background: '#FBF9F5', padding: '10px 0', marginTop: 6 }}>
++        <div style={{ height: 8, borderRadius: 999, background: 'rgba(16,39,90,.10)', overflow: 'hidden' }}>
++          <div style={{ height: '100%', width: `${Math.round((answered / QUESTIONS.length) * 100)}%`, background: '#10275A', borderRadius: 999, transition: 'width .2s' }} />
++        </div>
++      </div>
++      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, margin: '10px 0 0' }}>
+         {QUESTIONS.map((q, i) => {
+-          const c = tone(q.id);
++          const c = domainByArea[q.area];
+           const val = answers['q' + i];
++          const showHeader = q.area !== lastArea;
++          lastArea = q.area;
+           return (
+-            <div key={i} style={{ padding: 18, borderRadius: 18, background: '#fff', border: '1px solid rgba(16,39,90,.10)', boxShadow: '0 1px 2px rgba(16,39,90,.04)' }}>
+-              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.2, color: c.color }}>{q.area}</div>
+-              <div style={{ fontSize: 16, lineHeight: 1.5, fontWeight: 600, margin: '6px 0 14px', textWrap: 'pretty' }}>{q.text}</div>
+-              <div style={{ display: 'flex', gap: 8 }}>
+-                {[1, 2, 3, 4, 5].map((n) => {
+-                  const on = val === n;
+-                  return (
+-                    <button
+-                      key={n}
+-                      onClick={() => pick(i, n)}
+-                      style={{ flex: 1, height: 48, borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: 'pointer', border: `1px solid ${on ? c.color : 'rgba(16,39,90,.15)'}`, background: on ? c.color : '#FBF9F5', color: on ? '#fff' : 'rgba(16,39,90,.75)' }}
+-                    >
+-                      {n}
+-                    </button>
+-                  );
+-                })}
++            <div key={i}>
++              {showHeader && (
++                <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.4, color: c.color, margin: '18px 0 10px' }}>
++                  {c.label.toUpperCase()}
++                </div>
++              )}
++              <div style={{ padding: 18, borderRadius: 18, background: '#fff', border: '1px solid rgba(16,39,90,.10)', boxShadow: '0 1px 2px rgba(16,39,90,.04)' }}>
++                <div style={{ fontSize: 15.5, lineHeight: 1.5, fontWeight: 600, marginBottom: 14, textWrap: 'pretty' }}>{q.text}</div>
++                <div style={{ display: 'flex', gap: 8 }}>
++                  {[1, 2, 3, 4, 5].map((n) => {
++                    const on = val === n;
++                    return (
++                      <button
++                        key={n}
++                        onClick={() => pick(i, n)}
++                        style={{ flex: 1, height: 48, borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: 'pointer', border: `1px solid ${on ? c.color : 'rgba(16,39,90,.15)'}`, background: on ? c.color : '#FBF9F5', color: on ? '#fff' : 'rgba(16,39,90,.75)' }}
++                      >
++                        {n}
++                      </button>
++                    );
++                  })}
++                </div>
+               </div>
+             </div>
+           );
+diff --git a/app/src/screens/Dashboard.jsx b/app/src/screens/Dashboard.jsx
+index 2f637b6..684435f 100644
+--- a/app/src/screens/Dashboard.jsx
++++ b/app/src/screens/Dashboard.jsx
+@@ -1,18 +1,38 @@
+ import { useEffect, useState } from 'react';
+ import { supabase } from '../supabaseClient.js';
++import { CHECKIN_DOMAINS } from '../data.js';
++import { computeZ, zToLevel, MIN_POPULATION } from '../statsHelper.js';
+ 
+-const DOMAINS = [
+-  { key: 'fitland_score', label: 'Fitland', color: '#1E8A4C' },
+-  { key: 'assetland_score', label: 'Assetland', color: '#C9871A' },
+-  { key: 'mindland_score', label: 'Mindland', color: '#6C4FB6' },
+-  { key: 'soulland_score', label: 'Soulland', color: '#D9662F' },
+-  { key: 'next_score', label: 'Next Chapter', color: '#10275A' },
+-];
++const COLMAP = {
++  fitland: 'fitland_score',
++  assetland: 'assetland_score',
++  mindland: 'mindland_score',
++  sosial: 'sosial_score',
++  soulland: 'soulland_score',
++};
+ 
+-function avg(rows, key) {
+-  const vals = rows.map((r) => r[key]).filter((v) => v !== null && v !== undefined);
+-  if (!vals.length) return null;
+-  return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
++const LEVELS = ['Perlu Perhatian', 'Mulai Berkembang', 'Cukup Siap', 'Siap', 'Sangat Siap'];
++const LEVEL_COLORS = { 'Perlu Perhatian': '#B3261E', 'Mulai Berkembang': '#C9871A', 'Cukup Siap': '#6C4FB6', Siap: '#1E8A4C', 'Sangat Siap': '#0F6E3A' };
++
++function domainStats(rows, domainId) {
++  const col = COLMAP[domainId];
++  const vals = rows.map((r) => r[col]).filter((v) => v !== null && v !== undefined);
++  if (!vals.length) return { avg: null, n: 0, dist: null };
++  const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
++  const variance = vals.reduce((a, b) => a + (b - mean) ** 2, 0) / vals.length;
++  const sd = Math.sqrt(variance) || 1;
++  const avg = Math.round(mean);
++
++  if (vals.length < MIN_POPULATION) return { avg, n: vals.length, dist: null };
++
++  const counts = { 'Perlu Perhatian': 0, 'Mulai Berkembang': 0, 'Cukup Siap': 0, Siap: 0, 'Sangat Siap': 0 };
++  vals.forEach((v) => {
++    const z = computeZ(v, { mean, sd });
++    const lvl = zToLevel(z);
++    if (lvl) counts[lvl.label] += 1;
++  });
++  const dist = LEVELS.map((label) => ({ label, pct: Math.round((counts[label] / vals.length) * 100) }));
++  return { avg, n: vals.length, dist };
+ }
+ 
+ export default function Dashboard({ app }) {
+@@ -27,7 +47,6 @@ export default function Dashboard({ app }) {
+       setLoading(false);
+     })();
+ 
+-    // Live updates: any insert/update to the results table refreshes the list.
+     channel = supabase
+       .channel('mapan_checkin_results_live')
+       .on('postgres_changes', { event: '*', schema: 'public', table: 'mapan_checkin_results' }, (payload) => {
+@@ -58,41 +77,40 @@ export default function Dashboard({ app }) {
+       {loading ? (
+         <div style={{ marginTop: 40, textAlign: 'center', color: 'rgba(16,39,90,.5)' }}>Memuat...</div>
+       ) : (
+-        <>
+-          <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+-            {DOMAINS.map((d) => {
+-              const a = avg(rows, d.key);
+-              return (
+-                <div key={d.key} style={{ padding: 16, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.10)' }}>
+-                  <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, color: d.color }}>{d.label.toUpperCase()}</div>
+-                  <div style={{ fontSize: 30, fontWeight: 800, marginTop: 6, color: '#10275A' }}>{a === null ? '—' : `${a}%`}</div>
+-                  <div style={{ fontSize: 12, color: 'rgba(16,39,90,.5)', marginTop: 2 }}>rata-rata</div>
+-                </div>
+-              );
+-            })}
+-          </div>
+-
+-          <div style={{ marginTop: 24, fontSize: 14, fontWeight: 800, color: 'rgba(16,39,90,.6)', letterSpacing: 0.5 }}>SUBMISI TERBARU</div>
+-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
+-            {rows.length === 0 && <div style={{ color: 'rgba(16,39,90,.5)', fontSize: 14 }}>Belum ada peserta check-in.</div>}
+-            {rows.map((r) => (
+-              <div key={r.id} style={{ padding: 14, borderRadius: 14, background: '#fff', border: '1px solid rgba(16,39,90,.10)' }}>
+-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+-                  <div style={{ fontWeight: 800, fontSize: 15 }}>{r.nama || 'Tanpa nama'}</div>
+-                  <div style={{ fontSize: 12, color: 'rgba(16,39,90,.45)' }}>{new Date(r.submitted_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</div>
+-                </div>
+-                {!!r.instansi && <div style={{ fontSize: 13, color: 'rgba(16,39,90,.55)' }}>{r.instansi}</div>}
+-                <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+-                  {DOMAINS.map((d) => r[d.key] != null && (
+-                    <span key={d.key} style={{ fontSize: 11.5, fontWeight: 700, padding: '4px 9px', borderRadius: 999, background: d.color + '1A', color: d.color }}>
+-                      {d.label} {r[d.key]}%
+-                    </span>
+-                  ))}
++        <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
++          {CHECKIN_DOMAINS.map((d) => {
++            const s = domainStats(rows, d.id);
++            return (
++              <div key={d.id} style={{ padding: '20px 22px', borderRadius: 20, background: '#fff', border: '1px solid rgba(16,39,90,.10)' }}>
++                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
++                  <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 0.5, color: d.color }}>{d.label.toUpperCase()}</div>
++                  <div style={{ fontSize: 38, fontWeight: 800, color: '#10275A' }}>{s.avg === null ? '—' : `${s.avg}%`}</div>
+                 </div>
++                {s.dist ? (
++                  <>
++                    <div style={{ display: 'flex', height: 14, borderRadius: 999, overflow: 'hidden', marginTop: 14 }}>
++                      {s.dist.map((seg) => seg.pct > 0 && (
++                        <div key={seg.label} style={{ width: `${seg.pct}%`, background: LEVEL_COLORS[seg.label] }} title={`${seg.label} ${seg.pct}%`} />
++                      ))}
++                    </div>
++                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px', marginTop: 10 }}>
++                      {s.dist.filter((seg) => seg.pct > 0).map((seg) => (
++                        <span key={seg.label} style={{ fontSize: 11.5, fontWeight: 700, color: LEVEL_COLORS[seg.label], display: 'flex', alignItems: 'center', gap: 5 }}>
++                          <span style={{ width: 8, height: 8, borderRadius: 999, background: LEVEL_COLORS[seg.label], display: 'inline-block' }} />
++                          {seg.label} {seg.pct}%
++                        </span>
++                      ))}
++                    </div>
++                  </>
++                ) : (
++                  <div style={{ fontSize: 12.5, color: 'rgba(16,39,90,.5)', marginTop: 10 }}>
++                    Butuh minimal {MIN_POPULATION} peserta untuk distribusi level ({s.n}/{MIN_POPULATION} saat ini)
++                  </div>
++                )}
+               </div>
+-            ))}
+-          </div>
+-        </>
++            );
++          })}
++        </div>
+       )}
+     </div>
+   );
+diff --git a/app/src/screens/Result.jsx b/app/src/screens/Result.jsx
+index 9a2727f..c117ba8 100644
+--- a/app/src/screens/Result.jsx
++++ b/app/src/screens/Result.jsx
+@@ -1,32 +1,57 @@
+-import { TERMINALS, tone, NAVY } from '../data.js';
++import { useEffect, useState } from 'react';
++import { CHECKIN_DOMAINS } from '../data.js';
++import { fetchPopulationStats, computeZ, zToLevel, MIN_POPULATION } from '../statsHelper.js';
+ 
+-function band(p) {
++function absoluteBand(p) {
+   return p < 50 ? 'Perlu diperhatikan' : p < 65 ? 'Sedang dipersiapkan' : p < 80 ? 'Sudah cukup kuat' : 'Bisa terus dikembangkan';
+ }
+ 
+ export default function Result({ app }) {
+   const sco = app.data.initialAssessment.scores || {};
+-  const scores = TERMINALS.map((t) => {
+-    const c = tone(t.id);
+-    const p = sco[t.id] == null ? 0 : sco[t.id];
+-    return { name: t.name, color: c.color, pctText: p + '%', band: band(p) };
+-  }).concat([{ name: 'NEXT CHAPTER', color: NAVY, pctText: (sco.next == null ? 0 : sco.next) + '%', band: band(sco.next == null ? 0 : sco.next) }]);
++  const [pop, setPop] = useState(null); // null = loading
++  const [error, setError] = useState(false);
++
++  useEffect(() => {
++    let cancelled = false;
++    fetchPopulationStats()
++      .then((r) => { if (!cancelled) setPop(r); })
++      .catch(() => { if (!cancelled) setError(true); });
++    return () => { cancelled = true; };
++  }, []);
++
++  const usePopulation = pop && pop.n >= MIN_POPULATION;
++
++  const rows = CHECKIN_DOMAINS.map((d) => {
++    const p = sco[d.id] == null ? 0 : sco[d.id];
++    let level = null;
++    if (usePopulation) {
++      const z = computeZ(p, pop.stats[d.id]);
++      level = zToLevel(z);
++    }
++    return { name: d.label, color: d.color, pct: p, band: level ? level.label : absoluteBand(p), bandColor: level ? level.color : d.color };
++  });
+ 
+   return (
+     <div style={{ padding: '22px 24px 32px' }}>
+       <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: -0.5, margin: 0 }}>Titik Awal Perjalananmu</h1>
+-      <p style={{ fontSize: 16, lineHeight: 1.55, color: 'rgba(16,39,90,.7)', margin: '10px 0 0' }}>Ini gambaran awal, bukan penilaian. Semuanya bisa terus dikembangkan.</p>
++      <p style={{ fontSize: 16, lineHeight: 1.55, color: 'rgba(16,39,90,.7)', margin: '10px 0 0', textWrap: 'pretty' }}>
++        {pop === null && !error
++          ? 'Memuat gambaran dibanding peserta lain...'
++          : usePopulation
++          ? `Ini posisimu dibanding ${pop.n} peserta lain yang sudah check-in — bukan penilaian pribadi mutlak, dan semuanya bisa terus dikembangkan.`
++          : 'Belum cukup peserta lain untuk pembanding, jadi ini masih skor mentahmu sendiri. Levelnya akan otomatis lebih akurat begitu lebih banyak orang check-in.'}
++      </p>
+       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, margin: '22px 0 0' }}>
+-        {scores.map((s) => (
++        {rows.map((s) => (
+           <div key={s.name} style={{ padding: '16px 18px', borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.10)' }}>
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+               <span style={{ fontSize: 16, fontWeight: 800, letterSpacing: 0.3, color: s.color }}>{s.name}</span>
+-              <span style={{ fontSize: 18, fontWeight: 800 }}>{s.pctText}</span>
++              <span style={{ fontSize: 18, fontWeight: 800 }}>{s.pct}%</span>
+             </div>
+             <div style={{ height: 10, borderRadius: 6, background: 'rgba(16,39,90,.08)', margin: '10px 0 8px', overflow: 'hidden' }}>
+-              <div style={{ height: '100%', borderRadius: 6, width: s.pctText, background: s.color }} />
++              <div style={{ height: '100%', borderRadius: 6, width: `${s.pct}%`, background: s.color }} />
+             </div>
+-            <div style={{ fontSize: 14, color: 'rgba(16,39,90,.7)' }}>{s.band}</div>
++            <div style={{ fontSize: 14, fontWeight: 700, color: s.bandColor }}>{s.band}</div>
+           </div>
+         ))}
+       </div>
+diff --git a/app/src/statsHelper.js b/app/src/statsHelper.js
+new file mode 100644
+index 0000000..a521bc6
+--- /dev/null
++++ b/app/src/statsHelper.js
+@@ -0,0 +1,55 @@
++import { supabase } from './supabaseClient.js';
++import { CHECKIN_DOMAINS } from './data.js';
++
++// Below this many respondents, a population mean/SD isn't statistically
++// meaningful yet (classic rule of thumb for the normal approximation to
++// kick in) — so we fall back to showing the raw absolute score instead of
++// a relative level.
++export const MIN_POPULATION = 30;
++
++const COLMAP = {
++  fitland: 'fitland_score',
++  assetland: 'assetland_score',
++  mindland: 'mindland_score',
++  sosial: 'sosial_score',
++  soulland: 'soulland_score',
++};
++
++// Fetches every completed check-in's domain scores and computes the
++// population mean/SD per domain, client-side. Fine at moderate scale;
++// if this ever needs to run against thousands of rows, move the
++// aggregation into a Postgres function instead.
++export async function fetchPopulationStats() {
++  const { data, error } = await supabase
++    .from('mapan_checkin_results')
++    .select('fitland_score,assetland_score,mindland_score,sosial_score,soulland_score');
++  if (error || !data) return { n: 0, stats: {} };
++  const stats = {};
++  CHECKIN_DOMAINS.forEach((d) => {
++    const col = COLMAP[d.id];
++    const vals = data.map((r) => r[col]).filter((v) => v !== null && v !== undefined);
++    if (!vals.length) { stats[d.id] = null; return; }
++    const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
++    const variance = vals.reduce((a, b) => a + (b - mean) ** 2, 0) / vals.length;
++    const sd = Math.sqrt(variance) || 1; // guard divide-by-zero when everyone answers identically
++    stats[d.id] = { mean, sd, n: vals.length };
++  });
++  return { n: data.length, stats };
++}
++
++export function computeZ(value, domainStat) {
++  if (!domainStat) return null;
++  return (value - domainStat.mean) / domainStat.sd;
++}
++
++// Bands follow the standard normal distribution: roughly the middle ~24%
++// lands "Cukup Siap", ~22% on each side "Mulai Berkembang"/"Siap", and the
++// outer ~16% on each tail "Perlu Perhatian"/"Sangat Siap".
++export function zToLevel(z) {
++  if (z === null || z === undefined || Number.isNaN(z)) return null;
++  if (z < -1) return { label: 'Perlu Perhatian', color: '#B3261E' };
++  if (z < -0.3) return { label: 'Mulai Berkembang', color: '#C9871A' };
++  if (z < 0.3) return { label: 'Cukup Siap', color: '#6C4FB6' };
++  if (z < 1) return { label: 'Siap', color: '#1E8A4C' };
++  return { label: 'Sangat Siap', color: '#0F6E3A' };
++}
+diff --git a/app/src/store.js b/app/src/store.js
+index 1621681..0840faa 100644
+--- a/app/src/store.js
++++ b/app/src/store.js
+@@ -255,7 +255,7 @@ export function useJourney() {
+       assetland_score: s.assetland ?? null,
+       mindland_score: s.mindland ?? null,
+       soulland_score: s.soulland ?? null,
+-      next_score: s.next ?? null,
++      sosial_score: s.sosial ?? null,
+       submitted_at: new Date().toISOString(),
+     }).then(() => {});
+   }, [session]);
+-- 
+2.43.0
+
+
+From a9d56a4fbe344c8319d4908525579b4e6207043a Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Fri, 18 Sep 2026 00:53:23 +0000
+Subject: [PATCH 2/3] Lower population threshold: compare against whoever has
+ checked in so far
+
+Instead of gating the z-score level behind a fixed 'wait for 30 people'
+rule, it now always compares against the current pool (minimum 2, needed
+for a non-trivial standard deviation) and shows the headcount ('berdasarkan
+N peserta' on the dashboard, 'dibanding N peserta lain' on the participant
+result) so viewers can judge reliability themselves as the sample grows,
+rather than seeing nothing until an arbitrary threshold is hit.
+---
+ app/src/screens/Dashboard.jsx |  7 +++++--
+ app/src/screens/Result.jsx    |  4 ++--
+ app/src/statsHelper.js        | 12 +++++++-----
+ 3 files changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/app/src/screens/Dashboard.jsx b/app/src/screens/Dashboard.jsx
+index 684435f..bb55a8f 100644
+--- a/app/src/screens/Dashboard.jsx
++++ b/app/src/screens/Dashboard.jsx
+@@ -83,7 +83,10 @@ export default function Dashboard({ app }) {
+             return (
+               <div key={d.id} style={{ padding: '20px 22px', borderRadius: 20, background: '#fff', border: '1px solid rgba(16,39,90,.10)' }}>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+-                  <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 0.5, color: d.color }}>{d.label.toUpperCase()}</div>
++                  <div>
++                    <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 0.5, color: d.color }}>{d.label.toUpperCase()}</div>
++                    {s.n > 0 && <div style={{ fontSize: 11.5, color: 'rgba(16,39,90,.45)', marginTop: 2 }}>berdasarkan {s.n} peserta</div>}
++                  </div>
+                   <div style={{ fontSize: 38, fontWeight: 800, color: '#10275A' }}>{s.avg === null ? '—' : `${s.avg}%`}</div>
+                 </div>
+                 {s.dist ? (
+@@ -104,7 +107,7 @@ export default function Dashboard({ app }) {
+                   </>
+                 ) : (
+                   <div style={{ fontSize: 12.5, color: 'rgba(16,39,90,.5)', marginTop: 10 }}>
+-                    Butuh minimal {MIN_POPULATION} peserta untuk distribusi level ({s.n}/{MIN_POPULATION} saat ini)
++                    Belum ada peserta yang check-in untuk domain ini.
+                   </div>
+                 )}
+               </div>
+diff --git a/app/src/screens/Result.jsx b/app/src/screens/Result.jsx
+index c117ba8..aabf646 100644
+--- a/app/src/screens/Result.jsx
++++ b/app/src/screens/Result.jsx
+@@ -38,8 +38,8 @@ export default function Result({ app }) {
+         {pop === null && !error
+           ? 'Memuat gambaran dibanding peserta lain...'
+           : usePopulation
+-          ? `Ini posisimu dibanding ${pop.n} peserta lain yang sudah check-in — bukan penilaian pribadi mutlak, dan semuanya bisa terus dikembangkan.`
+-          : 'Belum cukup peserta lain untuk pembanding, jadi ini masih skor mentahmu sendiri. Levelnya akan otomatis lebih akurat begitu lebih banyak orang check-in.'}
++          ? `Ini posisimu dibanding ${pop.n} peserta lain yang sudah check-in sejauh ini — bukan penilaian pribadi mutlak, dan semuanya bisa terus dikembangkan. Semakin banyak yang check-in, semakin akurat gambaran ini.`
++          : 'Kamu peserta pertama yang check-in, jadi belum ada pembanding sama sekali. Ini skor mentahmu sendiri dulu.'}
+       </p>
+       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, margin: '22px 0 0' }}>
+         {rows.map((s) => (
+diff --git a/app/src/statsHelper.js b/app/src/statsHelper.js
+index a521bc6..d696761 100644
+--- a/app/src/statsHelper.js
++++ b/app/src/statsHelper.js
+@@ -1,11 +1,13 @@
+ import { supabase } from './supabaseClient.js';
+ import { CHECKIN_DOMAINS } from './data.js';
+ 
+-// Below this many respondents, a population mean/SD isn't statistically
+-// meaningful yet (classic rule of thumb for the normal approximation to
+-// kick in) — so we fall back to showing the raw absolute score instead of
+-// a relative level.
+-export const MIN_POPULATION = 30;
++// Minimum respondents needed before a mean/SD is even mathematically
++// meaningful (need at least 2 points to have a non-trivial spread). Below
++// this we simply have nothing to compare against yet. Above it, the level
++// is always shown relative to whoever has answered so far — the UI just
++// also shows that headcount so people can judge how sturdy it is
++// themselves, rather than hiding it behind a fixed "wait for 30" gate.
++export const MIN_POPULATION = 2;
+ 
+ const COLMAP = {
+   fitland: 'fitland_score',
+-- 
+2.43.0
+
+
+From 05ae0592adea4619d8f5653bac78e5dc98ccf494 Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Fri, 18 Sep 2026 01:08:22 +0000
+Subject: [PATCH 3/3] Align level labels, add stronger disclaimer, and
+ per-question breakdown on Dashboard
+
+- Result.jsx: absolute-score fallback labels now match the z-score labels
+  exactly (Perlu Perhatian/Mulai Berkembang/Cukup Siap/Siap/Sangat Siap)
+  instead of a differently-worded set, so the vocabulary is consistent
+  regardless of which mode is active.
+- Result.jsx: added an explicit disclaimer box -- not medical, financial,
+  or psychological professional advice; a subjective self-assessment only,
+  not a sole reference for important decisions.
+- Dashboard.jsx: each domain card now has a 'Lihat rincian per pertanyaan'
+  toggle showing the population average for every individual question in
+  that domain (not just the domain-level aggregate) -- facilitator-only,
+  still no participant names. Added the same disclaimer at the bottom.
+- store.js: syncCheckinResult now also writes raw per-item answers into
+  a new 'answers' jsonb column so the dashboard can compute per-question
+  averages without needing broader access to individual journey_state rows.
+- Supabase migration: added answers jsonb column to mapan_checkin_results.
+---
+ app/src/screens/Dashboard.jsx | 45 ++++++++++++++++++++++++++++++++++-
+ app/src/screens/Result.jsx    |  5 +++-
+ app/src/store.js              |  1 +
+ 3 files changed, 49 insertions(+), 2 deletions(-)
+
+diff --git a/app/src/screens/Dashboard.jsx b/app/src/screens/Dashboard.jsx
+index bb55a8f..768a1d4 100644
+--- a/app/src/screens/Dashboard.jsx
++++ b/app/src/screens/Dashboard.jsx
+@@ -1,6 +1,6 @@
+ import { useEffect, useState } from 'react';
+ import { supabase } from '../supabaseClient.js';
+-import { CHECKIN_DOMAINS } from '../data.js';
++import { CHECKIN_DOMAINS, QUESTIONS } from '../data.js';
+ import { computeZ, zToLevel, MIN_POPULATION } from '../statsHelper.js';
+ 
+ const COLMAP = {
+@@ -35,9 +35,20 @@ function domainStats(rows, domainId) {
+   return { avg, n: vals.length, dist };
+ }
+ 
++// Per-item breakdown: for each of the 32 questions, average every
++// respondent's raw 1-5 answer to that specific item, converted to %.
++function itemAverage(rows, questionIndex) {
++  const key = 'q' + questionIndex;
++  const vals = rows.map((r) => r.answers && r.answers[key]).filter((v) => v !== null && v !== undefined);
++  if (!vals.length) return { pct: null, n: 0 };
++  const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
++  return { pct: Math.round((mean / 5) * 100), n: vals.length };
++}
++
+ export default function Dashboard({ app }) {
+   const [rows, setRows] = useState([]);
+   const [loading, setLoading] = useState(true);
++  const [openDomain, setOpenDomain] = useState(null);
+ 
+   useEffect(() => {
+     let channel;
+@@ -80,6 +91,8 @@ export default function Dashboard({ app }) {
+         <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+           {CHECKIN_DOMAINS.map((d) => {
+             const s = domainStats(rows, d.id);
++            const isOpen = openDomain === d.id;
++            const domainQuestions = QUESTIONS.map((q, i) => ({ ...q, i })).filter((q) => q.id === d.id);
+             return (
+               <div key={d.id} style={{ padding: '20px 22px', borderRadius: 20, background: '#fff', border: '1px solid rgba(16,39,90,.10)' }}>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+@@ -110,9 +123,39 @@ export default function Dashboard({ app }) {
+                     Belum ada peserta yang check-in untuk domain ini.
+                   </div>
+                 )}
++
++                <button
++                  onClick={() => setOpenDomain(isOpen ? null : d.id)}
++                  style={{ marginTop: 14, background: 'none', border: 'none', padding: 0, fontSize: 13, fontWeight: 700, color: d.color, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
++                >
++                  {isOpen ? 'Sembunyikan' : 'Lihat'} rincian per pertanyaan {isOpen ? '▲' : '▼'}
++                </button>
++
++                {isOpen && (
++                  <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10, borderTop: '1px solid rgba(16,39,90,.08)', paddingTop: 12 }}>
++                    {domainQuestions.map((q) => {
++                      const item = itemAverage(rows, q.i);
++                      return (
++                        <div key={q.i}>
++                          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
++                            <span style={{ fontSize: 13, lineHeight: 1.4, color: 'rgba(16,39,90,.75)', flex: 1 }}>{q.text}</span>
++                            <span style={{ fontSize: 13, fontWeight: 800, color: '#10275A', flex: 'none' }}>{item.pct === null ? '—' : `${item.pct}%`}</span>
++                          </div>
++                          <div style={{ height: 6, borderRadius: 999, background: 'rgba(16,39,90,.08)', marginTop: 5, overflow: 'hidden' }}>
++                            <div style={{ height: '100%', width: `${item.pct || 0}%`, background: d.color, borderRadius: 999 }} />
++                          </div>
++                        </div>
++                      );
++                    })}
++                  </div>
++                )}
+               </div>
+             );
+           })}
++
++          <div style={{ padding: 14, borderRadius: 14, background: 'rgba(16,39,90,.05)', fontSize: 12, lineHeight: 1.55, color: 'rgba(16,39,90,.55)' }}>
++            Data ini adalah agregat persepsi diri peserta, bukan diagnosis medis, finansial, atau psikologis. Gunakan sebagai bahan diskusi kelompok, bukan rujukan tunggal untuk keputusan individu.
++          </div>
+         </div>
+       )}
+     </div>
+diff --git a/app/src/screens/Result.jsx b/app/src/screens/Result.jsx
+index aabf646..90d802a 100644
+--- a/app/src/screens/Result.jsx
++++ b/app/src/screens/Result.jsx
+@@ -3,7 +3,7 @@ import { CHECKIN_DOMAINS } from '../data.js';
+ import { fetchPopulationStats, computeZ, zToLevel, MIN_POPULATION } from '../statsHelper.js';
+ 
+ function absoluteBand(p) {
+-  return p < 50 ? 'Perlu diperhatikan' : p < 65 ? 'Sedang dipersiapkan' : p < 80 ? 'Sudah cukup kuat' : 'Bisa terus dikembangkan';
++  return p < 50 ? 'Perlu Perhatian' : p < 65 ? 'Mulai Berkembang' : p < 80 ? 'Cukup Siap' : p < 90 ? 'Siap' : 'Sangat Siap';
+ }
+ 
+ export default function Result({ app }) {
+@@ -61,6 +61,9 @@ export default function Result({ app }) {
+       >
+         Aktifkan MAPAN Passport
+       </button>
++      <div style={{ marginTop: 18, padding: 16, borderRadius: 14, background: 'rgba(16,39,90,.05)', fontSize: 12.5, lineHeight: 1.6, color: 'rgba(16,39,90,.6)' }}>
++        <strong style={{ color: 'rgba(16,39,90,.8)' }}>Bukan nasihat medis, finansial, atau psikologis profesional.</strong> Ini murni gambaran persepsi diri (self-assessment) berdasarkan jawabanmu sendiri, sifatnya subjektif dan bisa berubah kapan saja. Jangan jadikan ini satu-satunya rujukan untuk keputusan kesehatan, keuangan, atau hidup yang penting — untuk itu, tetap konsultasikan ke dokter, perencana keuangan, atau profesional yang berwenang.
++      </div>
+     </div>
+   );
+ }
+diff --git a/app/src/store.js b/app/src/store.js
+index 0840faa..fc17d01 100644
+--- a/app/src/store.js
++++ b/app/src/store.js
+@@ -256,6 +256,7 @@ export function useJourney() {
+       mindland_score: s.mindland ?? null,
+       soulland_score: s.soulland ?? null,
+       sosial_score: s.sosial ?? null,
++      answers: d.initialAssessment.answers || null,
+       submitted_at: new Date().toISOString(),
+     }).then(() => {});
+   }, [session]);
+-- 
+2.43.0
+
