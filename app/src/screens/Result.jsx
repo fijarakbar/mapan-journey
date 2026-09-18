@@ -3,7 +3,7 @@ import { CHECKIN_DOMAINS } from '../data.js';
 import { fetchPopulationStats, computeZ, zToLevel, MIN_POPULATION } from '../statsHelper.js';
 
 function absoluteBand(p) {
-  return p < 50 ? 'Perlu diperhatikan' : p < 65 ? 'Sedang dipersiapkan' : p < 80 ? 'Sudah cukup kuat' : 'Bisa terus dikembangkan';
+  return p < 50 ? 'Perlu Perhatian' : p < 65 ? 'Mulai Berkembang' : p < 80 ? 'Cukup Siap' : p < 90 ? 'Siap' : 'Sangat Siap';
 }
 
 export default function Result({ app }) {
@@ -38,8 +38,8 @@ export default function Result({ app }) {
         {pop === null && !error
           ? 'Memuat gambaran dibanding peserta lain...'
           : usePopulation
-          ? `Ini posisimu dibanding ${pop.n} peserta lain yang sudah check-in — bukan penilaian pribadi mutlak, dan semuanya bisa terus dikembangkan.`
-          : 'Belum cukup peserta lain untuk pembanding, jadi ini masih skor mentahmu sendiri. Levelnya akan otomatis lebih akurat begitu lebih banyak orang check-in.'}
+          ? `Ini posisimu dibanding ${pop.n} peserta lain yang sudah check-in sejauh ini — bukan penilaian pribadi mutlak, dan semuanya bisa terus dikembangkan. Semakin banyak yang check-in, semakin akurat gambaran ini.`
+          : 'Kamu peserta pertama yang check-in, jadi belum ada pembanding sama sekali. Ini skor mentahmu sendiri dulu.'}
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, margin: '22px 0 0' }}>
         {rows.map((s) => (
@@ -61,6 +61,9 @@ export default function Result({ app }) {
       >
         Aktifkan MAPAN Passport
       </button>
+      <div style={{ marginTop: 18, padding: 16, borderRadius: 14, background: 'rgba(16,39,90,.05)', fontSize: 12.5, lineHeight: 1.6, color: 'rgba(16,39,90,.6)' }}>
+        <strong style={{ color: 'rgba(16,39,90,.8)' }}>Bukan nasihat medis, finansial, atau psikologis profesional.</strong> Ini murni gambaran persepsi diri (self-assessment) berdasarkan jawabanmu sendiri, sifatnya subjektif dan bisa berubah kapan saja. Jangan jadikan ini satu-satunya rujukan untuk keputusan kesehatan, keuangan, atau hidup yang penting — untuk itu, tetap konsultasikan ke dokter, perencana keuangan, atau profesional yang berwenang.
+      </div>
     </div>
   );
 }

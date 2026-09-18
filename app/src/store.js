@@ -256,6 +256,7 @@ export function useJourney() {
       mindland_score: s.mindland ?? null,
       soulland_score: s.soulland ?? null,
       sosial_score: s.sosial ?? null,
+      answers: d.initialAssessment.answers || null,
       submitted_at: new Date().toISOString(),
     }).then(() => {});
   }, [session]);

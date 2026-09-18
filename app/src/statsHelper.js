@@ -1,11 +1,13 @@
 import { supabase } from './supabaseClient.js';
 import { CHECKIN_DOMAINS } from './data.js';
 
-// Below this many respondents, a population mean/SD isn't statistically
-// meaningful yet (classic rule of thumb for the normal approximation to
-// kick in) — so we fall back to showing the raw absolute score instead of
-// a relative level.
-export const MIN_POPULATION = 30;
+// Minimum respondents needed before a mean/SD is even mathematically
+// meaningful (need at least 2 points to have a non-trivial spread). Below
+// this we simply have nothing to compare against yet. Above it, the level
+// is always shown relative to whoever has answered so far — the UI just
+// also shows that headcount so people can judge how sturdy it is
+// themselves, rather than hiding it behind a fixed "wait for 30" gate.
+export const MIN_POPULATION = 2;
 
 const COLMAP = {
   fitland: 'fitland_score',

@@ -1,0 +1,232 @@
+From a9d56a4fbe344c8319d4908525579b4e6207043a Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Fri, 18 Sep 2026 00:53:23 +0000
+Subject: [PATCH 1/2] Lower population threshold: compare against whoever has
+ checked in so far
+
+Instead of gating the z-score level behind a fixed 'wait for 30 people'
+rule, it now always compares against the current pool (minimum 2, needed
+for a non-trivial standard deviation) and shows the headcount ('berdasarkan
+N peserta' on the dashboard, 'dibanding N peserta lain' on the participant
+result) so viewers can judge reliability themselves as the sample grows,
+rather than seeing nothing until an arbitrary threshold is hit.
+---
+ app/src/screens/Dashboard.jsx |  7 +++++--
+ app/src/screens/Result.jsx    |  4 ++--
+ app/src/statsHelper.js        | 12 +++++++-----
+ 3 files changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/app/src/screens/Dashboard.jsx b/app/src/screens/Dashboard.jsx
+index 684435f..bb55a8f 100644
+--- a/app/src/screens/Dashboard.jsx
++++ b/app/src/screens/Dashboard.jsx
+@@ -83,7 +83,10 @@ export default function Dashboard({ app }) {
+             return (
+               <div key={d.id} style={{ padding: '20px 22px', borderRadius: 20, background: '#fff', border: '1px solid rgba(16,39,90,.10)' }}>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+-                  <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 0.5, color: d.color }}>{d.label.toUpperCase()}</div>
++                  <div>
++                    <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 0.5, color: d.color }}>{d.label.toUpperCase()}</div>
++                    {s.n > 0 && <div style={{ fontSize: 11.5, color: 'rgba(16,39,90,.45)', marginTop: 2 }}>berdasarkan {s.n} peserta</div>}
++                  </div>
+                   <div style={{ fontSize: 38, fontWeight: 800, color: '#10275A' }}>{s.avg === null ? '—' : `${s.avg}%`}</div>
+                 </div>
+                 {s.dist ? (
+@@ -104,7 +107,7 @@ export default function Dashboard({ app }) {
+                   </>
+                 ) : (
+                   <div style={{ fontSize: 12.5, color: 'rgba(16,39,90,.5)', marginTop: 10 }}>
+-                    Butuh minimal {MIN_POPULATION} peserta untuk distribusi level ({s.n}/{MIN_POPULATION} saat ini)
++                    Belum ada peserta yang check-in untuk domain ini.
+                   </div>
+                 )}
+               </div>
+diff --git a/app/src/screens/Result.jsx b/app/src/screens/Result.jsx
+index c117ba8..aabf646 100644
+--- a/app/src/screens/Result.jsx
++++ b/app/src/screens/Result.jsx
+@@ -38,8 +38,8 @@ export default function Result({ app }) {
+         {pop === null && !error
+           ? 'Memuat gambaran dibanding peserta lain...'
+           : usePopulation
+-          ? `Ini posisimu dibanding ${pop.n} peserta lain yang sudah check-in — bukan penilaian pribadi mutlak, dan semuanya bisa terus dikembangkan.`
+-          : 'Belum cukup peserta lain untuk pembanding, jadi ini masih skor mentahmu sendiri. Levelnya akan otomatis lebih akurat begitu lebih banyak orang check-in.'}
++          ? `Ini posisimu dibanding ${pop.n} peserta lain yang sudah check-in sejauh ini — bukan penilaian pribadi mutlak, dan semuanya bisa terus dikembangkan. Semakin banyak yang check-in, semakin akurat gambaran ini.`
++          : 'Kamu peserta pertama yang check-in, jadi belum ada pembanding sama sekali. Ini skor mentahmu sendiri dulu.'}
+       </p>
+       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, margin: '22px 0 0' }}>
+         {rows.map((s) => (
+diff --git a/app/src/statsHelper.js b/app/src/statsHelper.js
+index a521bc6..d696761 100644
+--- a/app/src/statsHelper.js
++++ b/app/src/statsHelper.js
+@@ -1,11 +1,13 @@
+ import { supabase } from './supabaseClient.js';
+ import { CHECKIN_DOMAINS } from './data.js';
+ 
+-// Below this many respondents, a population mean/SD isn't statistically
+-// meaningful yet (classic rule of thumb for the normal approximation to
+-// kick in) — so we fall back to showing the raw absolute score instead of
+-// a relative level.
+-export const MIN_POPULATION = 30;
++// Minimum respondents needed before a mean/SD is even mathematically
++// meaningful (need at least 2 points to have a non-trivial spread). Below
++// this we simply have nothing to compare against yet. Above it, the level
++// is always shown relative to whoever has answered so far — the UI just
++// also shows that headcount so people can judge how sturdy it is
++// themselves, rather than hiding it behind a fixed "wait for 30" gate.
++export const MIN_POPULATION = 2;
+ 
+ const COLMAP = {
+   fitland: 'fitland_score',
+-- 
+2.43.0
+
+
+From 05ae0592adea4619d8f5653bac78e5dc98ccf494 Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Fri, 18 Sep 2026 01:08:22 +0000
+Subject: [PATCH 2/2] Align level labels, add stronger disclaimer, and
+ per-question breakdown on Dashboard
+
+- Result.jsx: absolute-score fallback labels now match the z-score labels
+  exactly (Perlu Perhatian/Mulai Berkembang/Cukup Siap/Siap/Sangat Siap)
+  instead of a differently-worded set, so the vocabulary is consistent
+  regardless of which mode is active.
+- Result.jsx: added an explicit disclaimer box -- not medical, financial,
+  or psychological professional advice; a subjective self-assessment only,
+  not a sole reference for important decisions.
+- Dashboard.jsx: each domain card now has a 'Lihat rincian per pertanyaan'
+  toggle showing the population average for every individual question in
+  that domain (not just the domain-level aggregate) -- facilitator-only,
+  still no participant names. Added the same disclaimer at the bottom.
+- store.js: syncCheckinResult now also writes raw per-item answers into
+  a new 'answers' jsonb column so the dashboard can compute per-question
+  averages without needing broader access to individual journey_state rows.
+- Supabase migration: added answers jsonb column to mapan_checkin_results.
+---
+ app/src/screens/Dashboard.jsx | 45 ++++++++++++++++++++++++++++++++++-
+ app/src/screens/Result.jsx    |  5 +++-
+ app/src/store.js              |  1 +
+ 3 files changed, 49 insertions(+), 2 deletions(-)
+
+diff --git a/app/src/screens/Dashboard.jsx b/app/src/screens/Dashboard.jsx
+index bb55a8f..768a1d4 100644
+--- a/app/src/screens/Dashboard.jsx
++++ b/app/src/screens/Dashboard.jsx
+@@ -1,6 +1,6 @@
+ import { useEffect, useState } from 'react';
+ import { supabase } from '../supabaseClient.js';
+-import { CHECKIN_DOMAINS } from '../data.js';
++import { CHECKIN_DOMAINS, QUESTIONS } from '../data.js';
+ import { computeZ, zToLevel, MIN_POPULATION } from '../statsHelper.js';
+ 
+ const COLMAP = {
+@@ -35,9 +35,20 @@ function domainStats(rows, domainId) {
+   return { avg, n: vals.length, dist };
+ }
+ 
++// Per-item breakdown: for each of the 32 questions, average every
++// respondent's raw 1-5 answer to that specific item, converted to %.
++function itemAverage(rows, questionIndex) {
++  const key = 'q' + questionIndex;
++  const vals = rows.map((r) => r.answers && r.answers[key]).filter((v) => v !== null && v !== undefined);
++  if (!vals.length) return { pct: null, n: 0 };
++  const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
++  return { pct: Math.round((mean / 5) * 100), n: vals.length };
++}
++
+ export default function Dashboard({ app }) {
+   const [rows, setRows] = useState([]);
+   const [loading, setLoading] = useState(true);
++  const [openDomain, setOpenDomain] = useState(null);
+ 
+   useEffect(() => {
+     let channel;
+@@ -80,6 +91,8 @@ export default function Dashboard({ app }) {
+         <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+           {CHECKIN_DOMAINS.map((d) => {
+             const s = domainStats(rows, d.id);
++            const isOpen = openDomain === d.id;
++            const domainQuestions = QUESTIONS.map((q, i) => ({ ...q, i })).filter((q) => q.id === d.id);
+             return (
+               <div key={d.id} style={{ padding: '20px 22px', borderRadius: 20, background: '#fff', border: '1px solid rgba(16,39,90,.10)' }}>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+@@ -110,9 +123,39 @@ export default function Dashboard({ app }) {
+                     Belum ada peserta yang check-in untuk domain ini.
+                   </div>
+                 )}
++
++                <button
++                  onClick={() => setOpenDomain(isOpen ? null : d.id)}
++                  style={{ marginTop: 14, background: 'none', border: 'none', padding: 0, fontSize: 13, fontWeight: 700, color: d.color, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
++                >
++                  {isOpen ? 'Sembunyikan' : 'Lihat'} rincian per pertanyaan {isOpen ? '▲' : '▼'}
++                </button>
++
++                {isOpen && (
++                  <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10, borderTop: '1px solid rgba(16,39,90,.08)', paddingTop: 12 }}>
++                    {domainQuestions.map((q) => {
++                      const item = itemAverage(rows, q.i);
++                      return (
++                        <div key={q.i}>
++                          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
++                            <span style={{ fontSize: 13, lineHeight: 1.4, color: 'rgba(16,39,90,.75)', flex: 1 }}>{q.text}</span>
++                            <span style={{ fontSize: 13, fontWeight: 800, color: '#10275A', flex: 'none' }}>{item.pct === null ? '—' : `${item.pct}%`}</span>
++                          </div>
++                          <div style={{ height: 6, borderRadius: 999, background: 'rgba(16,39,90,.08)', marginTop: 5, overflow: 'hidden' }}>
++                            <div style={{ height: '100%', width: `${item.pct || 0}%`, background: d.color, borderRadius: 999 }} />
++                          </div>
++                        </div>
++                      );
++                    })}
++                  </div>
++                )}
+               </div>
+             );
+           })}
++
++          <div style={{ padding: 14, borderRadius: 14, background: 'rgba(16,39,90,.05)', fontSize: 12, lineHeight: 1.55, color: 'rgba(16,39,90,.55)' }}>
++            Data ini adalah agregat persepsi diri peserta, bukan diagnosis medis, finansial, atau psikologis. Gunakan sebagai bahan diskusi kelompok, bukan rujukan tunggal untuk keputusan individu.
++          </div>
+         </div>
+       )}
+     </div>
+diff --git a/app/src/screens/Result.jsx b/app/src/screens/Result.jsx
+index aabf646..90d802a 100644
+--- a/app/src/screens/Result.jsx
++++ b/app/src/screens/Result.jsx
+@@ -3,7 +3,7 @@ import { CHECKIN_DOMAINS } from '../data.js';
+ import { fetchPopulationStats, computeZ, zToLevel, MIN_POPULATION } from '../statsHelper.js';
+ 
+ function absoluteBand(p) {
+-  return p < 50 ? 'Perlu diperhatikan' : p < 65 ? 'Sedang dipersiapkan' : p < 80 ? 'Sudah cukup kuat' : 'Bisa terus dikembangkan';
++  return p < 50 ? 'Perlu Perhatian' : p < 65 ? 'Mulai Berkembang' : p < 80 ? 'Cukup Siap' : p < 90 ? 'Siap' : 'Sangat Siap';
+ }
+ 
+ export default function Result({ app }) {
+@@ -61,6 +61,9 @@ export default function Result({ app }) {
+       >
+         Aktifkan MAPAN Passport
+       </button>
++      <div style={{ marginTop: 18, padding: 16, borderRadius: 14, background: 'rgba(16,39,90,.05)', fontSize: 12.5, lineHeight: 1.6, color: 'rgba(16,39,90,.6)' }}>
++        <strong style={{ color: 'rgba(16,39,90,.8)' }}>Bukan nasihat medis, finansial, atau psikologis profesional.</strong> Ini murni gambaran persepsi diri (self-assessment) berdasarkan jawabanmu sendiri, sifatnya subjektif dan bisa berubah kapan saja. Jangan jadikan ini satu-satunya rujukan untuk keputusan kesehatan, keuangan, atau hidup yang penting — untuk itu, tetap konsultasikan ke dokter, perencana keuangan, atau profesional yang berwenang.
++      </div>
+     </div>
+   );
+ }
+diff --git a/app/src/store.js b/app/src/store.js
+index 0840faa..fc17d01 100644
+--- a/app/src/store.js
++++ b/app/src/store.js
+@@ -256,6 +256,7 @@ export function useJourney() {
+       mindland_score: s.mindland ?? null,
+       soulland_score: s.soulland ?? null,
+       sosial_score: s.sosial ?? null,
++      answers: d.initialAssessment.answers || null,
+       submitted_at: new Date().toISOString(),
+     }).then(() => {});
+   }, [session]);
+-- 
+2.43.0
+
