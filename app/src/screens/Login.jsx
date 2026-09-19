@@ -4,6 +4,7 @@ export default function Login({ app }) {
   const [mode, setMode] = useState('signup'); // 'signup' | 'signin'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [sentConfirm, setSentConfirm] = useState(false);
@@ -12,12 +13,26 @@ export default function Login({ app }) {
     if (!email || !password) { setError('Isi email dan kata sandi dulu ya.'); return; }
     setBusy(true);
     setError('');
-    const fn = mode === 'signup' ? app.signUp : app.signIn;
-    const err = await fn(email.trim(), password);
+    if (mode === 'signup') {
+      const res = await app.signUp(email.trim(), password);
+      setBusy(false);
+      if (res.error) { setError(res.error); return; }
+      if (res.session) {
+        // Email confirmation is off on this project -- the account is
+        // already active, no need to make them wait for an email.
+        app.setState({ screen: 'intro', params: {}, stack: [] });
+      } else {
+        setSentConfirm(true);
+      }
+      return;
+    }
+    const err = await app.signIn(email.trim(), password);
     setBusy(false);
     if (err) { setError(err); return; }
-    if (mode === 'signup') { setSentConfirm(true); return; }
-    app.go('intro');
+    // Jump straight to Intro with an empty stack (not app.go) so Login
+    // never sits in the back-history -- otherwise pressing back right
+    // after signing in would dump the user right back on this form.
+    app.setState({ screen: 'intro', params: {}, stack: [] });
   };
 
   return (
@@ -57,13 +72,22 @@ export default function Login({ app }) {
           </div>
           <div style={{ marginTop: 14 }}>
             <label style={{ fontSize: 13, fontWeight: 700, color: 'rgba(16,39,90,.7)' }}>Kata Sandi</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Minimal 6 karakter"
-              style={{ width: '100%', height: 52, marginTop: 6, padding: '0 16px', fontSize: 16, borderRadius: 14, border: '1px solid rgba(16,39,90,.18)', background: '#fff' }}
-            />
+            <div style={{ position: 'relative', marginTop: 6 }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Minimal 6 karakter"
+                style={{ width: '100%', height: 52, padding: '0 92px 0 16px', fontSize: 16, borderRadius: 14, border: '1px solid rgba(16,39,90,.18)', background: '#fff' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                style={{ position: 'absolute', right: 6, top: 6, bottom: 6, padding: '0 12px', borderRadius: 10, border: 'none', background: 'rgba(16,39,90,.06)', color: '#10275A', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
+              >
+                {showPassword ? 'Sembunyikan' : 'Lihat'}
+              </button>
+            </div>
           </div>
 
           {!!error && <div style={{ marginTop: 12, fontSize: 14, color: '#B3261E' }}>{error}</div>}

@@ -228,8 +228,9 @@ export function useJourney() {
   }, []);
 
   const signUp = useCallback(async (email, password) => {
-    const { error } = await supabase.auth.signUp({ email, password });
-    return error ? error.message : null;
+    const { data: res, error } = await supabase.auth.signUp({ email, password });
+    if (error) return { error: error.message };
+    return { session: !!res.session };
   }, []);
 
   const signIn = useCallback(async (email, password) => {
