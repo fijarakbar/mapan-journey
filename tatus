@@ -1,0 +1,10 @@
+[33m77adf48[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Remove backup/restore, add facilitator role
+[33m48ac3d4[m Lower threshold, align labels, add disclaimer and dashboard breakdown
+[33m5363225[m New checkin instrument, z-score levels, dashboard breakdown
+[33m9e19bca[m New 32-item checkin instrument with z-score levels
+[33m33abc6b[m Add Supabase backend
+[33m3f6cf39[m Remove fake phone mockup, make app full-bleed
+[33m96fc4be[m Add PWA manifest and app icon
+[33m438b448[m Apply latest fixes and terminal background mockup
+[33m5a1e758[m Fix sizing and contrast
+[33m6b5148f[m Add avatar picker, illustrations and icons

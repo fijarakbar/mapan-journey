@@ -1,0 +1,80 @@
+git apply signout-badge.patchFrom 104ae0544880a01f1422f8a85a0e0769b10c8d5e Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Fri, 18 Sep 2026 06:47:35 +0000
+Subject: [PATCH 1/2] Fix: sign out now actually clears local data/screen, not
+ just the session
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Previously onAuthStateChange only updated the session variable — the old
+user's data and current screen stayed exactly as they were, fully
+navigable, even with no valid session. Now a SIGNED_OUT event wipes the
+local cache, resets role, and bounces back to the Welcome screen.
+---
+ app/src/store.js | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/app/src/store.js b/app/src/store.js
+index eb6a15c..1d9939d 100644
+--- a/app/src/store.js
++++ b/app/src/store.js
+@@ -69,8 +69,20 @@ export function useJourney() {
+       setSession(s);
+       setAuthLoading(false);
+     });
+-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
++    const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
+       setSession(s);
++      if (event === 'SIGNED_OUT') {
++        // Wipe the local cache and bounce back to Welcome — otherwise the
++        // previous session's data/screen would still be sitting there,
++        // fully navigable, even though there's no longer a valid session.
++        const d = blank();
++        persist(d);
++        setData(d);
++        setScreen('welcome');
++        setParams({});
++        setStack([]);
++        setRole('participant');
++      }
+     });
+     return () => sub.subscription.unsubscribe();
+   }, []);
+-- 
+2.43.0
+
+
+From 3c8a9bd8fc5bc84ebb19495cf688565d8d6df882 Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Fri, 18 Sep 2026 06:55:23 +0000
+Subject: [PATCH 2/2] Add FASILITATOR badge next to name in Profil, shown only
+ when role is facilitator
+
+---
+ app/src/screens/Profil.jsx | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/app/src/screens/Profil.jsx b/app/src/screens/Profil.jsx
+index f379f20..de561a0 100644
+--- a/app/src/screens/Profil.jsx
++++ b/app/src/screens/Profil.jsx
+@@ -14,7 +14,14 @@ export default function Profil({ app }) {
+     <div style={{ padding: '14px 20px 28px' }}>
+       <h1 style={{ fontSize: 24, fontWeight: 800, letterSpacing: -0.4, margin: 0 }}>Profil</h1>
+       <div style={{ margin: '16px 0 0', padding: 18, borderRadius: 18, background: '#fff', border: '1px solid rgba(16,39,90,.10)' }}>
+-        <div style={{ fontSize: 19, fontWeight: 800 }}>{nama}</div>
++        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
++          <div style={{ fontSize: 19, fontWeight: 800 }}>{nama}</div>
++          {app.role === 'facilitator' && (
++            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: 0.5, color: '#10275A', background: '#E0A32A33', border: '1px solid #E0A32A88', padding: '3px 9px', borderRadius: 999 }}>
++              FASILITATOR
++            </span>
++          )}
++        </div>
+         <div style={{ fontSize: 15, color: 'rgba(16,39,90,.65)', marginTop: 4 }}>{profileMeta}</div>
+         <button onClick={() => app.go('passport')} style={{ width: '100%', height: 50, margin: '14px 0 0', borderRadius: 14, border: '1px solid rgba(16,39,90,.18)', background: '#FBF9F5', color: '#10275A', fontSize: 16, fontWeight: 700, cursor: 'pointer' }}>
+           Buka MAPAN Passport
+-- 
+2.43.0
+

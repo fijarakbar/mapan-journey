@@ -7,14 +7,21 @@ function toggleStyle(active) {
 export default function Profil({ app }) {
   const { data } = app;
   const nama = data.participantProfile.nama || 'Sahabat';
-  const profileMeta = [data.participantProfile.instansi, data.participantProfile.purna ? 'Purna tugas ' + data.participantProfile.purna : ''].filter(Boolean).join(' · ') || (app.session ? app.session.user.email : 'Belum masuk akun');
+  const profileMeta = [data.participantProfile.instansi, data.participantProfile.purna ? 'Purna tugas ' + data.participantProfile.purna : ''].filter(Boolean).join(' - ') || (app.session ? app.session.user.email : 'Belum masuk akun');
   const tsz = data.appPreferences.textSize;
 
   return (
     <div style={{ padding: '14px 20px 28px' }}>
       <h1 style={{ fontSize: 24, fontWeight: 800, letterSpacing: -0.4, margin: 0 }}>Profil</h1>
       <div style={{ margin: '16px 0 0', padding: 18, borderRadius: 18, background: '#fff', border: '1px solid rgba(16,39,90,.10)' }}>
-        <div style={{ fontSize: 19, fontWeight: 800 }}>{nama}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ fontSize: 19, fontWeight: 800 }}>{nama}</div>
+          {app.role === 'facilitator' && (
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: 0.5, color: '#10275A', background: '#E0A32A33', border: '1px solid #E0A32A88', padding: '3px 9px', borderRadius: 999 }}>
+              FASILITATOR
+            </span>
+          )}
+        </div>
         <div style={{ fontSize: 15, color: 'rgba(16,39,90,.65)', marginTop: 4 }}>{profileMeta}</div>
         <button onClick={() => app.go('passport')} style={{ width: '100%', height: 50, margin: '14px 0 0', borderRadius: 14, border: '1px solid rgba(16,39,90,.18)', background: '#FBF9F5', color: '#10275A', fontSize: 16, fontWeight: 700, cursor: 'pointer' }}>
           Buka MAPAN Passport
@@ -35,7 +42,7 @@ export default function Profil({ app }) {
             <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Program Next Chapter</span>
             <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.65)', marginTop: 3 }}>Informasi pendampingan lanjutan</span>
           </span>
-          <span style={{ fontSize: 22, color: 'rgba(16,39,90,.35)' }}>›</span>
+          <span style={{ fontSize: 22, color: 'rgba(16,39,90,.35)' }}>&gt;</span>
         </button>
         {app.role === 'facilitator' && (
           <button onClick={() => app.go('dashboard')} style={{ width: '100%', textAlign: 'left', padding: 18, borderRadius: 16, background: '#fff', border: '1px solid rgba(16,39,90,.14)', cursor: 'pointer', color: '#10275A', minHeight: 56, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -43,7 +50,7 @@ export default function Profil({ app }) {
               <span style={{ display: 'block', fontSize: 16, fontWeight: 800 }}>Dashboard Fasilitator</span>
               <span style={{ display: 'block', fontSize: 14, color: 'rgba(16,39,90,.65)', marginTop: 3 }}>Lihat hasil check-in seluruh peserta (live)</span>
             </span>
-            <span style={{ fontSize: 22, color: 'rgba(16,39,90,.35)' }}>›</span>
+            <span style={{ fontSize: 22, color: 'rgba(16,39,90,.35)' }}>&gt;</span>
           </button>
         )}
         {!!app.session && (
@@ -59,8 +66,8 @@ export default function Profil({ app }) {
       </div>
       <div style={{ fontSize: 14, lineHeight: 1.6, color: 'rgba(16,39,90,.6)', margin: '20px 0 0' }}>
         <div style={{ fontWeight: 700, color: '#10275A' }}>Tentang MAPAN</div>
-        MAPAN Journey membantu persiapan purna tugas melalui empat terminal kesiapan. {app.session ? 'Datamu tersimpan aman di cloud dan tersalin juga di perangkat ini.' : 'Data sementara tersimpan di perangkat ini — masuk akun supaya tersimpan di cloud.'}
-        <div style={{ marginTop: 8 }}>Versi Aplikasi {data.appVersion} · Powered by MDI</div>
+        MAPAN Journey membantu persiapan purna tugas melalui empat terminal kesiapan. {app.session ? 'Datamu tersimpan aman di cloud dan tersalin juga di perangkat ini.' : 'Data sementara tersimpan di perangkat ini -- masuk akun supaya tersimpan di cloud.'}
+        <div style={{ marginTop: 8 }}>Versi Aplikasi {data.appVersion} - Powered by MDI</div>
       </div>
       <div style={{ fontSize: 13, fontWeight: 600, color: '#1E8A4C', margin: '12px 0 0', height: 18 }}>{app.saved ? (app.session ? 'Tersimpan' : 'Tersimpan di perangkat') : ''}</div>
     </div>

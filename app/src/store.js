@@ -16,7 +16,7 @@ export function blank() {
     visaStatus: {},
     passportStamps: [],
     passportSummary: {},
-    nextChapter: { primary: null, secondary: [], plan: {} },
+    nextChapter: { primary: null, secondary: [], plan: {}, coachingRequested: false, ideas: {}, locked: false },
     ninetyDayPlan: { d30: [], d60: [], d90: [] },
     notes: [],
     reminders: [],
@@ -41,7 +41,7 @@ function persist(d) {
   try {
     localStorage.setItem(KEY, JSON.stringify(d));
   } catch (e) {
-    /* storage unavailable — journey stays in-memory only */
+    /* storage unavailable -- journey stays in-memory only */
   }
 }
 
@@ -59,6 +59,8 @@ export function useJourney() {
   const [session, setSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [role, setRole] = useState('participant');
+  const [packageTier, setPackageTier] = useState(null);
+  const [batchLocked, setBatchLocked] = useState(false);
   const savedTimer = useRef(null);
   const editBase = useRef(null);
   const syncTimer = useRef(null);
@@ -69,8 +71,18 @@ export function useJourney() {
       setSession(s);
       setAuthLoading(false);
     });
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s);
+      if (event === 'SIGNED_OUT') {
+        const d = blank();
+        persist(d);
+        setData(d);
+        setScreen('welcome');
+        setParams({});
+        setStack([]);
+        setRole('participant');
+        setPackageTier(null);
+      }
     });
     return () => sub.subscription.unsubscribe();
   }, []);
@@ -97,19 +109,28 @@ export function useJourney() {
   }, [session]);
 
   // Ensure a mapan_profiles row exists for this user (role defaults to
-  // 'participant' — facilitators are flagged manually via SQL after their
-  // account is created), and read back whatever role they actually have.
+  // 'participant' -- facilitators are flagged manually via SQL after their
+  // account is created), and read back their role + package tier (via
+  // whichever batch/instansi their profile is linked to, if any).
   useEffect(() => {
-    if (!session) { setRole('participant'); return; }
+    if (!session) { setRole('participant'); setPackageTier(null); return; }
     let cancelled = false;
     (async () => {
-      const { data: row } = await supabase.from('mapan_profiles').select('role').eq('id', session.user.id).maybeSingle();
+      const { data: row } = await supabase
+        .from('mapan_profiles')
+        .select('role, batch_id, mapan_batches(package, instansi, locked_at)')
+        .eq('id', session.user.id)
+        .maybeSingle();
       if (cancelled) return;
       if (row) {
         setRole(row.role || 'participant');
+        setPackageTier(row.mapan_batches ? row.mapan_batches.package : null);
+        setBatchLocked(!!(row.mapan_batches && row.mapan_batches.locked_at));
       } else {
         await supabase.from('mapan_profiles').insert({ id: session.user.id });
         setRole('participant');
+        setPackageTier(null);
+        setBatchLocked(false);
       }
     })();
     return () => { cancelled = true; };
@@ -178,7 +199,7 @@ export function useJourney() {
       if (data.visaStatus[t.id]) continue;
       for (let j = 0; j < 8; j++) {
         if (!resp(t.id, j).done) {
-          return { screen: 'module', params: { t: t.id, m: j }, label: t.nameTitle + ' · Modul ' + (j + 1) };
+          return { screen: 'module', params: { t: t.id, m: j }, label: t.nameTitle + ' - Modul ' + (j + 1) };
         }
       }
       return { screen: 'visaq', params: { t: t.id }, label: 'Visa ' + t.nameTitle };
@@ -237,6 +258,58 @@ export function useJourney() {
     }).then(() => {});
   }, [session]);
 
+  const joinBatch = useCallback(async (code) => {
+    if (!session || !code) return { error: 'Kode tidak boleh kosong.' };
+    const { data: batch } = await supabase.from('mapan_batches').select('id, instansi, package').eq('invite_code', code.trim().toUpperCase()).maybeSingle();
+    if (!batch) return { error: 'Kode undangan tidak ditemukan. Cek lagi ke HR/fasilitator.' };
+    await supabase.from('mapan_profiles').upsert({ id: session.user.id, batch_id: batch.id });
+    setPackageTier(batch.package);
+    return { instansi: batch.instansi, package: batch.package };
+  }, [session]);
+
+  const createBatch = useCallback(async (instansi, pkg) => {
+    if (!session) return { error: 'Belum login.' };
+    const slug = instansi.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) || 'BATCH';
+    const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
+    const code = `${slug}-${pkg.slice(0, 3).toUpperCase()}-${suffix}`;
+    const { data: row, error } = await supabase
+      .from('mapan_batches')
+      .insert({ instansi: instansi.trim(), package: pkg, invite_code: code, created_by: session.user.id })
+      .select()
+      .single();
+    if (error) return { error: error.message };
+    return { batch: row };
+  }, [session]);
+
+  const listBatches = useCallback(async () => {
+    const { data: rows } = await supabase.from('mapan_batches').select('*').order('created_at', { ascending: false });
+    return rows || [];
+  }, []);
+
+  const lockBatch = useCallback(async (batchId, lock) => {
+    const { error } = await supabase.from('mapan_batches').update({ locked_at: lock ? new Date().toISOString() : null }).eq('id', batchId);
+    return error ? { error: error.message } : { ok: true };
+  }, []);
+
+  const requestCoaching = useCallback(async () => {
+    if (!session) return { error: 'Belum login.' };
+    const { error } = await supabase.from('mapan_profiles').update({ coaching_requested_at: new Date().toISOString() }).eq('id', session.user.id);
+    if (error) return { error: error.message };
+    return { ok: true };
+  }, [session]);
+
+  // Sync the participant's chosen archetype + specific idea picks to a
+  // facilitator-readable row, mirroring the checkin-results pattern.
+  const syncArchetypeChoice = useCallback((nc) => {
+    if (!session) return;
+    supabase.from('mapan_profiles').update({
+      primary_archetype: nc.primary,
+      secondary_archetypes: nc.secondary,
+      archetype_ideas: nc.ideas,
+    }).eq('id', session.user.id).then(() => {});
+  }, [session]);
+
+
   return {
     data,
     screen,
@@ -250,10 +323,18 @@ export function useJourney() {
     session,
     authLoading,
     role,
+    packageTier,
+    batchLocked,
     signUp,
     signIn,
     signOut,
     syncCheckinResult,
+    joinBatch,
+    createBatch,
+    listBatches,
+    lockBatch,
+    requestCoaching,
+    syncArchetypeChoice,
     upd,
     go,
     back,
